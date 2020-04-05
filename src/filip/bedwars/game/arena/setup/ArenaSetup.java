@@ -8,13 +8,14 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 
 import filip.bedwars.game.arena.Arena;
-import filip.bedwars.game.arena.Spawner;
 import filip.bedwars.inventory.ClickableInventory;
 import filip.bedwars.inventory.IClickable;
 import filip.bedwars.inventory.ItemBuilder;
 import filip.bedwars.inventory.UsableItem;
+import filip.bedwars.utils.TeamColorConverter;
 
 public class ArenaSetup {
 
@@ -46,33 +47,30 @@ public class ArenaSetup {
 				switch (slot) {
 				case (9 + 2): // Bronze
 					{
-						Spawner spawner = new SpawnerBuilder()
+						new SpawnerBuilder()
 								.setItem(Material.BRICK)
 								.setItemName("Bronze")
-								.setTicksPerSpawn(10)
-								.build();
+								.setTicksPerSpawn(10);
 						
 						addSpawner();
 					}
 					break;
 				case (9 + 4): // Eisen
 					{
-						Spawner spawner = new SpawnerBuilder()
+						new SpawnerBuilder()
 								.setItem(Material.IRON_INGOT)
 								.setItemName("Eisen")
-								.setTicksPerSpawn(40)
-								.build();
+								.setTicksPerSpawn(40);
 				
 						addSpawner();
 					}
 					break;
 				case (9 + 6): // Gold
 					{
-						Spawner spawner = new SpawnerBuilder()
+						new SpawnerBuilder()
 								.setItem(Material.GOLD_INGOT)
 								.setItemName("Gold")
-								.setTicksPerSpawn(100)
-								.build();
+								.setTicksPerSpawn(100);
 				
 						addSpawner();
 					}
@@ -82,49 +80,91 @@ public class ArenaSetup {
 			}
 		};
 		
+		// Do the following when an item with the custom name is right clicked on a block:
+		// Set the location of the spawner to the blocks' position through the spawnerBuilder.
+		// Open an inventory menu to select the spawner type.
 		new UsableItem(new ItemBuilder().setName("§rSpawner").setMaterial(Material.SPAWNER).build()) {
 			
 			@Override
-			public void use(@NotNull PlayerInteractEvent event) {
-				if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-					Block clickedBlock = event.getClickedBlock();
-					
-					if (clickedBlock != null) {
-						spawnerBuilder.setLocation(clickedBlock.getLocation());
-						Player player = event.getPlayer();
-						player.openInventory(spawnerSelector.getInventory());
-					}
+			public void use(@NotNull PlayerInteractEvent event) {}
+
+			@Override
+			public void place(@NotNull BlockPlaceEvent event) {
+				Block block = event.getBlockPlaced();
+				
+				if (block != null) {
+					spawnerBuilder.setLocation(block.getLocation());
+					Player player = event.getPlayer();
+					player.openInventory(spawnerSelector.getInventory());
 				}
 			}
 		};
 		
-		
-		
-		
-		new UsableItem(new ItemBuilder().setName("§rShop").setMaterial(Material.EMERALD_BLOCK).build()) {
+		// Do the following when an item with the custom name is right clicked on a block:
+		// Set the item shop of the base at the blocks' position through the baseBuilder.
+		new UsableItem(new ItemBuilder().setName("§rItem Shop").setMaterial(Material.EMERALD_BLOCK).build()) {
 			
 			@Override
-			public void use(@NotNull PlayerInteractEvent event) {
-				if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-					Block clickedBlock = event.getClickedBlock();
-					
-					if (clickedBlock != null)
-						baseBuilder.setItemShop(clickedBlock.getLocation());
-				}
+			public void use(@NotNull PlayerInteractEvent event) {}
+
+			@Override
+			public void place(@NotNull BlockPlaceEvent event) {
+				Block block = event.getBlockPlaced();
+				
+				if (block != null)
+					baseBuilder.setItemShop(block.getLocation());
 			}
 		};
 		
+		// Do the following when an item with the custom name is right clicked on a block:
+		// Set the team shop of the base at the blocks' position through the baseBuilder.
+		new UsableItem(new ItemBuilder().setName("§rTeam Shop").setMaterial(Material.DIAMOND_BLOCK).build()) {
+			
+			@Override
+			public void use(@NotNull PlayerInteractEvent event) {}
+
+			@Override
+			public void place(@NotNull BlockPlaceEvent event) {
+				Block block = event.getBlockPlaced();
+				
+				if (block != null)
+					baseBuilder.setTeamShop(block.getLocation());
+			}
+		};
 		
+		// Do the following when an item with the custom name is right clicked on a block:
+		// Set the spawn of the base at the blocks' position through the baseBuilder.
 		new UsableItem(new ItemBuilder().setName("§rSpawn").setMaterial(Material.BEACON).build()) {
 			
 			@Override
+			public void use(@NotNull PlayerInteractEvent event) {}
+
+			@Override
+			public void place(@NotNull BlockPlaceEvent event) {
+				Block block = event.getBlockPlaced();
+				
+				if (block != null)
+					baseBuilder.setSpawn(block.getLocation());
+			}
+		};
+		
+		// Do the following when an item with the custom name is right clicked:
+		// Set the team color of the base by checking the wool color the player is holding.
+		// Build a base with base builder.
+		// Add it to arenaBuilder.
+		// Create a new BaseBuilder.
+		new UsableItem(new ItemBuilder().setName("§rCreate Base").setMaterial(Material.WHITE_WOOL).build()) {
+			
+			@Override
 			public void use(@NotNull PlayerInteractEvent event) {
-				if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-					Block clickedBlock = event.getClickedBlock();
-					
-					if (clickedBlock != null)
-						baseBuilder.setSpawn(clickedBlock.getLocation());
+				if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+					baseBuilder.setTeamColor(TeamColorConverter.convertMaterialToTeamColor(event.getItem().getType()));
+					addBase();
 				}
+			}
+
+			@Override
+			public void place(@NotNull BlockPlaceEvent event) {
 			}
 		};
 	}

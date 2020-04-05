@@ -1,5 +1,6 @@
 package filip.bedwars.inventory;
 
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -26,6 +27,14 @@ public interface IUsable {
      * @param playerWrapper
      */
 	void use(PlayerInteractEvent event);
+	
+	/**
+     * Called when the block is placed
+     *
+     * @param event
+     * @param playerWrapper
+     */
+	void place(BlockPlaceEvent event);
 	
 	/**
 	 * Register the usable.
