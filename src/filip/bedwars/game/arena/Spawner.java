@@ -3,6 +3,7 @@ package filip.bedwars.game.arena;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.inventory.ItemBuilder;
 
@@ -13,7 +14,7 @@ public class Spawner {
     
     private int currentTick;
     
-    public Spawner(Location location, int ticksPerSpawn, Material material, String name) {
+    public Spawner(@NotNull Location location, int ticksPerSpawn, Material material,@NotNull String name) {
     	this.location = location;
     	this.ticksPerSpawn = ticksPerSpawn;
     	this.itemStack = new ItemBuilder()

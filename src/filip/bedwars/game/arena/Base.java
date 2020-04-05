@@ -1,6 +1,7 @@
 package filip.bedwars.game.arena;
 
 import org.bukkit.Location;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.TeamColor;
 
@@ -8,7 +9,7 @@ public class Base {
 	private final Location spawn, itemShop, teamShop, bedTop, bedBottom;
 	private final TeamColor teamColor;
 	
-	public Base(Location spawn, Location itemShop, Location teamShop, Location bedTop, Location bedBottom, TeamColor teamColor) {
+	public Base(@NotNull Location spawn,@NotNull Location itemShop,@NotNull Location teamShop,@NotNull Location bedTop,@NotNull Location bedBottom,@NotNull TeamColor teamColor) {
 		this.spawn = spawn;
 		this.itemShop = itemShop;
 		this.teamShop = teamShop;

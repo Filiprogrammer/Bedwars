@@ -17,8 +17,8 @@ public class SpawnerBuilder {
 		return this;
 	}
 	
-	public SpawnerBuilder setTicks(int ticks) {
-		ticksPerSpawn = ticks;
+	public SpawnerBuilder setTicksPerSpawn(int ticksPerSpawn) {
+		this.ticksPerSpawn = ticksPerSpawn;
 		return this;
 	}
 	

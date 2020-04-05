@@ -8,6 +8,12 @@ import filip.bedwars.BedwarsPlugin;
 
 public interface IClickable {
 	/**
+	 * Get the inventory.
+	 * @return
+	 */
+	Inventory getInventory();
+	
+	/**
      * Gets whether the inventory matches the parameter
      *
      * @param inventory

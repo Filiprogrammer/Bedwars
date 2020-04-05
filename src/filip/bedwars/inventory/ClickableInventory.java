@@ -18,6 +18,11 @@ public abstract class ClickableInventory implements IClickable {
     }
 	
 	@Override
+	public Inventory getInventory() {
+		return inventory;
+	}
+	
+	@Override
     public boolean matches(Inventory inventory, Player player) {
         return inventoryGetTitle(this.inventory).equals(inventoryGetTitle(inventory));
     }
