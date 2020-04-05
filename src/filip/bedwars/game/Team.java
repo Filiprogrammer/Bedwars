@@ -3,6 +3,8 @@ package filip.bedwars.game;
 import java.util.List;
 import java.util.UUID;
 
+import org.jetbrains.annotations.NotNull;
+
 import filip.bedwars.game.arena.Base;
 
 public class Team {
@@ -10,7 +12,7 @@ public class Team {
     private final Base base;
     private final List<UUID> members;
     
-    public Team(int id, Base base, List<UUID> members) {
+    public Team(int id, @NotNull Base base, @NotNull List<UUID> members) {
         this.id = id;
         this.base = base;
         this.members = members;
@@ -24,11 +26,11 @@ public class Team {
     	return base;
     }
     
-    public void addMember(UUID uuid) {
+    public void addMember(@NotNull UUID uuid) {
     	members.add(uuid);
     }
     
-    public void removeMember(UUID uuid) {
+    public void removeMember(@NotNull UUID uuid) {
     	members.remove(uuid);
     }
     

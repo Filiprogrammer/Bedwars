@@ -1,6 +1,7 @@
 package filip.bedwars.game.arena.setup;
 
 import org.bukkit.Location;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.TeamColor;
 import filip.bedwars.game.arena.Base;
@@ -9,32 +10,32 @@ public class BaseBuilder {
 	private Location spawn, itemShop, teamShop, bedTop, bedBottom;
 	private TeamColor teamColor;
 
-	public BaseBuilder setSpawn(Location spawn) {
+	public BaseBuilder setSpawn(@NotNull Location spawn) {
 		this.spawn = spawn;
 		return this;
 	}
 
-	public BaseBuilder setItemShop(Location itemShop) {
+	public BaseBuilder setItemShop(@NotNull Location itemShop) {
 		this.itemShop = itemShop;
 		return this;
 	}
 
-	public BaseBuilder setTeamShop(Location teamShop) {
+	public BaseBuilder setTeamShop(@NotNull Location teamShop) {
 		this.teamShop = teamShop;
 		return this;
 	}
 
-	public BaseBuilder setBedTop(Location bedTop) {
+	public BaseBuilder setBedTop(@NotNull Location bedTop) {
 		this.bedTop = bedTop;
 		return this;
 	}
 
-	public BaseBuilder setBedBottom(Location bedBottom) {
+	public BaseBuilder setBedBottom(@NotNull Location bedBottom) {
 		this.bedTop = bedBottom;
 		return this;
 	}
 
-	public BaseBuilder setTeamColor(TeamColor teamColor) {
+	public BaseBuilder setTeamColor(@NotNull TeamColor teamColor) {
 		this.teamColor = teamColor;
 		return this;
 	}

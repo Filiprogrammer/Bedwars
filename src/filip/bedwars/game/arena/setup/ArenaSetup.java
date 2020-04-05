@@ -6,6 +6,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.jetbrains.annotations.NotNull;
 import org.bukkit.event.block.Action;
 
 import filip.bedwars.game.arena.Arena;
@@ -21,10 +22,11 @@ public class ArenaSetup {
 	BaseBuilder baseBuilder;
 	ArenaBuilder arenaBuilder;
 	
-	public ArenaSetup() {
+	public ArenaSetup(@NotNull String mapName) {
 		spawnerBuilder = new SpawnerBuilder();
 		baseBuilder = new BaseBuilder();
 		arenaBuilder = new ArenaBuilder();
+		arenaBuilder.setMapName(mapName);
 		
 		// TODO: Read stuff like spawner ticks and item names from config files
 		// TODO: Add localizations
@@ -38,9 +40,8 @@ public class ArenaSetup {
 			}
 			
 			@Override
-			public void click(InventoryClickEvent event) {
+			public void click(@NotNull InventoryClickEvent event) {
 				int slot = event.getSlot();
-				Player player = (Player) event.getWhoClicked();
 				
 				switch (slot) {
 				case (9 + 2): // Bronze
@@ -51,7 +52,7 @@ public class ArenaSetup {
 								.setTicksPerSpawn(10)
 								.build();
 						
-						arenaBuilder.addSpawner(spawner);
+						addSpawner();
 					}
 					break;
 				case (9 + 4): // Eisen
@@ -62,7 +63,7 @@ public class ArenaSetup {
 								.setTicksPerSpawn(40)
 								.build();
 				
-						arenaBuilder.addSpawner(spawner);
+						addSpawner();
 					}
 					break;
 				case (9 + 6): // Gold
@@ -73,7 +74,7 @@ public class ArenaSetup {
 								.setTicksPerSpawn(100)
 								.build();
 				
-						arenaBuilder.addSpawner(spawner);
+						addSpawner();
 					}
 					break;
 				}
@@ -84,7 +85,7 @@ public class ArenaSetup {
 		new UsableItem(new ItemBuilder().setName("§rSpawner").setMaterial(Material.SPAWNER).build()) {
 			
 			@Override
-			public void use(PlayerInteractEvent event) {
+			public void use(@NotNull PlayerInteractEvent event) {
 				if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 					Block clickedBlock = event.getClickedBlock();
 					
@@ -96,10 +97,50 @@ public class ArenaSetup {
 				}
 			}
 		};
+		
+		
+		
+		
+		new UsableItem(new ItemBuilder().setName("§rShop").setMaterial(Material.EMERALD_BLOCK).build()) {
+			
+			@Override
+			public void use(@NotNull PlayerInteractEvent event) {
+				if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+					Block clickedBlock = event.getClickedBlock();
+					
+					if (clickedBlock != null)
+						baseBuilder.setItemShop(clickedBlock.getLocation());
+				}
+			}
+		};
+		
+		
+		new UsableItem(new ItemBuilder().setName("§rSpawn").setMaterial(Material.BEACON).build()) {
+			
+			@Override
+			public void use(@NotNull PlayerInteractEvent event) {
+				if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+					Block clickedBlock = event.getClickedBlock();
+					
+					if (clickedBlock != null)
+						baseBuilder.setSpawn(clickedBlock.getLocation());
+				}
+			}
+		};
+	}
+	
+	public void addBase() {
+		arenaBuilder.addBase(baseBuilder.build());
+		baseBuilder = new BaseBuilder();
+	}
+	
+	public void addSpawner() {
+		arenaBuilder.addSpawner(spawnerBuilder.build());
+		spawnerBuilder = new SpawnerBuilder();
 	}
 	
 	public Arena finish() {
-		
+		return arenaBuilder.build();
 	}
 	
 }

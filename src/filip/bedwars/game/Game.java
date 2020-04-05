@@ -2,6 +2,8 @@ package filip.bedwars.game;
 
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
+
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.lobby.Lobby;
 
@@ -12,7 +14,7 @@ public class Game {
 	private GameState gameState;
 	private List<Team> teams;
 	
-	public Game(Arena arena, Lobby lobby, List<Team> teams) {
+	public Game(@NotNull Arena arena, @NotNull Lobby lobby, @NotNull List<Team> teams) {
 		this.arena = arena;
 		this.lobby = lobby;
 		this.teams = teams;

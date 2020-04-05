@@ -2,6 +2,7 @@ package filip.bedwars.game.arena.setup;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.arena.Spawner;
 
@@ -12,7 +13,7 @@ public class SpawnerBuilder {
 	private Material item;
 	private String itemName;
 	
-	public SpawnerBuilder setLocation(Location location) {
+	public SpawnerBuilder setLocation(@NotNull Location location) {
 		loc = location;
 		return this;
 	}
@@ -22,12 +23,12 @@ public class SpawnerBuilder {
 		return this;
 	}
 	
-	public SpawnerBuilder setItem(Material item) {
+	public SpawnerBuilder setItem(@NotNull Material item) {
 		this.item = item;
 		return this;
 	}
 	
-	public SpawnerBuilder setItemName(String name) {
+	public SpawnerBuilder setItemName(@NotNull String name) {
 		this.itemName = name;
 		return this;
 	}
