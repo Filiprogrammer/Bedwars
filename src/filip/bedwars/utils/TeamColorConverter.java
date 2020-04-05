@@ -6,6 +6,11 @@ import filip.bedwars.game.TeamColor;
 
 public class TeamColorConverter {
 	
+	/**
+	 * If you input a colored Wool Block you will get the TeamColor-Enum returned
+	 * @param material The wool block that is going to be converted
+	 * @return TeamColor enum; default return value is TeamColor.RED
+	 */
 	public static TeamColor convertMaterialToTeamColor(Material material) {
 		String materialString = material.toString();
 		

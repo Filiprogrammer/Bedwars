@@ -1,0 +1,7 @@
+buy-item: ENTITY_PLAYER_BURP
+cant-afford-item: ENTITY_VILLAGER_NO
+arena-setup: BLOCK_NOTE_BLOCK_DIDGERIDOO
+bed-destroyed: ENTITY_WITHER_DEATH
+boomball-shoot: ENTITY_WITHER_SHOOT
+countdown-tick: BLOCK_STONE_BUTTON_CLICK_OFF
+error: BLOCK_FIRE_EXTINGUISH

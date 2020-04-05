@@ -33,6 +33,10 @@ public class SpawnerBuilder {
 		return this;
 	}
 	
+	public String getItemName() {
+		return itemName;
+	}
+	
 	public Spawner build() {
 		return new Spawner(loc, ticksPerSpawn, item, itemName);
 	}

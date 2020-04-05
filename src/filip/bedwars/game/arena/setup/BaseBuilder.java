@@ -39,6 +39,10 @@ public class BaseBuilder {
 		this.teamColor = teamColor;
 		return this;
 	}
+	
+	public TeamColor getTeamColor() {
+		return teamColor;
+	}
 
 	public Base build() {
 		return new Base(spawn, itemShop, teamShop, bedTop, bedBottom, teamColor);
