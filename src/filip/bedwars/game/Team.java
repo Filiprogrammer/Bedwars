@@ -3,18 +3,16 @@ package filip.bedwars.game;
 import java.util.List;
 import java.util.UUID;
 
-import org.bukkit.ChatColor;
+import filip.bedwars.game.arena.Base;
 
 public class Team {
     private final int id;
-	private final TeamColor dyeColor;
-    private final ChatColor chatColor;
+    private final Base base;
     private final List<UUID> members;
     
-    public Team(int id, TeamColor dyeColor, ChatColor chatColor, List<UUID> members) {
+    public Team(int id, Base base, List<UUID> members) {
         this.id = id;
-        this.dyeColor = dyeColor;
-        this.chatColor = chatColor;
+        this.base = base;
         this.members = members;
     }
     
@@ -22,12 +20,8 @@ public class Team {
     	return id;
     }
     
-    public TeamColor getDyeColor() {
-    	return dyeColor;
-    }
-    
-    public ChatColor getChatColor() {
-    	return chatColor;
+    public Base getBase() {
+    	return base;
     }
     
     public void addMember(UUID uuid) {

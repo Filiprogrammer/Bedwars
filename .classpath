@@ -8,5 +8,11 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="E:/BukkitModdingLibrary/Spigot-API-1.14.4-94af569-20190911-0820.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Marcel/Downloads/Spigot-API-1.14.4-94af569-20190911-0820.jar"/>
+	<classpathentry kind="lib" path="D:/Johannes/Privat/dev/Spigot-API-1.14.4-94af569-20190911-0820.jar"/>
+	<classpathentry kind="lib" path="E:/Java-Libraries/annotations-16.0.2.jar"/>
+	<classpathentry kind="lib" path="E:/___testserver/cache/patched_1.14.4.jar"/>
+	<classpathentry kind="lib" path="D:/Johannes/Privat/dev/annotations-16.0.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Marcel/Downloads/annotations-16.0.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Marcel/Downloads/patched_1.14.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

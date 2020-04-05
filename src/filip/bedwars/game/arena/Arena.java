@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
 
 public class Arena {
 	
@@ -11,17 +12,14 @@ public class Arena {
 	private List<Base> bases = new ArrayList<Base>();
 	private final String mapName;	
 	private World world;
-	
-	public Arena(String mapName, List<Spawner> spawner, List<Base> bases) {
+
+	public Arena(@NotNull String mapName, @NotNull List<Spawner> spawner, @NotNull List<Base> bases) {
 		this.spawner = spawner;
 		this.bases = bases;
 		this.mapName = mapName;
 		
-		
-		if(this.bases.size() >= 1) {
-			this.world = this.bases.get(0).getSpawn().getWorld(); //Sets the world as the first base spawn point
-		}
-		
+		if(this.bases.size() >= 1)
+			this.world = this.bases.get(0).getSpawn().getWorld(); // Set the world of the arena
 	}
 	
 	public Base getBase(int id) {
