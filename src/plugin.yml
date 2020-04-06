@@ -1,5 +1,5 @@
 name: Bedwars
 version: 1.0
 author: Filiprogrammer
-main: filip.bedwars
+main: filip.bedwars.BedwarsPlugin
 api-version: 1.13

@@ -3,8 +3,10 @@ package filip.bedwars.config;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import filip.bedwars.game.arena.Arena;
+import filip.bedwars.utils.ArenaSerializer;
 
 public class ArenaConfig extends SingleConfig {
 
@@ -57,7 +59,12 @@ private static ArenaConfig instance = null;
 	public boolean saveConfig() {
 		createAndLoadConfigFileIfNotExistent(true);
 		
-		config.set("arenas", arenas);
+		List<Map<String, Object>> serializedArenas = new ArrayList<Map<String, Object>>();
+		
+		for (Arena arena : arenas)
+			serializedArenas.add(ArenaSerializer.serializeArena(arena));
+		
+		config.set("arenas", serializedArenas);
 		
 		try {
 			config.save(configFile);
