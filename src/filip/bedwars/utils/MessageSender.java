@@ -3,7 +3,9 @@ package filip.bedwars.utils;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
+import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
 
 public class MessageSender {
@@ -14,7 +16,15 @@ public class MessageSender {
 	 * @param msg Message that should be sent
 	 */
 	public static void sendMessage(CommandSender sendTo, String msg) {
-		sendTo.sendMessage(MessagesConfig.getInstance().getStringValue("prefix") + msg);
+		String locale;
+		
+		if (sendTo instanceof Player) {
+			locale = ((Player)sendTo).getLocale();
+		} else {
+			locale = MainConfig.getInstance().getLanguage();
+		}
+		
+		sendTo.sendMessage(MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg);
 	}
 	
 	/**
@@ -24,7 +34,15 @@ public class MessageSender {
 	 */
 	public static void sendMessage(List<CommandSender> receivers, String msg) {
 		for(CommandSender cs : receivers) {
-			cs.sendMessage(MessagesConfig.getInstance().getStringValue("prefix") + msg);
+			String locale;
+			
+			if (cs instanceof Player) {
+				locale = ((Player)cs).getLocale();
+			} else {
+				locale = MainConfig.getInstance().getLanguage();
+			}
+			
+			cs.sendMessage(MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg);
 		}
 		
 	}

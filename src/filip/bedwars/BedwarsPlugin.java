@@ -59,6 +59,10 @@ public class BedwarsPlugin extends JavaPlugin {
     	clickables.add(clickable);
     }
     
+    public void removeClickable(IClickable clickable) {
+    	clickables.remove(clickable);
+    }
+    
     /**
      * Get a usable.
      *
@@ -77,6 +81,10 @@ public class BedwarsPlugin extends JavaPlugin {
     
     public void addUsable(IUsable usable) {
     	usables.add(usable);
+    }
+    
+    public void removeUsable(IUsable usable) {
+    	usables.remove(usable);
     }
 	
 }
