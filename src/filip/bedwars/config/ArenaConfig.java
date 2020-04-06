@@ -6,7 +6,7 @@ import java.util.List;
 
 import filip.bedwars.game.arena.Arena;
 
-public class ArenaConfig extends Config {
+public class ArenaConfig extends SingleConfig {
 
 private static ArenaConfig instance = null;
 	

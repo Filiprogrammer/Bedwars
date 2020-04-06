@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.bukkit.Sound;
 
-public class SoundsConfig extends Config {
+public class SoundsConfig extends SingleConfig {
 
 	private static SoundsConfig instance = null;
 	

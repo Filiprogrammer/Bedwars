@@ -7,12 +7,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import filip.bedwars.BedwarsPlugin;
 
-public abstract class Config {
-	private String configFileName;
+public abstract class SingleConfig implements IConfig {
+	
+	private String configFileName = null;
 	protected File configFile = null;
 	protected YamlConfiguration config = null;
 	
-	protected Config(String configFileName) {
+	protected SingleConfig(String configFileName) {
 		this.configFileName = configFileName;
 	}
 	
@@ -22,6 +23,7 @@ public abstract class Config {
 		if (!dataFolder.exists())
 			dataFolder.mkdir();
 		
+		// Only one config file is used
 		if (configFile == null)
 			configFile = new File(BedwarsPlugin.getInstance().getDataFolder(), configFileName);
 		
@@ -41,4 +43,5 @@ public abstract class Config {
 		
 		return true;
 	}
+	
 }
