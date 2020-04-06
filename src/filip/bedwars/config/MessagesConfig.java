@@ -3,15 +3,16 @@ package filip.bedwars.config;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MessagesConfig {
+public class MessagesConfig extends Config {
 
 	private static MessagesConfig instance = null;
 	
 	private Map<String, String> stringValues = new HashMap<String, String>();
 	
 	private MessagesConfig() {
-		// TODO: load config files
-		// TODO: if file doesn't exist generate default config
+		// TODO: add a MainConfig class and get the language from that class
+		super("messages-en.yml");
+		reloadConfigFile();
 	}
 	
 	public String getStringValue(String key) {
@@ -27,6 +28,15 @@ public class MessagesConfig {
 			instance = new MessagesConfig();
 		
 		return instance;
+	}
+	
+	public void reloadConfigFile() {
+		// TODO: load config files
+		// TODO: if file doesn't exist generate default config
+	}
+	
+	private void saveConfigFile() {
+		// TODO: Ahjo
 	}
 
 }

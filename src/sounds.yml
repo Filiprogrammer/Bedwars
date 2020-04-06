@@ -1,3 +1,5 @@
+# If you do not want a certain sound to play at all, just remove the corresponding entry or comment it out.
+
 buy-item: ENTITY_PLAYER_BURP
 cant-afford-item: ENTITY_VILLAGER_NO
 arena-setup: BLOCK_NOTE_BLOCK_DIDGERIDOO

@@ -1,19 +1,21 @@
 package filip.bedwars.config;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Sound;
 
-public class SoundsConfig {
+public class SoundsConfig extends Config {
 
 	private static SoundsConfig instance = null;
 	
 	private Map<String, Sound> soundValues = new HashMap<String, Sound>();
 	
 	private SoundsConfig() {
-		// TODO: load config files
-		// TODO: if file doesn't exist generate default config
+		super("sounds.yml");
+		reloadConfig();
 	}
 	
 	public Sound getSoundValue(String key) {
@@ -21,7 +23,7 @@ public class SoundsConfig {
 	}
 	
 	public void setSoundValue(String key, Sound value) {
-		// TODO Ahjo
+		soundValues.put(key, value);
 	}
 	
 	public static SoundsConfig getInstance() {
@@ -29,6 +31,35 @@ public class SoundsConfig {
 			instance = new SoundsConfig();
 		
 		return instance;
+	}
+	
+	public boolean saveConfig() {
+		if (!createAndLoadConfigFileIfNotExistent(true))
+			return false;
+		
+		Set<String> keys = soundValues.keySet();
+		
+		for (String key : keys)
+			config.set(key, soundValues.get(key).toString());
+		
+		try {
+			config.save(configFile);
+		} catch (IOException e) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public void reloadConfig() {
+		createAndLoadConfigFileIfNotExistent(false);
+		
+		Set<String> keys = config.getKeys(false);
+		
+		for (String key : keys) {
+			Sound sound = Sound.valueOf(config.getString(key));
+			soundValues.put(key, sound);
+		}
 	}
 
 }

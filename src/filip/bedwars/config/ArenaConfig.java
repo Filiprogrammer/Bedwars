@@ -1,19 +1,20 @@
 package filip.bedwars.config;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import filip.bedwars.game.arena.Arena;
 
-public class ArenaConfig {
+public class ArenaConfig extends Config {
 
 private static ArenaConfig instance = null;
 	
 	List<Arena> arenas = new ArrayList<Arena>();
 	
 	private ArenaConfig() {
-		// TODO: load config files
-		// TODO: if file doesn't exist generate default config
+		super("arenas.yml");
+		reloadConfig();
 	}
 
 	public Arena getArena(String mapName) {
@@ -43,12 +44,28 @@ private static ArenaConfig instance = null;
 		return instance;
 	}
 	
-	private void updateConfigFile() {
-		// TODO: Ahjo
+	@SuppressWarnings("unchecked")
+	public void reloadConfig() {
+		createAndLoadConfigFileIfNotExistent(true);
+		
+		if (config.isList("arenas"))
+			arenas = (List<Arena>) config.getList("arenas");
+		else
+			arenas = new ArrayList<Arena>();
 	}
 	
-	private void reloadConfigFile() {
-		// TODO: Ahjo
+	public boolean saveConfig() {
+		createAndLoadConfigFileIfNotExistent(true);
+		
+		config.set("arenas", arenas);
+		
+		try {
+			config.save(configFile);
+		} catch (IOException e) {
+			return false;
+		}
+		
+		return true;
 	}
 
 }
