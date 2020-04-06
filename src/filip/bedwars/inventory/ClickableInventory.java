@@ -4,11 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftInventory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-
-import net.minecraft.server.v1_14_R1.IInventory;
 
 public abstract class ClickableInventory implements IClickable {
 	protected final Inventory inventory;
@@ -33,12 +30,18 @@ public abstract class ClickableInventory implements IClickable {
 	 * @return
 	 */
 	private String inventoryGetTitle(Inventory inv) {
-		// TODO: Use reflections for everything
-		
 		try {
-			Class<?> minecraftInventoryClass = Class.forName("org.bukkit.craftbukkit." + Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3] + ".inventory.CraftInventoryCustom.MinecraftInventory");
-			CraftInventory cinv = (CraftInventory) inv;
-			IInventory iinv = cinv.getInventory();
+			String versionStr = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+			
+			Class<?> minecraftInventoryClass = Class.forName("org.bukkit.craftbukkit." + versionStr + ".inventory.CraftInventoryCustom.MinecraftInventory");
+			Class<?> craftInventoryClass = Class.forName("org.bukkit.craftbukkit." + versionStr + ".inventory.CraftInventory");
+			Method getInventoryMethod = craftInventoryClass.getMethod("getInventory");
+			
+			// CraftInventory cinv = (CraftInventory) inv;
+			Object cinv = craftInventoryClass.cast(inv);
+			
+			// IInventory iinv = cinv.getInventory();
+			Object iinv = getInventoryMethod.invoke(cinv);
 			
 			Object minv = minecraftInventoryClass.cast(iinv);
 			Method getTitleMethod = minecraftInventoryClass.getMethod("getTitle");
