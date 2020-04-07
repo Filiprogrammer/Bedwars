@@ -9,14 +9,18 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import filip.bedwars.commands.AddArenaCommand;
+import filip.bedwars.commands.FinishArenaCommand;
 import filip.bedwars.commands.HelpCommand;
 import filip.bedwars.commands.ICommand;
 import filip.bedwars.config.ArenaConfig;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.setup.ArenaSetup;
 import filip.bedwars.inventory.IClickable;
+import filip.bedwars.inventory.IPlacable;
 import filip.bedwars.inventory.IUsable;
 import filip.bedwars.listener.inventory.InventoryClickListener;
+import filip.bedwars.listener.player.BlockPlaceListener;
+import filip.bedwars.listener.player.PlayerInteractListener;
 
 public class BedwarsPlugin extends JavaPlugin {
 
@@ -24,6 +28,7 @@ public class BedwarsPlugin extends JavaPlugin {
 	
 	private List<IClickable> clickables;
 	private List<IUsable> usables;
+	private List<IPlacable> placables;
 	private List<ICommand> commands;
 	private ICommand helpCommand;
 	private List<ArenaSetup> arenaSetups;
@@ -34,12 +39,16 @@ public class BedwarsPlugin extends JavaPlugin {
 		
 		clickables = new ArrayList<IClickable>();
 		usables = new ArrayList<IUsable>();
+		placables = new ArrayList<IPlacable>();
 		commands = new ArrayList<ICommand>();
 		arenaSetups = new ArrayList<ArenaSetup>();
 		
+		new PlayerInteractListener(this);
+		new BlockPlaceListener(this);
 		new InventoryClickListener(this);
 		new BedwarsCommandExecutor(this);
 		commands.add(new AddArenaCommand());
+		commands.add(new FinishArenaCommand());
 		helpCommand = new HelpCommand();
 	}
 	
@@ -98,6 +107,24 @@ public class BedwarsPlugin extends JavaPlugin {
     
     public void removeUsable(IUsable usable) {
     	usables.remove(usable);
+    }
+    
+    public IPlacable getPlacable(ItemStack itemStack) {
+    	for (int i = 0; i < placables.size(); i++) {
+            if (placables.get(i).matches(itemStack)) {
+                return placables.get(i);
+            }
+        }
+        
+        return null;
+    }
+    
+    public void addPlacable(IPlacable placable) {
+    	placables.add(placable);
+    }
+    
+    public void removePlacable(IPlacable placable) {
+    	placables.remove(placable);
     }
 	
     public List<ICommand> getCommands() {

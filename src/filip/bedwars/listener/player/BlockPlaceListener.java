@@ -4,38 +4,17 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import filip.bedwars.BedwarsPlugin;
-import filip.bedwars.inventory.IUsable;
+import filip.bedwars.inventory.IPlacable;
 
-public class PlayerInteractItemListener implements Listener {
+public class BlockPlaceListener implements Listener {
 
-	public PlayerInteractItemListener(JavaPlugin plugin) {
+	public BlockPlaceListener(JavaPlugin plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
-	}
-	
-	@EventHandler
-	public void onPlayerInteract(PlayerInteractEvent event) {
-		ItemStack item = event.getItem();
-		
-		if (item != null) {
-			if (item.hasItemMeta()) {
-				ItemMeta itemMeta = item.getItemMeta();
-				
-				if (itemMeta.hasDisplayName()) {
-					IUsable usable = BedwarsPlugin.getInstance().getUsable(item);
-					
-					if (usable != null) {
-						usable.use(event);
-						event.setCancelled(true);
-					}
-				}
-			}
-		}
 	}
 	
 	@EventHandler
@@ -50,10 +29,10 @@ public class PlayerInteractItemListener implements Listener {
 					ItemMeta itemMeta = item.getItemMeta();
 					
 					if (itemMeta.hasDisplayName()) {
-						IUsable usable = BedwarsPlugin.getInstance().getUsable(item);
+						IPlacable placable = BedwarsPlugin.getInstance().getPlacable(item);
 						
-						if (usable != null) {
-							usable.place(event);
+						if (placable != null) {
+							placable.place(event);
 							event.setCancelled(true);
 						}
 					}

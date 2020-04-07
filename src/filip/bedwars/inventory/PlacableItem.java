@@ -2,13 +2,13 @@ package filip.bedwars.inventory;
 
 import org.bukkit.inventory.ItemStack;
 
-public abstract class UsableItem implements IUsable {
+public abstract class PlacableItem implements IPlacable {
 
 	protected final ItemStack itemStack;
 	
-	public UsableItem(ItemStack itemStack) {
+	public PlacableItem(ItemStack itemStack) {
 		this.itemStack = itemStack;
-		registerUsable();
+		registerPlacable();
 	}
 	
 	@Override

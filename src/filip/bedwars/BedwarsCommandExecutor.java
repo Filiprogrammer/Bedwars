@@ -31,7 +31,7 @@ public class BedwarsCommandExecutor implements CommandExecutor {
 		List<ICommand> commands = BedwarsPlugin.getInstance().getCommands();
 		
 		for (ICommand cmd : commands) {
-			if (cmd.getName().equals(command.getName())) {
+			if (cmd.getName().equals(args[0])) {
 				if (sender.hasPermission("filip.bedwars." + cmd.getPermission())) {
 					String[] cmdArgs = new String[args.length - 1];
 					

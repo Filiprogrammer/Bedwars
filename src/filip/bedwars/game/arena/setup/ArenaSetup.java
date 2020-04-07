@@ -24,14 +24,17 @@ import filip.bedwars.game.TeamColor;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.inventory.ClickableInventory;
 import filip.bedwars.inventory.IClickable;
+import filip.bedwars.inventory.IPlacable;
 import filip.bedwars.inventory.IUsable;
 import filip.bedwars.inventory.ItemBuilder;
+import filip.bedwars.inventory.PlacableItem;
 import filip.bedwars.inventory.UsableItem;
 import filip.bedwars.utils.MessageSender;
 
 public class ArenaSetup {
 
 	private final List<IUsable> usables = new ArrayList<IUsable>();
+	private final List<IPlacable> placables = new ArrayList<IPlacable>();
 	private final List<IClickable> clickables = new ArrayList<IClickable>();
 	
 	SpawnerBuilder spawnerBuilder;
@@ -80,7 +83,7 @@ public class ArenaSetup {
 				switch (slot) {
 				case (9 + 2): // Bronze
 					{
-						new SpawnerBuilder()
+						spawnerBuilder
 								.setItem(Material.BRICK)
 								.setItemName("Bronze")
 								.setTicksPerSpawn(10);
@@ -91,7 +94,7 @@ public class ArenaSetup {
 					break;
 				case (9 + 4): // Eisen
 					{
-						new SpawnerBuilder()
+						spawnerBuilder
 								.setItem(Material.IRON_INGOT)
 								.setItemName("Eisen")
 								.setTicksPerSpawn(40);
@@ -102,7 +105,7 @@ public class ArenaSetup {
 					break;
 				case (9 + 6): // Gold
 					{
-						new SpawnerBuilder()
+						spawnerBuilder
 								.setItem(Material.GOLD_INGOT)
 								.setItemName("Gold")
 								.setTicksPerSpawn(100);
@@ -163,10 +166,7 @@ public class ArenaSetup {
 		// Do the following when an item with the custom name is right clicked on a block:
 		// Set the location of the spawner to the blocks' position through the spawnerBuilder.
 		// Open an inventory menu to select the spawner type.
-		usables.add(new UsableItem(spawnerItem) {
-			
-			@Override
-			public void use(@NotNull PlayerInteractEvent event) {}
+		placables.add(new PlacableItem(spawnerItem) {
 
 			@Override
 			public void place(@NotNull BlockPlaceEvent event) {
@@ -187,10 +187,7 @@ public class ArenaSetup {
 		
 		// Do the following when an item with the custom name is right clicked on a block:
 		// Set the item shop of the base at the blocks' position through the baseBuilder.
-		usables.add(new UsableItem(itemShopItem) {
-			
-			@Override
-			public void use(@NotNull PlayerInteractEvent event) {}
+		placables.add(new PlacableItem(itemShopItem) {
 
 			@Override
 			public void place(@NotNull BlockPlaceEvent event) {
@@ -212,10 +209,7 @@ public class ArenaSetup {
 		
 		// Do the following when an item with the custom name is right clicked on a block:
 		// Set the team shop of the base at the blocks' position through the baseBuilder.
-		usables.add(new UsableItem(teamShopItem) {
-			
-			@Override
-			public void use(@NotNull PlayerInteractEvent event) {}
+		placables.add(new PlacableItem(teamShopItem) {
 
 			@Override
 			public void place(@NotNull BlockPlaceEvent event) {
@@ -237,10 +231,7 @@ public class ArenaSetup {
 		
 		// Do the following when an item with the custom name is right clicked on a block:
 		// Set the spawn of the base at the blocks' position through the baseBuilder.
-		usables.add(new UsableItem(spawnItem) {
-			
-			@Override
-			public void use(@NotNull PlayerInteractEvent event) {}
+		placables.add(new PlacableItem(spawnItem) {
 
 			@Override
 			public void place(@NotNull BlockPlaceEvent event) {
@@ -273,6 +264,8 @@ public class ArenaSetup {
 				if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 					Block block = event.getClickedBlock();
 					
+					System.out.println(block);
+					
 					if (block instanceof Bed) {
 						World w = block.getWorld();
 						Location loc = block.getLocation();
@@ -299,9 +292,6 @@ public class ArenaSetup {
 					}
 				}
 			}
-
-			@Override
-			public void place(@NotNull BlockPlaceEvent event) {}
 		});
 		
 		// Do the following when an item with the custom name is right clicked:
@@ -322,9 +312,6 @@ public class ArenaSetup {
 				if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))
 					player.openInventory(teamColorSelector.getInventory());
 			}
-
-			@Override
-			public void place(@NotNull BlockPlaceEvent event) {}
 		});
 	}
 	

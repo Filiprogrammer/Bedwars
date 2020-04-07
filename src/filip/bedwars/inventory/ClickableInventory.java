@@ -12,6 +12,7 @@ public abstract class ClickableInventory implements IClickable {
 	
 	public ClickableInventory(Inventory inventory) {
         this.inventory = inventory;
+        registerClickable();
     }
 	
 	@Override
@@ -33,7 +34,15 @@ public abstract class ClickableInventory implements IClickable {
 		try {
 			String versionStr = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
 			
-			Class<?> minecraftInventoryClass = Class.forName("org.bukkit.craftbukkit." + versionStr + ".inventory.CraftInventoryCustom.MinecraftInventory");
+			Class<?> craftInventoryCustomClass = Class.forName("org.bukkit.craftbukkit." + versionStr + ".inventory.CraftInventoryCustom");
+			Class<?>[] craftInventoryCustomClasses = craftInventoryCustomClass.getDeclaredClasses();
+			Class<?> minecraftInventoryClass = null;
+			for (Class<?> subclass : craftInventoryCustomClasses) {
+				if (subclass.getSimpleName().equals("MinecraftInventory")) {
+					minecraftInventoryClass = subclass;
+					break;
+				}
+			}
 			Class<?> craftInventoryClass = Class.forName("org.bukkit.craftbukkit." + versionStr + ".inventory.CraftInventory");
 			Method getInventoryMethod = craftInventoryClass.getMethod("getInventory");
 			
@@ -45,6 +54,7 @@ public abstract class ClickableInventory implements IClickable {
 			
 			Object minv = minecraftInventoryClass.cast(iinv);
 			Method getTitleMethod = minecraftInventoryClass.getMethod("getTitle");
+			getTitleMethod.setAccessible(true);
 			String title = (String) getTitleMethod.invoke(minv);
 			return title;
 		} catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {

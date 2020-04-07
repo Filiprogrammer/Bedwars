@@ -1,11 +1,11 @@
 package filip.bedwars.inventory;
 
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
 import filip.bedwars.BedwarsPlugin;
 
-public interface IUsable {
+public interface IPlacable {
 	/**
 	 * Get the item.
 	 * @return
@@ -20,17 +20,17 @@ public interface IUsable {
 	boolean matches(ItemStack itemStack);
 	
 	/**
-     * Called when the item is interacted on
+     * Called when the block is placed
      *
      * @param event
      * @param playerWrapper
      */
-	void use(PlayerInteractEvent event);
+	void place(BlockPlaceEvent event);
 	
 	/**
 	 * Register the usable.
 	 */
-	default void registerUsable() {
-		BedwarsPlugin.getInstance().addUsable(this);
+	default void registerPlacable() {
+		BedwarsPlugin.getInstance().addPlacable(this);
 	}
 }

@@ -32,6 +32,9 @@ public abstract class MultipleConfig implements IConfig {
 				configFiles.put(key, new File(BedwarsPlugin.getInstance().getDataFolder(), configFileNames.get(key)));
 		}
 		
+		if (configs == null)
+			configs = new HashMap<String, YamlConfiguration>();
+		
 		for (String key : configFiles.keySet()) {
 			File configFile = configFiles.get(key);
 			
