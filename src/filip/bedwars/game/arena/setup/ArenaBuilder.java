@@ -3,6 +3,7 @@ package filip.bedwars.game.arena.setup;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.arena.Arena;
@@ -14,6 +15,7 @@ public class ArenaBuilder {
 	private String mapName;
 	private List<Base> bases = new ArrayList<Base>();
 	private List<Spawner> spawner = new ArrayList<Spawner>();
+	private World world;
 	
 	public ArenaBuilder addBase(@NotNull Base base) {
 		bases.add(base);
@@ -30,12 +32,25 @@ public class ArenaBuilder {
 		return this;
 	}
 	
+	public ArenaBuilder setWorld(@NotNull World world) {
+		this.world = world;
+		return this;
+	}
+	
 	public boolean hasBase(@NotNull Base base) {
 		return bases.contains(base);
 	}
 	
+	public String getMapName() {
+		return mapName;
+	}
+	
+	public World getWorld() {
+		return world;
+	}
+	
 	public Arena build() {
-		return new Arena(mapName, spawner, bases);
+		return new Arena(mapName, world, spawner, bases);
 	}
 
 }

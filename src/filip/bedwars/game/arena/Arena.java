@@ -13,13 +13,11 @@ public class Arena {
 	private final String mapName;	
 	private World world;
 
-	public Arena(@NotNull String mapName, @NotNull List<Spawner> spawner, @NotNull List<Base> bases) {
+	public Arena(@NotNull String mapName, @NotNull World world, @NotNull List<Spawner> spawner, @NotNull List<Base> bases) {
 		this.spawner = spawner;
 		this.bases = bases;
 		this.mapName = mapName;
-		
-		if(this.bases.size() >= 1)
-			this.world = this.bases.get(0).getSpawn().getWorld(); // Set the world of the arena
+		this.world = world;
 	}
 	
 	public Base getBase(int id) {

@@ -50,6 +50,7 @@ public class ArenaSetup {
 		baseBuilder = new BaseBuilder();
 		arenaBuilder = new ArenaBuilder();
 		arenaBuilder.setMapName(mapName);
+		arenaBuilder.setWorld(setuper.getWorld());
 		this.setuper = setuper;
 		
 		createSetupItems();
@@ -356,6 +357,18 @@ public class ArenaSetup {
 			plugin.removeUsable(usable);
 		
 		return arenaBuilder.build();
+	}
+	
+	public String getMapName() {
+		return arenaBuilder.getMapName();
+	}
+	
+	public World getWorld() {
+		return arenaBuilder.getWorld();
+	}
+	
+	public Player getSetuper() {
+		return setuper;
 	}
 	
 	private void createSetupItems() {

@@ -10,7 +10,7 @@ import filip.bedwars.utils.ArenaSerializer;
 
 public class ArenaConfig extends SingleConfig {
 
-private static ArenaConfig instance = null;
+	private static ArenaConfig instance = null;
 	
 	List<Arena> arenas = new ArrayList<Arena>();
 	
@@ -39,7 +39,7 @@ private static ArenaConfig instance = null;
 		arenas.remove(arena);
 	}
 	
-	public ArenaConfig getInstance() {
+	public static ArenaConfig getInstance() {
 		if (instance == null)
 			instance = new ArenaConfig();
 		

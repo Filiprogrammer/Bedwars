@@ -18,11 +18,10 @@ public class MessageSender {
 	public static void sendMessage(CommandSender sendTo, String msg) {
 		String locale;
 		
-		if (sendTo instanceof Player) {
+		if (sendTo instanceof Player)
 			locale = ((Player)sendTo).getLocale();
-		} else {
+		else
 			locale = MainConfig.getInstance().getLanguage();
-		}
 		
 		sendTo.sendMessage(MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg);
 	}
@@ -36,11 +35,10 @@ public class MessageSender {
 		for(CommandSender cs : receivers) {
 			String locale;
 			
-			if (cs instanceof Player) {
+			if (cs instanceof Player)
 				locale = ((Player)cs).getLocale();
-			} else {
+			else
 				locale = MainConfig.getInstance().getLanguage();
-			}
 			
 			cs.sendMessage(MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg);
 		}
