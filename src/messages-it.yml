@@ -9,7 +9,7 @@ base-added: '&b%teamcolor% Base wurde gsetzt'
 team-color-set: '&bIl colore della squadra è stato impostato sul %color%!'
 bed-set-error: '&cOIDA NA! Du musst ein bereits &4EXISTIERENDES BETT &crechtsklicken!'
 bed-set: '&bIl letto è stato sistemato con successo'
-arena-setup-finish: "&bL'Arena %name% è stata allestita con successo"
+arena-setup-finish: "&bL'Arena è stata allestita con successo"
 bought-item: '&aHai comprato %amount%x %item%'
 cant-afford-item: '&cDu hast ned gnua &e%itemname% &cums des zu kaufen!'
 no-permission: '&cNa, des derf nur da Admin!'

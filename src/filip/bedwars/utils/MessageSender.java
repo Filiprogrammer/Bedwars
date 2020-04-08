@@ -23,7 +23,7 @@ public class MessageSender {
 		else
 			locale = MainConfig.getInstance().getLanguage();
 		
-		sendTo.sendMessage(MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg);
+		sendTo.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg).replace('&', '§'));
 	}
 	
 	/**
@@ -40,7 +40,7 @@ public class MessageSender {
 			else
 				locale = MainConfig.getInstance().getLanguage();
 			
-			cs.sendMessage(MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg);
+			cs.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg).replace('&', '§'));
 		}
 		
 	}

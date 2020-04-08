@@ -320,6 +320,28 @@ public class ArenaSetup {
 	}
 	
 	public void addBase() {
+		if (baseBuilder.getBedBottom() == null || baseBuilder.getBedTop() == null) {
+			MessageSender.sendMessage(setuper, "Cannot add base because the bed is not set up correctly");
+			return;
+		}
+		else if (baseBuilder.getItemShop() == null) {
+			MessageSender.sendMessage(setuper, "Cannot add base because item shop location is not set");
+			return;
+		}
+		else if (baseBuilder.getTeamShop() == null) {
+			MessageSender.sendMessage(setuper, "Cannot add base because team shop location is not set");
+			return;
+		}
+		else if (baseBuilder.getSpawn() == null) {
+			MessageSender.sendMessage(setuper, "Cannot add base because spawn location is not set");
+			return;
+		}
+		else if (baseBuilder.getTeamColor() == null) {
+			// How did we get here?
+			MessageSender.sendMessage(setuper, "Cannot add base because team color is not set");
+			return;
+		}
+		
 		arenaBuilder.addBase(baseBuilder.build());
 		
 		String colorConfigKey = "color-" + baseBuilder.getTeamColor().toString().toLowerCase().replace("_", "-");
@@ -339,18 +361,12 @@ public class ArenaSetup {
 	}
 	
 	public Arena finish() {
-		BedwarsPlugin plugin = BedwarsPlugin.getInstance();
-		
-		for (IClickable clickable : clickables)
-			plugin.removeClickable(clickable);
-		
-		for (IUsable usable : usables)
-			plugin.removeUsable(usable);
-		
-		for (IPlacable placable : placables)
-			plugin.removePlacable(placable);
-		
+		cleanup();
 		return arenaBuilder.build();
+	}
+	
+	public void cancel() {
+		cleanup();
 	}
 	
 	public String getMapName() {
@@ -381,6 +397,19 @@ public class ArenaSetup {
 		setuper.getInventory().setItem(3, spawnItem);
 		setuper.getInventory().setItem(4, bedItem);
 		setuper.getInventory().setItem(5, createBaseItem);
+	}
+	
+	private void cleanup() {
+		BedwarsPlugin plugin = BedwarsPlugin.getInstance();
+		
+		for (IClickable clickable : clickables)
+			plugin.removeClickable(clickable);
+		
+		for (IUsable usable : usables)
+			plugin.removeUsable(usable);
+		
+		for (IPlacable placable : placables)
+			plugin.removePlacable(placable);
 	}
 	
 }

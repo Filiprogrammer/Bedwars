@@ -16,6 +16,10 @@ commands:
     description: Finish adding the new arena
     usage: /<command>
     permission: filip.bedwars.setup
+  bw cancelarenasetup:
+    description: Cancel adding the new arena
+    usage: /<command>
+    permission: filip.bedwars.setup
 permissions:
   filip.bedwars.base:
     description: hj

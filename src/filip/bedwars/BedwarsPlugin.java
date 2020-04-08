@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import filip.bedwars.commands.AddArenaCommand;
+import filip.bedwars.commands.CancelArenaSetupCommand;
 import filip.bedwars.commands.FinishArenaCommand;
 import filip.bedwars.commands.HelpCommand;
 import filip.bedwars.commands.ICommand;
@@ -20,7 +21,9 @@ import filip.bedwars.inventory.IPlacable;
 import filip.bedwars.inventory.IUsable;
 import filip.bedwars.listener.inventory.InventoryClickListener;
 import filip.bedwars.listener.player.BlockPlaceListener;
+import filip.bedwars.listener.player.PlayerChangedWorldListener;
 import filip.bedwars.listener.player.PlayerInteractListener;
+import filip.bedwars.listener.player.PlayerQuitListener;
 
 public class BedwarsPlugin extends JavaPlugin {
 
@@ -46,9 +49,12 @@ public class BedwarsPlugin extends JavaPlugin {
 		new PlayerInteractListener(this);
 		new BlockPlaceListener(this);
 		new InventoryClickListener(this);
+		new PlayerQuitListener(this);
+		new PlayerChangedWorldListener(this);
 		new BedwarsCommandExecutor(this);
 		commands.add(new AddArenaCommand());
 		commands.add(new FinishArenaCommand());
+		commands.add(new CancelArenaSetupCommand());
 		helpCommand = new HelpCommand();
 	}
 	
@@ -135,6 +141,14 @@ public class BedwarsPlugin extends JavaPlugin {
     	return helpCommand;
     }
     
+    public ArenaSetup getArenaSetup(Player setuper) {
+    	for (ArenaSetup arenaSetup : arenaSetups)
+    		if (arenaSetup.getSetuper().getUniqueId().equals(setuper.getUniqueId()))
+    			return arenaSetup;
+    	
+    	return null;
+    }
+    
     public enum SetupArenaResponse {
     	ARENA_IN_WORLD_ALREADY_SETTING_UP,
     	ALREADY_SETTING_UP_ARENA,
@@ -143,21 +157,18 @@ public class BedwarsPlugin extends JavaPlugin {
     };
     
     public SetupArenaResponse setupArena(String mapName, Player setuper) {
+    	if (ArenaConfig.getInstance().getArena(setuper.getWorld()) != null)
+			// An Arena already exists in this world
+			return SetupArenaResponse.ARENA_IN_WORLD_ALREADY_EXISTS;
+    	
     	for (ArenaSetup arenaSetup : arenaSetups) {
-    		if (arenaSetup.getSetuper().getUniqueId().equals(setuper.getUniqueId())) {
+    		if (arenaSetup.getSetuper().getUniqueId().equals(setuper.getUniqueId()))
     			// The player is already setting up an arena
     			return SetupArenaResponse.ALREADY_SETTING_UP_ARENA;
-    		}
     		
-    		if (arenaSetup.getWorld().getName().equals(setuper.getWorld().getName())) {
+    		if (arenaSetup.getWorld().getName().equals(setuper.getWorld().getName()))
     			// An Arena in the setupers world is already being set up.
     			return SetupArenaResponse.ARENA_IN_WORLD_ALREADY_SETTING_UP;
-    		}
-    		
-    		if (ArenaConfig.getInstance().getArena(setuper.getWorld()) != null) {
-    			// An Arena already exists in this world
-    			return SetupArenaResponse.ARENA_IN_WORLD_ALREADY_EXISTS;
-    		}
     	}
     	
     	arenaSetups.add(new ArenaSetup(mapName, setuper));
@@ -171,6 +182,18 @@ public class BedwarsPlugin extends JavaPlugin {
     			arenaSetups.remove(arenaSetup);
     			ArenaConfig.getInstance().addArena(arena);
     			ArenaConfig.getInstance().saveConfig();
+    			return true;
+    		}
+    	}
+    	
+    	return false;
+    }
+    
+    public boolean cancelArenaSetup(Player setuper) {
+    	for (ArenaSetup arenaSetup : arenaSetups) {
+    		if (arenaSetup.getSetuper().getUniqueId().equals(setuper.getUniqueId())) {
+    			arenaSetup.cancel();
+    			arenaSetups.remove(arenaSetup);
     			return true;
     		}
     	}

@@ -41,6 +41,14 @@ public class ArenaBuilder {
 		return bases.contains(base);
 	}
 	
+	public int getBaseCount() {
+		return bases.size();
+	}
+	
+	public int getSpawnerCount() {
+		return spawner.size();
+	}
+	
 	public String getMapName() {
 		return mapName;
 	}
