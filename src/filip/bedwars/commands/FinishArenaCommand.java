@@ -4,6 +4,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import filip.bedwars.BedwarsPlugin;
+import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.utils.MessageSender;
 
 public class FinishArenaCommand implements ICommand {
@@ -13,12 +14,15 @@ public class FinishArenaCommand implements ICommand {
 		if (args.length != 0)
 			return false;
 		
-		if (!(sender instanceof Player)) {
-			// TODO: Add localizations for this message
-			MessageSender.sendMessage(sender, "You have to be a player");
-		}
+		// TODO: Add localizations for the messages
 		
-		BedwarsPlugin.getInstance().finishArenaSetup((Player) sender);
+		if (!(sender instanceof Player))
+			MessageSender.sendMessage(sender, "You have to be a player");
+		
+		if (BedwarsPlugin.getInstance().finishArenaSetup((Player) sender))
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player)sender).getLocale(), "arena-setup-finish"));
+		else
+			MessageSender.sendMessage(sender, "You were not setting up an arena anyway.");
 		
 		return true;
 	}

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.World;
+
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.utils.ArenaDeserializer;
 import filip.bedwars.utils.ArenaSerializer;
@@ -23,6 +25,14 @@ public class ArenaConfig extends SingleConfig {
 	public Arena getArena(String mapName) {
 		for (Arena arena : arenas)
 			if (arena.getMapName().equals(mapName))
+				return arena;
+		
+		return null;
+	}
+	
+	public Arena getArena(World world) {
+		for (Arena arena : arenas)
+			if (arena.getWorld().getName().equals(world.getName()))
 				return arena;
 		
 		return null;
