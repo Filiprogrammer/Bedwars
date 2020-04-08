@@ -5,6 +5,8 @@ import org.bukkit.entity.Player;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.BedwarsPlugin.SetupArenaResponse;
+import filip.bedwars.config.MainConfig;
+import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.utils.MessageSender;
 
 public class AddArenaCommand implements ICommand {
@@ -17,16 +19,16 @@ public class AddArenaCommand implements ICommand {
 		// TODO: Add localizations for the messages
 		
 		if (!(sender instanceof Player))
-			MessageSender.sendMessage(sender, "You have to be a player");
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(MainConfig.getInstance().getLanguage(), "you-must-be-player"));
 		
 		SetupArenaResponse setupArenaResponse = BedwarsPlugin.getInstance().setupArena(args[0], (Player) sender);
 		
 		switch (setupArenaResponse) {
 		case ARENA_IN_WORLD_ALREADY_SETTING_UP:
-			MessageSender.sendMessage(sender, "An arena in this world is already beeing set up");
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "arena-in-world-already-setting-up"));
 			break;
 		case ALREADY_SETTING_UP_ARENA:
-			MessageSender.sendMessage(sender, "You are already setting up an arena");
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "arena-already-setting-up"));
 			break;
 		case ARENA_IN_WORLD_ALREADY_EXISTS:
 			MessageSender.sendMessage(sender, "This world already has an arena");
