@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import filip.bedwars.game.arena.Arena;
+import filip.bedwars.utils.ArenaDeserializer;
 import filip.bedwars.utils.ArenaSerializer;
 
 public class ArenaConfig extends SingleConfig {
@@ -50,10 +51,14 @@ public class ArenaConfig extends SingleConfig {
 	public void reloadConfig() {
 		createAndLoadConfigFileIfNotExistent(true);
 		
-		if (config.isList("arenas"))
-			arenas = (List<Arena>) config.getList("arenas");
-		else
-			arenas = new ArrayList<Arena>();
+		arenas = new ArrayList<Arena>();
+		
+		if (config.isList("arenas")) {
+			List<Object> serializedArenas = (List<Object>) config.getList("arenas");
+			
+			for (Object serializedArena : serializedArenas)
+				arenas.add(ArenaDeserializer.deserializeArena(serializedArena));
+		}
 	}
 	
 	public boolean saveConfig() {

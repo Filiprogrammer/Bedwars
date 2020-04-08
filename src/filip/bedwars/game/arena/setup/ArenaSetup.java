@@ -37,16 +37,16 @@ public class ArenaSetup {
 	private final List<IPlacable> placables = new ArrayList<IPlacable>();
 	private final List<IClickable> clickables = new ArrayList<IClickable>();
 	
-	SpawnerBuilder spawnerBuilder;
-	BaseBuilder baseBuilder;
-	ArenaBuilder arenaBuilder;
-	Player setuper;
-	ItemStack spawnerItem;
-	ItemStack itemShopItem;
-	ItemStack teamShopItem;
-	ItemStack spawnItem;
-	ItemStack bedItem;
-	ItemStack createBaseItem;
+	private SpawnerBuilder spawnerBuilder;
+	private BaseBuilder baseBuilder;
+	private ArenaBuilder arenaBuilder;
+	private final Player setuper;
+	private ItemStack spawnerItem;
+	private ItemStack itemShopItem;
+	private ItemStack teamShopItem;
+	private ItemStack spawnItem;
+	private ItemStack bedItem;
+	private ItemStack createBaseItem;
 	
 	public ArenaSetup(@NotNull String mapName, @NotNull Player setuper) {
 		spawnerBuilder = new SpawnerBuilder();
@@ -266,22 +266,28 @@ public class ArenaSetup {
 					
 					System.out.println(block);
 					
-					if (block instanceof Bed) {
+					if (block.getBlockData() instanceof Bed) {
 						World w = block.getWorld();
 						Location loc = block.getLocation();
 						baseBuilder.setBedTop(loc);
 						
 						List<Block> surroundingBlocks = new ArrayList<Block>();
-						surroundingBlocks.add(w.getBlockAt(loc.add(1, 0, 0)));
-						surroundingBlocks.add(w.getBlockAt(loc.add(0, 0, 1)));
-						surroundingBlocks.add(w.getBlockAt(loc.add(-1, 0, 0)));
-						surroundingBlocks.add(w.getBlockAt(loc.add(0, 0, -1)));
+						surroundingBlocks.add(w.getBlockAt(loc.clone().add(1, 0, 0)));
+						surroundingBlocks.add(w.getBlockAt(loc.clone().add(0, 0, 1)));
+						surroundingBlocks.add(w.getBlockAt(loc.clone().add(-1, 0, 0)));
+						surroundingBlocks.add(w.getBlockAt(loc.clone().add(0, 0, -1)));
 						
 						for (Block b : surroundingBlocks) {
-							if (b instanceof Bed) {
+							if (b.getBlockData() instanceof Bed) {
 								baseBuilder.setBedBottom(b.getLocation());
 								break;
 							}
+						}
+						
+						if (baseBuilder.getBedBottom() == null) {
+							MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "bed-bottom-error"));
+							player.playSound(player.getLocation(), SoundsConfig.getInstance().getSoundValue("error"), 1, 1);
+							return;
 						}
 						
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "bed-set"));
@@ -342,6 +348,9 @@ public class ArenaSetup {
 		
 		for (IUsable usable : usables)
 			plugin.removeUsable(usable);
+		
+		for (IPlacable placable : placables)
+			plugin.removePlacable(placable);
 		
 		return arenaBuilder.build();
 	}

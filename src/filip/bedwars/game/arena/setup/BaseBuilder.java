@@ -31,13 +31,17 @@ public class BaseBuilder {
 	}
 
 	public BaseBuilder setBedBottom(@NotNull Location bedBottom) {
-		this.bedTop = bedBottom;
+		this.bedBottom = bedBottom;
 		return this;
 	}
 
 	public BaseBuilder setTeamColor(@NotNull TeamColor teamColor) {
 		this.teamColor = teamColor;
 		return this;
+	}
+	
+	public Location getBedBottom() {
+		return bedBottom;
 	}
 	
 	public TeamColor getTeamColor() {

@@ -27,7 +27,8 @@ public class ArenaSerializer {
 					put("y", spawner.getLocation().getBlockY());
 					put("z", spawner.getLocation().getBlockZ());
 				}});
-				put("itemStack", spawner.getItemStack());
+				put("itemMaterial", spawner.getItemStack().getType().toString());
+				put("itemName", spawner.getItemStack().getItemMeta().getDisplayName());
 			}};
 			spawnerList.add(spawnerInfo);
 		}
@@ -43,7 +44,7 @@ public class ArenaSerializer {
 					put("y", base.getSpawn().getBlockY());
 					put("z", base.getSpawn().getBlockZ());
 				}});
-				put("teamColor", base.getTeamColor());
+				put("teamColor", base.getTeamColor().toString());
 				put("bedBottom", new HashMap<String, Integer>() {{
 					put("x", base.getBedBottom().getBlockX());
 					put("y", base.getBedBottom().getBlockY());

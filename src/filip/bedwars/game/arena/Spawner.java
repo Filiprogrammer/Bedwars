@@ -14,7 +14,7 @@ public class Spawner {
     
     private int currentTick;
     
-    public Spawner(@NotNull Location location, int ticksPerSpawn, @NotNull Material material,@NotNull String name) {
+    public Spawner(@NotNull Location location, int ticksPerSpawn, @NotNull Material material, @NotNull String name) {
     	this.location = location;
     	this.ticksPerSpawn = ticksPerSpawn;
     	this.itemStack = new ItemBuilder()
