@@ -91,9 +91,9 @@ public class BedwarsPlugin extends JavaPlugin {
      * @param inventory
      * @return usable
      */
-    public IUsable getUsable(ItemStack itemStack) {
+    public IUsable getUsable(ItemStack itemStack, Player player) {
         for (int i = 0; i < usables.size(); i++) {
-            if (usables.get(i).matches(itemStack)) {
+            if (usables.get(i).matches(itemStack, player)) {
                 return usables.get(i);
             }
         }
@@ -109,9 +109,9 @@ public class BedwarsPlugin extends JavaPlugin {
     	usables.remove(usable);
     }
     
-    public IPlacable getPlacable(ItemStack itemStack) {
+    public IPlacable getPlacable(ItemStack itemStack, Player player) {
     	for (int i = 0; i < placables.size(); i++) {
-            if (placables.get(i).matches(itemStack)) {
+            if (placables.get(i).matches(itemStack, player)) {
                 return placables.get(i);
             }
         }

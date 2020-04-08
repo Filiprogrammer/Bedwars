@@ -1,5 +1,6 @@
 package filip.bedwars.inventory;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -12,12 +13,15 @@ public interface IPlacable {
 	 */
 	ItemStack getItemStack();
 	
+	Player getPlayer();
+	
 	/**
 	 * Get whether the item matches the param.
 	 * @param itemStack
+	 * @param player
 	 * @return matches
 	 */
-	boolean matches(ItemStack itemStack);
+	boolean matches(ItemStack itemStack, Player player);
 	
 	/**
      * Called when the block is placed

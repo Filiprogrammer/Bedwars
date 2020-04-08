@@ -25,7 +25,7 @@ public class PlayerInteractListener implements Listener {
 				ItemMeta itemMeta = item.getItemMeta();
 				
 				if (itemMeta.hasDisplayName()) {
-					IUsable usable = BedwarsPlugin.getInstance().getUsable(item);
+					IUsable usable = BedwarsPlugin.getInstance().getUsable(item, event.getPlayer());
 					
 					if (usable != null) {
 						usable.use(event);

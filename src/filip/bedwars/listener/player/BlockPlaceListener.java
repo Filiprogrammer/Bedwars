@@ -29,7 +29,7 @@ public class BlockPlaceListener implements Listener {
 					ItemMeta itemMeta = item.getItemMeta();
 					
 					if (itemMeta.hasDisplayName()) {
-						IPlacable placable = BedwarsPlugin.getInstance().getPlacable(item);
+						IPlacable placable = BedwarsPlugin.getInstance().getPlacable(item, event.getPlayer());
 						
 						if (placable != null) {
 							placable.place(event);

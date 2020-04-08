@@ -13,6 +13,8 @@ public interface IClickable {
 	 */
 	Inventory getInventory();
 	
+	Player getPlayer();
+	
 	/**
      * Gets whether the inventory matches the parameter
      *

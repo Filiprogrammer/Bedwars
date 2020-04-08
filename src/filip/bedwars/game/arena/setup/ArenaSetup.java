@@ -62,7 +62,7 @@ public class ArenaSetup {
 		// TODO: Read stuff like spawner ticks and item names from config files
 		
 		// An inventory menu to select the spawner item and add the spawner to the arena
-		IClickable spawnerSelector = new ClickableInventory(Bukkit.createInventory(null, 9 * 3, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "select-spawner-item"))) {
+		IClickable spawnerSelector = new ClickableInventory(Bukkit.createInventory(null, 9 * 3, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "select-spawner-item")), setuper) {
 			
 			{
 				inventory.setItem(9 + 2, new ItemBuilder().setName("§r§aBronze Spawner setzen").setMaterial(Material.BRICK).build());
@@ -122,7 +122,7 @@ public class ArenaSetup {
 		clickables.add(spawnerSelector);
 		
 		// An inventory menu to select the team color and add the base to the arena
-		IClickable teamColorSelector = new ClickableInventory(Bukkit.createInventory(null, 9 * 3, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "select-team-color"))) {
+		IClickable teamColorSelector = new ClickableInventory(Bukkit.createInventory(null, 9 * 3, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "select-team-color")), setuper) {
 			
 			{
 				inventory.setItem(0, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-white")).setMaterial(Material.WHITE_WOOL).build());
@@ -166,7 +166,7 @@ public class ArenaSetup {
 		// Do the following when an item with the custom name is right clicked on a block:
 		// Set the location of the spawner to the blocks' position through the spawnerBuilder.
 		// Open an inventory menu to select the spawner type.
-		placables.add(new PlacableItem(spawnerItem) {
+		placables.add(new PlacableItem(spawnerItem, setuper) {
 
 			@Override
 			public void place(@NotNull BlockPlaceEvent event) {
@@ -187,7 +187,7 @@ public class ArenaSetup {
 		
 		// Do the following when an item with the custom name is right clicked on a block:
 		// Set the item shop of the base at the blocks' position through the baseBuilder.
-		placables.add(new PlacableItem(itemShopItem) {
+		placables.add(new PlacableItem(itemShopItem, setuper) {
 
 			@Override
 			public void place(@NotNull BlockPlaceEvent event) {
@@ -209,7 +209,7 @@ public class ArenaSetup {
 		
 		// Do the following when an item with the custom name is right clicked on a block:
 		// Set the team shop of the base at the blocks' position through the baseBuilder.
-		placables.add(new PlacableItem(teamShopItem) {
+		placables.add(new PlacableItem(teamShopItem, setuper) {
 
 			@Override
 			public void place(@NotNull BlockPlaceEvent event) {
@@ -231,7 +231,7 @@ public class ArenaSetup {
 		
 		// Do the following when an item with the custom name is right clicked on a block:
 		// Set the spawn of the base at the blocks' position through the baseBuilder.
-		placables.add(new PlacableItem(spawnItem) {
+		placables.add(new PlacableItem(spawnItem, setuper) {
 
 			@Override
 			public void place(@NotNull BlockPlaceEvent event) {
@@ -251,7 +251,7 @@ public class ArenaSetup {
 			}
 		});
 		
-		usables.add(new UsableItem(bedItem) {
+		usables.add(new UsableItem(bedItem, setuper) {
 			
 			@Override
 			public void use(@NotNull PlayerInteractEvent event) {
@@ -263,8 +263,6 @@ public class ArenaSetup {
 				
 				if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 					Block block = event.getClickedBlock();
-					
-					System.out.println(block);
 					
 					if (block.getBlockData() instanceof Bed) {
 						World w = block.getWorld();
@@ -305,7 +303,7 @@ public class ArenaSetup {
 		// Build a base with base builder.
 		// Add it to arenaBuilder.
 		// Create a new BaseBuilder.
-		usables.add(new UsableItem(createBaseItem) {
+		usables.add(new UsableItem(createBaseItem, setuper) {
 			
 			@Override
 			public void use(@NotNull PlayerInteractEvent event) {
