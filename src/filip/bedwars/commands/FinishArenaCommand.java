@@ -14,15 +14,13 @@ public class FinishArenaCommand implements ICommand {
 		if (args.length != 0)
 			return false;
 		
-		// TODO: Add localizations for the messages
-		
 		if (!(sender instanceof Player))
-			MessageSender.sendMessage(sender, "You have to be a player");
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "you-must-be-player"));
 		
 		if (BedwarsPlugin.getInstance().finishArenaSetup((Player) sender))
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player)sender).getLocale(), "arena-setup-finish"));
 		else
-			MessageSender.sendMessage(sender, "You were not setting up an arena anyway.");
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player)sender).getLocale(), "arena-you-were-not-setup"));
 		
 		return true;
 	}

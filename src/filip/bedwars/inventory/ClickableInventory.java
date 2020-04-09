@@ -30,7 +30,12 @@ public abstract class ClickableInventory implements IClickable {
 	
 	@Override
 	public boolean matches(Inventory inventory, Player player) {
-		return (this.player == player) && inventoryGetTitle(this.inventory).equals(inventoryGetTitle(inventory));
+		String invTitle = inventoryGetTitle(inventory);
+		
+		if (invTitle == null)
+			return false;
+		
+		return (this.player == player) && invTitle.equals(inventoryGetTitle(this.inventory));
 	}
 	
 	/**
@@ -59,6 +64,9 @@ public abstract class ClickableInventory implements IClickable {
 			
 			// IInventory iinv = cinv.getInventory();
 			Object iinv = getInventoryMethod.invoke(cinv);
+			
+			if (!iinv.getClass().getSimpleName().equals("MinecraftInventory"))
+				return null;
 			
 			Object minv = minecraftInventoryClass.cast(iinv);
 			Method getTitleMethod = minecraftInventoryClass.getMethod("getTitle");

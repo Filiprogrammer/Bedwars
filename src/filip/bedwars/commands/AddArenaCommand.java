@@ -16,8 +16,6 @@ public class AddArenaCommand implements ICommand {
 		if (args.length != 1)
 			return false;
 		
-		// TODO: Add localizations for the messages
-		
 		if (!(sender instanceof Player))
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(MainConfig.getInstance().getLanguage(), "you-must-be-player"));
 		
@@ -31,10 +29,10 @@ public class AddArenaCommand implements ICommand {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "arena-already-setting-up"));
 			break;
 		case ARENA_IN_WORLD_ALREADY_EXISTS:
-			MessageSender.sendMessage(sender, "This world already has an arena");
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "world-has-arena"));
 			break;
 		case SUCCESS:
-			MessageSender.sendMessage(sender, "Began setup for arena with map name \"" + args[0] + "\"");
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "arena-setup-started").replace("%mapname%", args[0]));
 			break;
 		}
 		

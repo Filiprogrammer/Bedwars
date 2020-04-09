@@ -8,6 +8,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.onarandombox.MultiverseCore.MultiverseCore;
+
 import filip.bedwars.commands.AddArenaCommand;
 import filip.bedwars.commands.CancelArenaSetupCommand;
 import filip.bedwars.commands.FinishArenaCommand;
@@ -29,6 +31,8 @@ public class BedwarsPlugin extends JavaPlugin {
 
 	private static BedwarsPlugin plugin;
 	
+	private MultiverseCore mv;
+	
 	private List<IClickable> clickables;
 	private List<IUsable> usables;
 	private List<IPlacable> placables;
@@ -39,6 +43,8 @@ public class BedwarsPlugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		plugin = this;
+		
+		mv = (MultiverseCore) getServer().getPluginManager().getPlugin("Multiverse-Core");
 		
 		clickables = new ArrayList<IClickable>();
 		usables = new ArrayList<IUsable>();
@@ -199,6 +205,10 @@ public class BedwarsPlugin extends JavaPlugin {
     	}
     	
     	return false;
+    }
+    
+    public MultiverseCore getMultiverse() {
+    	return mv;
     }
     
 }

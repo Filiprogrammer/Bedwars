@@ -4,6 +4,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import filip.bedwars.BedwarsPlugin;
+import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.utils.MessageSender;
 
 public class CancelArenaSetupCommand implements ICommand {
@@ -13,15 +14,13 @@ public class CancelArenaSetupCommand implements ICommand {
 		if (args.length != 0)
 			return false;
 		
-		// TODO: Add localizations for the messages
-		
 		if (!(sender instanceof Player))
-			MessageSender.sendMessage(sender, "You have to be a player");
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "you-must-be-player"));
 		
 		if (BedwarsPlugin.getInstance().cancelArenaSetup((Player) sender))
-			MessageSender.sendMessage(sender, "Arena setup was cancelled");
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "arena-setup-cancelled"));
 		else
-			MessageSender.sendMessage(sender, "You where not setting up an arena anyway");
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "arena-you-were-not-setup"));
 		
 		return true;
 	}
