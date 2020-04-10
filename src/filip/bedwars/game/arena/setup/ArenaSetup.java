@@ -1,7 +1,9 @@
 package filip.bedwars.game.arena.setup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
@@ -34,6 +36,8 @@ import filip.bedwars.inventory.IUsable;
 import filip.bedwars.inventory.ItemBuilder;
 import filip.bedwars.inventory.PlacableItem;
 import filip.bedwars.inventory.UsableItem;
+import filip.bedwars.listener.player.IPacketListener;
+import filip.bedwars.listener.player.UseEntityPacketListener;
 import filip.bedwars.utils.ArmorStandItemNPC;
 import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.PlayerNPC;
@@ -58,7 +62,7 @@ public class ArenaSetup {
 	private VillagerNPC itemShopNPC;
 	private VillagerNPC teamShopNPC;
 	private PlayerNPC spawnNPC;
-	private List<ArmorStandItemNPC> spawnerNPCs = new ArrayList<ArmorStandItemNPC>();
+	private Map<ArmorStandItemNPC, IPacketListener> spawnerNPCs = new HashMap<ArmorStandItemNPC, IPacketListener>();
 	
 	public ArenaSetup(@NotNull String mapName, @NotNull Player setuper) {
 		spawnerBuilder = new SpawnerBuilder();
@@ -491,7 +495,19 @@ public class ArenaSetup {
 	}
 	
 	private void spawnSpawnerNPC(Location loc, Material material, String itemName) {
-		spawnerNPCs.add(new ArmorStandItemNPC(new Location(loc.getWorld(), loc.getBlockX() + 0.5, loc.getBlockY() -0.5, loc.getBlockZ() + 0.5), itemName + " - Spawner", material, setuper));
+		ArmorStandItemNPC npc = new ArmorStandItemNPC(new Location(loc.getWorld(), loc.getBlockX() + 0.5, loc.getBlockY() -0.5, loc.getBlockZ() + 0.5), itemName + " - Spawner", material, setuper);
+		int index = spawnerNPCs.size();
+		
+		UseEntityPacketListener listener = new UseEntityPacketListener(npc.getEntityId()) {
+			@Override
+			public void onUse() {
+				arenaBuilder.removeSpawner(index);
+				despawnSpawnerNPC(npc);
+			}
+		};
+		
+		BedwarsPlugin.getInstance().addPacketListener(setuper, listener);
+		spawnerNPCs.put(npc, listener);
 	}
 	
 	private void despawnSpawnerNPC(ArmorStandItemNPC npc) {
@@ -500,10 +516,13 @@ public class ArenaSetup {
 	}
 	
 	private void despawnAllSpawnerNPCs() {
-		for (ArmorStandItemNPC npc : spawnerNPCs)
+		for (ArmorStandItemNPC npc : spawnerNPCs.keySet()) {
+			IPacketListener packetListener = spawnerNPCs.get(npc);
+			BedwarsPlugin.getInstance().removePacketListener(setuper, packetListener);
 			npc.despawn(setuper);
+		}
 		
-		spawnerNPCs = new ArrayList<ArmorStandItemNPC>();
+		spawnerNPCs = new HashMap<ArmorStandItemNPC, IPacketListener>();
 	}
 	
 }

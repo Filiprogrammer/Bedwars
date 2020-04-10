@@ -37,6 +37,11 @@ public class ArenaBuilder {
 		return this;
 	}
 	
+	public ArenaBuilder removeSpawner(int index) {
+		this.spawner.remove(index);
+		return this;
+	}
+	
 	public boolean hasBase(@NotNull Base base) {
 		return bases.contains(base);
 	}

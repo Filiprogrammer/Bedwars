@@ -23,6 +23,8 @@ import filip.bedwars.inventory.IPlacable;
 import filip.bedwars.inventory.IUsable;
 import filip.bedwars.listener.inventory.InventoryClickListener;
 import filip.bedwars.listener.player.BlockPlaceListener;
+import filip.bedwars.listener.player.IPacketListener;
+import filip.bedwars.listener.player.PacketReader;
 import filip.bedwars.listener.player.PlayerChangedWorldListener;
 import filip.bedwars.listener.player.PlayerInteractListener;
 import filip.bedwars.listener.player.PlayerQuitListener;
@@ -33,24 +35,19 @@ public class BedwarsPlugin extends JavaPlugin {
 	
 	private MultiverseCore mv;
 	
-	private List<IClickable> clickables;
-	private List<IUsable> usables;
-	private List<IPlacable> placables;
-	private List<ICommand> commands;
+	private List<IClickable> clickables = new ArrayList<IClickable>();
+	private List<IUsable> usables = new ArrayList<IUsable>();
+	private List<IPlacable> placables = new ArrayList<IPlacable>();
+	private List<ICommand> commands = new ArrayList<ICommand>();
 	private ICommand helpCommand;
-	private List<ArenaSetup> arenaSetups;
+	private List<ArenaSetup> arenaSetups = new ArrayList<ArenaSetup>();
+	private List<PacketReader> packetReaders = new ArrayList<PacketReader>();
 	
 	@Override
 	public void onEnable() {
 		plugin = this;
 		
 		mv = (MultiverseCore) getServer().getPluginManager().getPlugin("Multiverse-Core");
-		
-		clickables = new ArrayList<IClickable>();
-		usables = new ArrayList<IUsable>();
-		placables = new ArrayList<IPlacable>();
-		commands = new ArrayList<ICommand>();
-		arenaSetups = new ArrayList<ArenaSetup>();
 		
 		new PlayerInteractListener(this);
 		new BlockPlaceListener(this);
@@ -205,6 +202,40 @@ public class BedwarsPlugin extends JavaPlugin {
     	}
     	
     	return false;
+    }
+    
+    public void addPacketListener(Player player, IPacketListener packetListener) {
+    	PacketReader packetReader = null;
+    	
+    	for (PacketReader pr : packetReaders) {
+    		if (pr.getPlayer().equals(player)) {
+    			packetReader = pr;
+    			break;
+    		}
+    	}
+    	
+    	if (packetReader == null) {
+    		packetReader = new PacketReader(player);
+    		packetReaders.add(packetReader);
+    	}
+    	
+    	packetReader.addListener(packetListener);
+    }
+    
+    public boolean removePacketListener(Player player, IPacketListener packetListener) {
+    	PacketReader packetReader = null;
+    	
+    	for (PacketReader pr : packetReaders) {
+    		if (pr.getPlayer().equals(player)) {
+    			packetReader = pr;
+    			break;
+    		}
+    	}
+    	
+    	if (packetReader == null)
+    		return false;
+    	
+    	return packetReader.removeListener(packetListener);
     }
     
     public MultiverseCore getMultiverse() {
