@@ -35,6 +35,8 @@ import filip.bedwars.inventory.ItemBuilder;
 import filip.bedwars.inventory.PlacableItem;
 import filip.bedwars.inventory.UsableItem;
 import filip.bedwars.utils.MessageSender;
+import filip.bedwars.utils.PlayerNPC;
+import filip.bedwars.utils.VillagerNPC;
 
 public class ArenaSetup {
 
@@ -52,6 +54,9 @@ public class ArenaSetup {
 	private ItemStack spawnItem;
 	private ItemStack bedItem;
 	private ItemStack createBaseItem;
+	private VillagerNPC itemShopNPC;
+	private VillagerNPC teamShopNPC;
+	private PlayerNPC spawnNPC;
 	
 	public ArenaSetup(@NotNull String mapName, @NotNull Player setuper) {
 		spawnerBuilder = new SpawnerBuilder();
@@ -127,25 +132,25 @@ public class ArenaSetup {
 		clickables.add(spawnerSelector);
 		
 		// An inventory menu to select the team color and add the base to the arena
-		IClickable teamColorSelector = new ClickableInventory(Bukkit.createInventory(null, 9 * 3, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "select-team-color")), setuper) {
+		IClickable teamColorSelector = new ClickableInventory(Bukkit.createInventory(null, 9 * 3, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "select-team-color").replace("&", "§")), setuper) {
 			
 			{
-				inventory.setItem(0, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-white")).setMaterial(Material.WHITE_WOOL).build());
-				inventory.setItem(1, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-orange")).setMaterial(Material.ORANGE_WOOL).build());
-				inventory.setItem(2, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-magenta")).setMaterial(Material.MAGENTA_WOOL).build());
-				inventory.setItem(3, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-light-blue")).setMaterial(Material.LIGHT_BLUE_WOOL).build());
-				inventory.setItem(4, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-yellow")).setMaterial(Material.YELLOW_WOOL).build());
-				inventory.setItem(5, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-lime")).setMaterial(Material.LIME_WOOL).build());
-				inventory.setItem(6, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-pink")).setMaterial(Material.PINK_WOOL).build());
-				inventory.setItem(7, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-gray")).setMaterial(Material.GRAY_WOOL).build());
-				inventory.setItem(8, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-light-gray")).setMaterial(Material.LIGHT_GRAY_WOOL).build());
-				inventory.setItem(9, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-cyan")).setMaterial(Material.CYAN_WOOL).build());
-				inventory.setItem(10, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-blue")).setMaterial(Material.BLUE_WOOL).build());
-				inventory.setItem(11, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-purple")).setMaterial(Material.PURPLE_WOOL).build());
-				inventory.setItem(12, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-green")).setMaterial(Material.GREEN_WOOL).build());
-				inventory.setItem(13, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-brown")).setMaterial(Material.BROWN_WOOL).build());
-				inventory.setItem(14, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-red")).setMaterial(Material.RED_WOOL).build());
-				inventory.setItem(15,new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-black")).setMaterial(Material.BLACK_WOOL).build());
+				inventory.setItem(0, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-white").replace("&", "§")).setMaterial(Material.WHITE_WOOL).build());
+				inventory.setItem(1, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-orange").replace("&", "§")).setMaterial(Material.ORANGE_WOOL).build());
+				inventory.setItem(2, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-magenta").replace("&", "§")).setMaterial(Material.MAGENTA_WOOL).build());
+				inventory.setItem(3, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-light-blue").replace("&", "§")).setMaterial(Material.LIGHT_BLUE_WOOL).build());
+				inventory.setItem(4, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-yellow").replace("&", "§")).setMaterial(Material.YELLOW_WOOL).build());
+				inventory.setItem(5, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-lime").replace("&", "§")).setMaterial(Material.LIME_WOOL).build());
+				inventory.setItem(6, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-pink").replace("&", "§")).setMaterial(Material.PINK_WOOL).build());
+				inventory.setItem(7, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-gray").replace("&", "§")).setMaterial(Material.GRAY_WOOL).build());
+				inventory.setItem(8, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-light-gray").replace("&", "§")).setMaterial(Material.LIGHT_GRAY_WOOL).build());
+				inventory.setItem(9, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-cyan").replace("&", "§")).setMaterial(Material.CYAN_WOOL).build());
+				inventory.setItem(10, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-blue").replace("&", "§")).setMaterial(Material.BLUE_WOOL).build());
+				inventory.setItem(11, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-purple").replace("&", "§")).setMaterial(Material.PURPLE_WOOL).build());
+				inventory.setItem(12, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-green").replace("&", "§")).setMaterial(Material.GREEN_WOOL).build());
+				inventory.setItem(13, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-brown").replace("&", "§")).setMaterial(Material.BROWN_WOOL).build());
+				inventory.setItem(14, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-red").replace("&", "§")).setMaterial(Material.RED_WOOL).build());
+				inventory.setItem(15,new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-black").replace("&", "§")).setMaterial(Material.BLACK_WOOL).build());
 			}
 			
 			@Override
@@ -206,6 +211,7 @@ public class ArenaSetup {
 				
 				if (block != null) {
 					baseBuilder.setItemShop(block.getLocation());
+					spawnItemShopNPC(block.getLocation());
 					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "shop-set").replace("%type%", "Item"));
 					setuper.playSound(player.getLocation(), SoundsConfig.getInstance().getSoundValue("arena-setup"), 1, 1);
 				}
@@ -228,6 +234,7 @@ public class ArenaSetup {
 				
 				if (block != null) {
 					baseBuilder.setTeamShop(block.getLocation());
+					spawnTeamShopNPC(block.getLocation());
 					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "shop-set").replace("%type%", "Team"));
 					setuper.playSound(player.getLocation(), SoundsConfig.getInstance().getSoundValue("arena-setup"), 1, 1);
 				}
@@ -250,6 +257,7 @@ public class ArenaSetup {
 				
 				if (block != null) {
 					baseBuilder.setSpawn(block.getLocation());
+					spawnSpawnNPC(block.getLocation());
 					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "spawn-set"));
 					setuper.playSound(player.getLocation(), SoundsConfig.getInstance().getSoundValue("arena-setup"), 1, 1);
 				}
@@ -350,6 +358,9 @@ public class ArenaSetup {
 		
 		arenaBuilder.addBase(baseBuilder.build());
 		
+		despawnItemShopNPC();
+		despawnTeamShopNPC();
+		despawnSpawnNPC();
 		String colorConfigKey = "color-" + baseBuilder.getTeamColor().toString().toLowerCase().replace("_", "-");
 		MessagesConfig msgConfig = MessagesConfig.getInstance();
 		String colorStr = msgConfig.getStringValue(setuper.getLocale(), colorConfigKey);
@@ -427,6 +438,52 @@ public class ArenaSetup {
 		
 		for (IPlacable placable : placables)
 			plugin.removePlacable(placable);
+		
+		despawnItemShopNPC();
+		despawnTeamShopNPC();
+		despawnSpawnNPC();
+	}
+	
+	private void spawnItemShopNPC(Location loc) {
+		if (itemShopNPC == null)
+			itemShopNPC = new VillagerNPC(loc.clone().add(0.5, 0, 0.5), "DESERT", "ARMORER", "Item Shop", setuper);
+		else
+			itemShopNPC.teleport(loc.getBlockX() + 0.5, loc.getBlockY(), loc.getBlockZ() + 0.5, setuper);
+	}
+	
+	private void despawnItemShopNPC() {
+		if (itemShopNPC != null) {
+			itemShopNPC.despawn(setuper);
+			itemShopNPC = null;
+		}
+	}
+	
+	private void spawnTeamShopNPC(Location loc) {
+		if (teamShopNPC == null)
+			teamShopNPC = new VillagerNPC(loc.clone().add(0.5, 0, 0.5), "SNOW", "CLERIC", "Team Shop", setuper);
+		else
+			teamShopNPC.teleport(loc.getBlockX() + 0.5, loc.getBlockY(), loc.getBlockZ() + 0.5, setuper);
+	}
+	
+	private void despawnTeamShopNPC() {
+		if (teamShopNPC != null) {
+			teamShopNPC.despawn(setuper);
+			teamShopNPC = null;
+		}
+	}
+	
+	private void spawnSpawnNPC(Location loc) {
+		if (spawnNPC == null)
+			spawnNPC = new PlayerNPC(loc.clone().add(0.5, 0, 0.5), "Spawn", setuper);
+		else
+			spawnNPC.teleport(loc.getBlockX() + 0.5, loc.getBlockY(), loc.getBlockZ() + 0.5, setuper);
+	}
+	
+	private void despawnSpawnNPC() {
+		if (spawnNPC != null) {
+			spawnNPC.despawn(setuper);
+			spawnNPC = null;
+		}
 	}
 	
 }
