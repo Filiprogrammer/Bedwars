@@ -33,6 +33,14 @@ public class SpawnerBuilder {
 		return this;
 	}
 	
+	public Location getLocation() {
+		return loc;
+	}
+	
+	public Material getMaterial() {
+		return item;
+	}
+	
 	public String getItemName() {
 		return itemName;
 	}

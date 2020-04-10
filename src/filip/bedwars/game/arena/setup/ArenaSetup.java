@@ -34,6 +34,7 @@ import filip.bedwars.inventory.IUsable;
 import filip.bedwars.inventory.ItemBuilder;
 import filip.bedwars.inventory.PlacableItem;
 import filip.bedwars.inventory.UsableItem;
+import filip.bedwars.utils.ArmorStandItemNPC;
 import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.PlayerNPC;
 import filip.bedwars.utils.VillagerNPC;
@@ -57,6 +58,7 @@ public class ArenaSetup {
 	private VillagerNPC itemShopNPC;
 	private VillagerNPC teamShopNPC;
 	private PlayerNPC spawnNPC;
+	private List<ArmorStandItemNPC> spawnerNPCs = new ArrayList<ArmorStandItemNPC>();
 	
 	public ArenaSetup(@NotNull String mapName, @NotNull Player setuper) {
 		spawnerBuilder = new SpawnerBuilder();
@@ -372,6 +374,7 @@ public class ArenaSetup {
 	
 	public void addSpawner() {
 		arenaBuilder.addSpawner(spawnerBuilder.build());
+		spawnSpawnerNPC(spawnerBuilder.getLocation(), spawnerBuilder.getMaterial(), spawnerBuilder.getItemName());
 		MessageSender.sendMessage(setuper, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "spawner-set").replace("%itemname%", spawnerBuilder.getItemName()));
 		setuper.playSound(setuper.getLocation(), SoundsConfig.getInstance().getSoundValue("arena-setup"), 1, 1);
 		spawnerBuilder = new SpawnerBuilder();
@@ -442,6 +445,7 @@ public class ArenaSetup {
 		despawnItemShopNPC();
 		despawnTeamShopNPC();
 		despawnSpawnNPC();
+		despawnAllSpawnerNPCs();
 	}
 	
 	private void spawnItemShopNPC(Location loc) {
@@ -484,6 +488,22 @@ public class ArenaSetup {
 			spawnNPC.despawn(setuper);
 			spawnNPC = null;
 		}
+	}
+	
+	private void spawnSpawnerNPC(Location loc, Material material, String itemName) {
+		spawnerNPCs.add(new ArmorStandItemNPC(new Location(loc.getWorld(), loc.getBlockX() + 0.5, loc.getBlockY() -0.5, loc.getBlockZ() + 0.5), itemName + " - Spawner", material, setuper));
+	}
+	
+	private void despawnSpawnerNPC(ArmorStandItemNPC npc) {
+		npc.despawn(setuper);
+		spawnerNPCs.remove(npc);
+	}
+	
+	private void despawnAllSpawnerNPCs() {
+		for (ArmorStandItemNPC npc : spawnerNPCs)
+			npc.despawn(setuper);
+		
+		spawnerNPCs = new ArrayList<ArmorStandItemNPC>();
 	}
 	
 }
