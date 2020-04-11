@@ -500,9 +500,21 @@ public class ArenaSetup {
 		
 		UseEntityPacketListener listener = new UseEntityPacketListener(npc.getEntityId()) {
 			@Override
-			public void onUse() {
+			public void onUse(String action) {
+				if (!action.equals("ATTACK"))
+					return;
+				
 				arenaBuilder.removeSpawner(index);
-				despawnSpawnerNPC(npc);
+				// TODO: Get message from config
+				MessageSender.sendMessage(setuper, "Spawner was removed");
+				
+				// Delay Spawner despawn because otherwise the client throws an exception for some reason
+				Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), new Runnable() {
+					@Override
+					public void run() {
+						despawnSpawnerNPC(npc);
+					}
+				}, 1L);
 			}
 		};
 		
@@ -511,6 +523,8 @@ public class ArenaSetup {
 	}
 	
 	private void despawnSpawnerNPC(ArmorStandItemNPC npc) {
+		IPacketListener packetListener = spawnerNPCs.get(npc);
+		BedwarsPlugin.getInstance().removePacketListener(setuper, packetListener);
 		npc.despawn(setuper);
 		spawnerNPCs.remove(npc);
 	}

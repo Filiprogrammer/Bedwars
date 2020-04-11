@@ -22,15 +22,17 @@ public abstract class UseEntityPacketListener implements IPacketListener {
 		try {
 			Class<?> packetPlayInUseEntityClass = Class.forName("net.minecraft.server." + versionStr + ".PacketPlayInUseEntity");
 			Method getEntityIdMethod = packetPlayInUseEntityClass.getMethod("getEntityId");
+			Method bMethod = packetPlayInUseEntityClass.getMethod("b");
 			int entityId = (int) getEntityIdMethod.invoke(packet);
+			Object action = bMethod.invoke(packet);
 			
 			if (entityId == this.entityId)
-				onUse();
+				onUse(((Enum<?>)action).toString());
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public abstract void onUse();
+	public abstract void onUse(String action);
 
 }

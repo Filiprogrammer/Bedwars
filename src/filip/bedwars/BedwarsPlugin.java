@@ -235,7 +235,14 @@ public class BedwarsPlugin extends JavaPlugin {
     	if (packetReader == null)
     		return false;
     	
-    	return packetReader.removeListener(packetListener);
+    	boolean ret = packetReader.removeListener(packetListener);
+    	
+		if (!packetReader.hasListeners()) {
+			packetReader.uninject();
+			return packetReaders.remove(packetReader);
+		}
+    	
+    	return ret;
     }
     
     public MultiverseCore getMultiverse() {

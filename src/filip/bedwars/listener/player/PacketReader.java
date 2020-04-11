@@ -55,15 +55,15 @@ public class PacketReader {
 			Object playerConnection = playerConnectionField.get(entityPlayer);
 			Object networkManager = networkManagerField.get(playerConnection);
 			channel = (Channel) channelField.get(networkManager);
-			channel.pipeline().addBefore("packet_handler", player.getName(), channelDuplexHandler);
+			channel.pipeline().addBefore("packet_handler", "bedwars_handler_" + player.getName(), channelDuplexHandler);
 		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public void uninject() {
-		if(channel.pipeline().get("packet_handler") != null)
-			channel.pipeline().remove("packet_handler");
+		if(channel.pipeline().get("bedwars_handler_" + player.getName()) != null)
+			channel.pipeline().remove("bedwars_handler_" + player.getName());
 	}
 	
 	public Player getPlayer() {
@@ -81,6 +81,14 @@ public class PacketReader {
 	
 	public boolean removeListener(IPacketListener listener) {
 		return listeners.remove(listener);
+	}
+	
+	public int getListenersCount() {
+		return listeners.size();
+	}
+	
+	public boolean hasListeners() {
+		return !listeners.isEmpty();
 	}
 	
 }
