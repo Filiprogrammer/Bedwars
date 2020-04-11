@@ -21,10 +21,17 @@ commands:
     description: Cancel adding the new arena
     usage: /<command>
     permission: filip.bedwars.setup
+  bw reload:
+    description: Reload the config files
+    usage: /<command>
+    permission: filip.bedwars.reload
 permissions:
   filip.bedwars.base:
     description: hj
     default: true
   filip.bedwars.setup:
     description: aho
+    default: op
+  filip.bedwars.reload:
+    description: hablydably
     default: op

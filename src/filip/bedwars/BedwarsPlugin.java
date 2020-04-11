@@ -15,6 +15,7 @@ import filip.bedwars.commands.CancelArenaSetupCommand;
 import filip.bedwars.commands.FinishArenaCommand;
 import filip.bedwars.commands.HelpCommand;
 import filip.bedwars.commands.ICommand;
+import filip.bedwars.commands.ReloadCommand;
 import filip.bedwars.config.ArenaConfig;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.setup.ArenaSetup;
@@ -58,6 +59,7 @@ public class BedwarsPlugin extends JavaPlugin {
 		commands.add(new AddArenaCommand());
 		commands.add(new FinishArenaCommand());
 		commands.add(new CancelArenaSetupCommand());
+		commands.add(new ReloadCommand());
 		helpCommand = new HelpCommand();
 	}
 	

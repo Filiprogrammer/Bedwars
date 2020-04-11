@@ -59,6 +59,8 @@ public class ArenaSetup {
 	private ItemStack spawnItem;
 	private ItemStack bedItem;
 	private ItemStack createBaseItem;
+	private ItemStack cancelSetupItem;
+	private ItemStack finishSetupItem;
 	private VillagerNPC itemShopNPC;
 	private VillagerNPC teamShopNPC;
 	private PlayerNPC spawnNPC;
@@ -337,6 +339,40 @@ public class ArenaSetup {
 					player.openInventory(teamColorSelector.getInventory());
 			}
 		});
+		
+		usables.add(new UsableItem(cancelSetupItem, setuper) {
+			
+			@Override
+			public void use(PlayerInteractEvent event) {
+				Player player = event.getPlayer();
+				
+				// Check if the player who initiated the event is the setuper of the arena
+				if (player != setuper)
+					return;
+				
+				if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+					BedwarsPlugin.getInstance().cancelArenaSetup(player);
+					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-setup-cancelled"));
+				}
+			}
+		});
+		
+		usables.add(new UsableItem(finishSetupItem, setuper) {
+			
+			@Override
+			public void use(PlayerInteractEvent event) {
+				Player player = event.getPlayer();
+				
+				// Check if the player who initiated the event is the setuper of the arena
+				if (player != setuper)
+					return;
+				
+				if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+					BedwarsPlugin.getInstance().finishArenaSetup(player);
+					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-setup-finish"));
+				}
+			}
+		});
 	}
 	
 	public void addBase() {
@@ -423,6 +459,8 @@ public class ArenaSetup {
 		spawnItem = new ItemBuilder().setName("§rSpawn").setMaterial(Material.BEACON).build();
 		bedItem = new ItemBuilder().setName("§rBed").setMaterial(Material.WHITE_BED).build();
 		createBaseItem = new ItemBuilder().setName("§rCreate Base").setMaterial(Material.WHITE_WOOL).build();
+		cancelSetupItem = new ItemBuilder().setName("§rCancel Setup").setMaterial(Material.BARRIER).build();
+		finishSetupItem = new ItemBuilder().setName("§rFinish Setup").setMaterial(Material.GREEN_DYE).build();
 	}
 	
 	private void giveSetupItems() {
@@ -432,6 +470,8 @@ public class ArenaSetup {
 		setuper.getInventory().setItem(3, spawnItem);
 		setuper.getInventory().setItem(4, bedItem);
 		setuper.getInventory().setItem(5, createBaseItem);
+		setuper.getInventory().setItem(6, cancelSetupItem);
+		setuper.getInventory().setItem(7, finishSetupItem);
 	}
 	
 	private void cleanup() {
