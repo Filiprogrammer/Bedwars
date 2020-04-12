@@ -1,5 +1,7 @@
+#
 # If you do not want a certain sound to play at all, just remove the corresponding entry or comment it out.
-
+# Please be sure to use the right sound, you will find the right sound names here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+#
 buy-item:
   sound: ENTITY_PLAYER_BURP
   pitch: 1.35
@@ -18,12 +20,18 @@ boomball-shoot:
 countdown-tick:
   sound: UI_BUTTON_CLICK
   pitch: 0.5
+success:
+  sound: ENTITY_PLAYER_LEVELUP
+  pitch: 2
 select:
   sound: ENTITY_EXPERIENCE_ORB_PICKUP
   pitch: 2
 error:
   sound: BLOCK_ANVIL_LAND
   pitch: 0.54
+cancel:
+  sound: BLOCK_FIRE_EXTINGUISH
+  pitch: 1.3
 victory:
   sound: UI_TOAST_CHALLENGE_COMPLETE
   pitch: 1.25

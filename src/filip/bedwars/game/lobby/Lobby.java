@@ -73,7 +73,7 @@ public class Lobby {
 					return true;
 				}
 				
-				// TODO: Start game
+				game.startGame();
 				return false;
 			}
 			

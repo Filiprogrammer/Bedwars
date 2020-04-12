@@ -37,7 +37,7 @@ public class MessagesConfig extends MultipleConfig {
 		Map<String, String> msgs = messages.get(language);
 		
 		if (msgs == null)
-			return null;
+			return messages.get(MainConfig.getInstance().getLanguage()).get(key); // If the language was not found it will use the default language from the config
 		
 		return msgs.get(key);
 	}

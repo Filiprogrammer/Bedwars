@@ -30,8 +30,8 @@ public class Team {
     	members.add(uuid);
     }
     
-    public void removeMember(@NotNull UUID uuid) {
-    	members.remove(uuid);
+    public boolean removeMember(@NotNull UUID uuid) {
+    	return members.remove(uuid);
     }
     
     public boolean containsMember(@NotNull UUID uuid) {

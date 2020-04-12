@@ -41,6 +41,7 @@ import filip.bedwars.listener.player.UseEntityPacketListener;
 import filip.bedwars.utils.ArmorStandItemNPC;
 import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.PlayerNPC;
+import filip.bedwars.utils.SoundPlayer;
 import filip.bedwars.utils.VillagerNPC;
 
 public class ArenaSetup {
@@ -223,7 +224,7 @@ public class ArenaSetup {
 					baseBuilder.setItemShop(block.getLocation());
 					spawnItemShopNPC(block.getLocation());
 					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "shop-set").replace("%type%", "Item"));
-					setuper.playSound(player.getLocation(), SoundsConfig.getInstance().getSoundValue("arena-setup"), 1, 1);
+					SoundPlayer.playSound("arena-setup", setuper);
 				}
 			}
 		});
@@ -246,7 +247,7 @@ public class ArenaSetup {
 					baseBuilder.setTeamShop(block.getLocation());
 					spawnTeamShopNPC(block.getLocation());
 					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "shop-set").replace("%type%", "Team"));
-					setuper.playSound(player.getLocation(), SoundsConfig.getInstance().getSoundValue("arena-setup"), 1, 1);
+					SoundPlayer.playSound("arena-setup", setuper);
 				}
 			}
 		});
@@ -269,7 +270,7 @@ public class ArenaSetup {
 					baseBuilder.setSpawn(block.getLocation());
 					spawnSpawnNPC(block.getLocation());
 					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "spawn-set"));
-					setuper.playSound(player.getLocation(), SoundsConfig.getInstance().getSoundValue("arena-setup"), 1, 1);
+					SoundPlayer.playSound("arena-setup", setuper);
 				}
 			}
 		});
@@ -308,15 +309,15 @@ public class ArenaSetup {
 						
 						if (baseBuilder.getBedBottom() == null) {
 							MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "bed-bottom-error"));
-							player.playSound(player.getLocation(), SoundsConfig.getInstance().getSoundValue("error"), 1, 1);
+							SoundPlayer.playSound("error", player);
 							return;
 						}
 						
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "bed-set"));
-						player.playSound(player.getLocation(), SoundsConfig.getInstance().getSoundValue("arena-setup"), 1, 1);
+						SoundPlayer.playSound("arena-setup", player);
 					} else {
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "bed-set-error"));
-						player.playSound(player.getLocation(), SoundsConfig.getInstance().getSoundValue("error"), 1, 1);
+						SoundPlayer.playSound("error", player);
 					}
 				}
 			}
@@ -409,7 +410,7 @@ public class ArenaSetup {
 		MessagesConfig msgConfig = MessagesConfig.getInstance();
 		String colorStr = msgConfig.getStringValue(setuper.getLocale(), colorConfigKey);
 		MessageSender.sendMessage(setuper, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "base-added").replace("%teamcolor%", colorStr));
-		setuper.playSound(setuper.getLocation(), SoundsConfig.getInstance().getSoundValue("arena-setup"), 1, 1);
+		SoundPlayer.playSound("arena-setup", setuper);
 		
 		baseBuilder = new BaseBuilder();
 	}
@@ -418,7 +419,7 @@ public class ArenaSetup {
 		arenaBuilder.addSpawner(spawnerBuilder.build());
 		spawnSpawnerNPC(spawnerBuilder.getLocation(), spawnerBuilder.getMaterial(), spawnerBuilder.getItemName());
 		MessageSender.sendMessage(setuper, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "spawner-set").replace("%itemname%", spawnerBuilder.getItemName()));
-		setuper.playSound(setuper.getLocation(), SoundsConfig.getInstance().getSoundValue("arena-setup"), 1, 1);
+		SoundPlayer.playSound("arena-setup", setuper);
 		spawnerBuilder = new SpawnerBuilder();
 	}
 	

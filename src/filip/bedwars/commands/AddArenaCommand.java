@@ -8,6 +8,7 @@ import filip.bedwars.BedwarsPlugin.SetupArenaResponse;
 import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.utils.MessageSender;
+import filip.bedwars.utils.SoundPlayer;
 
 public class AddArenaCommand implements ICommand {
 
@@ -16,40 +17,43 @@ public class AddArenaCommand implements ICommand {
 		if (args.length != 3)
 			return false;
 		
-		if (!(sender instanceof Player))
+		if (!(sender instanceof Player)) {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(MainConfig.getInstance().getLanguage(), "you-must-be-player"));
+			return true;
+		}
 		
 		int minPlayersToStart = 0;
 		int playersPerTeam = 0;
+		Player player = (Player) sender;
 		
 		try {
 			minPlayersToStart = Integer.parseInt(args[1]);
 		} catch (NumberFormatException e) {
-			// TODO: Read message from config
-			MessageSender.sendMessage(sender, "Minimun players to start has to be a number");
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "min-start-player-must-be-number"));
+			SoundPlayer.playSound("error", player);
 		}
 		
 		try {
 			playersPerTeam = Integer.parseInt(args[2]);
 		} catch (NumberFormatException e) {
-			// TODO: Read message from config
-			MessageSender.sendMessage(sender, "Players per team has to be a number");
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "player-per-team-must-be-number"));
+			SoundPlayer.playSound("error", player);
 		}
 		
 		SetupArenaResponse setupArenaResponse = BedwarsPlugin.getInstance().setupArena(args[0], minPlayersToStart, playersPerTeam, (Player) sender);
 		
 		switch (setupArenaResponse) {
 		case ARENA_IN_WORLD_ALREADY_SETTING_UP:
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "arena-in-world-already-setting-up"));
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-in-world-already-setting-up"));
 			break;
 		case ALREADY_SETTING_UP_ARENA:
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "arena-already-setting-up"));
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-already-setting-up"));
 			break;
 		case ARENA_IN_WORLD_ALREADY_EXISTS:
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "world-has-arena"));
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "world-has-arena"));
 			break;
 		case SUCCESS:
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "arena-setup-started").replace("%mapname%", args[0]));
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-setup-started").replace("%mapname%", args[0]));
 			break;
 		}
 		

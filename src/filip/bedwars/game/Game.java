@@ -63,10 +63,9 @@ public class Game {
 	// TODO: Add reconnect function
 	
 	public void joinPlayer(Player player) {
-		// TODO: Teleport players
-		
 		if (isRunning()) {
 			spectators.add(player.getUniqueId());
+			gameLogic.joinSpectator(player);
 		} else {
 			players.add(player.getUniqueId());
 			lobby.joinPlayer(player);
@@ -78,8 +77,22 @@ public class Game {
 			joinPlayer(player);
 	}
 	
-	public void leavePlayer(Player player) {
+	public boolean leavePlayer(Player player) {
+		if (players.remove(player.getUniqueId())) {
+			for (Team team : teams)
+				if (team.removeMember(player.getUniqueId()))
+					break;
+			
+			if (isRunning())
+				gameLogic.leavePlayer(player);
+			else
+				lobby.leavePlayer(player);
+		} else if (spectators.remove(player.getUniqueId())) {
+			if (isRunning())
+				gameLogic.leavePlayer(player);
+		}
 		
+		return false;
 	}
 	
 	public Arena getArena() {
@@ -100,6 +113,14 @@ public class Game {
 				return true;
 		
 		return false;
+	}
+	
+	public Team getTeamOfPlayer(UUID uuid) {
+		for (Team team : teams)
+			if (team.containsMember(uuid))
+				return team;
+		
+		return null;
 	}
 	
 	private Team getSmallestTeam() {

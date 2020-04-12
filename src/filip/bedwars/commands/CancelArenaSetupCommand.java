@@ -4,8 +4,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import filip.bedwars.BedwarsPlugin;
+import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.utils.MessageSender;
+import filip.bedwars.utils.SoundPlayer;
 
 public class CancelArenaSetupCommand implements ICommand {
 
@@ -14,13 +16,20 @@ public class CancelArenaSetupCommand implements ICommand {
 		if (args.length != 0)
 			return false;
 		
-		if (!(sender instanceof Player))
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "you-must-be-player"));
+		if (!(sender instanceof Player)) {
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(MainConfig.getInstance().getLanguage(), "you-must-be-player"));
+			return true;
+		}
 		
-		if (BedwarsPlugin.getInstance().cancelArenaSetup((Player) sender))
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "arena-setup-cancelled"));
-		else
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(((Player) sender).getLocale(), "arena-you-were-not-setup"));
+		Player player = (Player) sender;
+		
+		if (BedwarsPlugin.getInstance().cancelArenaSetup(player)) {
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-setup-cancelled"));
+			SoundPlayer.playSound("cancel", player);
+		} else {
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-you-were-not-setup"));
+			SoundPlayer.playSound("error", player);
+		}
 		
 		return true;
 	}

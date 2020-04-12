@@ -6,7 +6,7 @@ public class MainConfig extends SingleConfig {
 
 	private static MainConfig instance = null;
 	
-	String language = "en_us";
+	private String language = "en_us";
 	
 	protected MainConfig() {
 		super("config.yml");

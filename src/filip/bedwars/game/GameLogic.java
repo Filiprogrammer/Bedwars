@@ -1,6 +1,12 @@
 package filip.bedwars.game;
 
 import java.util.List;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.world.GameWorld;
@@ -48,6 +54,28 @@ public class GameLogic {
 			}
 		};
 		this.gameState.initiate();
+		
+		// Teleport every player to the spawnpoint of their base
+		for (UUID uuid : game.getPlayers())
+			teleportToSpawn(Bukkit.getPlayer(uuid));
+	}
+	
+	private void teleportToSpawn(Player player) {
+		if (player == null)
+			return;
+		
+		Location spawnLoc = game.getTeamOfPlayer(player.getUniqueId()).getBase().getSpawn().clone();
+		spawnLoc.setWorld(gameWorld.getWorld());
+		player.teleport(spawnLoc);
+	}
+	
+	public void joinSpectator(Player player) {
+		player.teleport();
+		player.setGameMode(GameMode.SPECTATOR);
+	}
+	
+	public void leavePlayer(Player player) {
+		// TODO: Teleport to main lobby
 	}
 	
 }
