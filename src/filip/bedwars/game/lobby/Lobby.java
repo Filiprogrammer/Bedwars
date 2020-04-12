@@ -6,11 +6,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
-import filip.bedwars.config.SoundsConfig;
 import filip.bedwars.game.Countdown;
 import filip.bedwars.game.Game;
 import filip.bedwars.utils.MessageSender;
+import filip.bedwars.utils.SoundPlayer;
 
 public class Lobby {
 	
@@ -30,33 +31,34 @@ public class Lobby {
 					for (UUID uuid : game.getPlayers()) {
 						Player player = Bukkit.getPlayer(uuid);
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "countdown-not-enough-player"));
-						player.playSound(player.getLocation(), SoundsConfig.getInstance().getSoundValue("error"), 1, 1);
+						SoundPlayer.playSound("error", player);
 					}
 					
-					countdown.cancel();
+					cancel();
 				}
 				
-				int secondsLeft = countdown.getSecondsLeft();
+				int secondsLeft = getSecondsLeft();
 				
 				if (secondsLeft == 1) {
 					for (UUID uuid : game.getPlayers()) {
 						Player player = Bukkit.getPlayer(uuid);
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "game-starts-in-one-second"));
-						player.playSound(player.getLocation(), SoundsConfig.getInstance().getSoundValue("countdown-tick"), 1, 1);
+						SoundPlayer.playSound("countdown-tick", player);
 					}
 				} else if ((secondsLeft % 10) == 0 || secondsLeft <= 5) {
 					for (UUID uuid : game.getPlayers()) {
 						Player player = Bukkit.getPlayer(uuid);
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "game-starts-in"));
-						player.playSound(player.getLocation(), SoundsConfig.getInstance().getSoundValue("countdown-tick"), 1, 1);
+						SoundPlayer.playSound("countdown-tick", player);
 					}
 				}
 			}
 			
 			@Override
 			public void onStart() {
-				// TODO: Get message from config
-				MessageSender.sendMessageUUID(game.getPlayers(), "Countdown was started");
+				for(UUID uuid : game.getPlayers()) {
+					MessageSender.sendMessageUUID(uuid, MessagesConfig.getInstance().getStringValue(Bukkit.getPlayer(uuid).getLocale(), "countdown-started"));
+				}
 			}
 			
 			@Override
@@ -66,10 +68,10 @@ public class Lobby {
 					for (UUID uuid : game.getPlayers()) {
 						Player player = Bukkit.getPlayer(uuid);
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "countdown-not-enough-player"));
-						player.playSound(player.getLocation(), SoundsConfig.getInstance().getSoundValue("error"), 1, 1);
+						SoundPlayer.playSound("cancel", player);
 					}
 					
-					countdown.cancel();
+					cancel();
 					return true;
 				}
 				
@@ -79,8 +81,8 @@ public class Lobby {
 			
 			@Override
 			public void onCancel() {
-				// TODO: Get message from config
-				MessageSender.sendMessageUUID(game.getPlayers(), "Countdown was cancelled");
+				for(UUID uuid : game.getPlayers())
+					MessageSender.sendMessageUUID(uuid, MessagesConfig.getInstance().getStringValue(Bukkit.getPlayer(uuid).getLocale(), "countdown-not-enough-player"));
 			}
 		};
 		
@@ -108,7 +110,7 @@ public class Lobby {
 	 */
 	public void leavePlayer(Player player) {
 		// TODO: Unhide the player
-		// TODO: Teleport to main lobby
+		player.teleport(MainConfig.getInstance().getMainLobby());
 	}
 	
 	private void updatePlayerVisibilities() {

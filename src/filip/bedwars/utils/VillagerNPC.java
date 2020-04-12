@@ -151,4 +151,14 @@ public class VillagerNPC {
 		}
 	}
 	
+	public int getEntityId() {
+		try {
+			return (int) getIdMethod.invoke(entity);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		
+		return 0;
+	}
+	
 }

@@ -26,7 +26,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.config.MessagesConfig;
-import filip.bedwars.config.SoundsConfig;
 import filip.bedwars.game.TeamColor;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.inventory.ClickableInventory;
@@ -424,6 +423,9 @@ public class ArenaSetup {
 	}
 	
 	public Arena finish() {
+		if(arenaBuilder.getBaseCount() < 2) // if there are not enough bases, return null so the setup does NOT finish
+			return null;
+		
 		cleanup();
 		World w = arenaBuilder.getWorld();
 		MVWorldManager mvWorldManager = BedwarsPlugin.getInstance().getMultiverse().getMVWorldManager();

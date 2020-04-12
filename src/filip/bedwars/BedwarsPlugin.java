@@ -180,19 +180,29 @@ public class BedwarsPlugin extends JavaPlugin {
     	return SetupArenaResponse.SUCCESS;
     }
     
-    public boolean finishArenaSetup(Player setuper) {
+    public enum FinishArenaResponse {
+    	NO_ARENA_SETTING_UP,
+    	NOT_ENOUGH_BASES,
+    	ARENA_CREATED
+    };
+    
+    public FinishArenaResponse finishArenaSetup(Player setuper) {
     	for (ArenaSetup arenaSetup : arenaSetups) {
     		if (arenaSetup.getSetuper().getUniqueId().equals(setuper.getUniqueId())) {
     			Arena arena = arenaSetup.finish();
+    			if(arena == null)
+    				return FinishArenaResponse.NOT_ENOUGH_BASES;
     			arenaSetups.remove(arenaSetup);
     			ArenaConfig.getInstance().addArena(arena);
     			ArenaConfig.getInstance().saveConfig();
-    			return true;
+    			return FinishArenaResponse.ARENA_CREATED;
     		}
     	}
     	
-    	return false;
+    	return FinishArenaResponse.NO_ARENA_SETTING_UP;
     }
+    
+
     
     public boolean cancelArenaSetup(Player setuper) {
     	for (ArenaSetup arenaSetup : arenaSetups) {

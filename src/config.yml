@@ -1,2 +1,10 @@
 # This only effects the language of the server console
 language: en_us
+
+main-lobby:
+  w: world
+  x: 0.0
+  y: 65.0
+  z: 0.0
+  yaw: 0.0
+  pitch: 0.0
