@@ -161,7 +161,7 @@ public class BedwarsPlugin extends JavaPlugin {
     	SUCCESS
     };
     
-    public SetupArenaResponse setupArena(String mapName, Player setuper) {
+    public SetupArenaResponse setupArena(String mapName, int minPlayersToStart, int playersPerTeam, Player setuper) {
     	if (ArenaConfig.getInstance().getArena(setuper.getWorld()) != null)
 			// An Arena already exists in this world
 			return SetupArenaResponse.ARENA_IN_WORLD_ALREADY_EXISTS;
@@ -176,7 +176,7 @@ public class BedwarsPlugin extends JavaPlugin {
     			return SetupArenaResponse.ARENA_IN_WORLD_ALREADY_SETTING_UP;
     	}
     	
-    	arenaSetups.add(new ArenaSetup(mapName, setuper));
+    	arenaSetups.add(new ArenaSetup(mapName, minPlayersToStart, playersPerTeam, setuper));
     	return SetupArenaResponse.SUCCESS;
     }
     

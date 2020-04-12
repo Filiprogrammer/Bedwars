@@ -15,6 +15,8 @@ public class ArenaSerializer {
 	public static Map<String, Object> serializeArena(Arena arena) {
 		Map<String, Object> ret = new HashMap<String, Object>();
 		ret.put("mapName", arena.getMapName());
+		ret.put("minPlayersToStart", arena.getMinPlayersToStart());
+		ret.put("playersPerTeam", arena.getPlayersPerTeam());
 		ret.put("world", arena.getWorld().getName());
 		
 		List<Map<String, Object>> spawnerList = new ArrayList<Map<String, Object>>();

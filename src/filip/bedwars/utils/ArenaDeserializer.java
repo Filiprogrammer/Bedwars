@@ -21,6 +21,8 @@ public class ArenaDeserializer {
 		ArenaBuilder arenaBuilder = new ArenaBuilder();
 		
 		arenaBuilder.setMapName((String) mapOfElements.get("mapName"));
+		arenaBuilder.setMinPlayersToStart((int) mapOfElements.get("minPlayersToStart"));
+		arenaBuilder.setPlayersPerTeam((int) mapOfElements.get("playersPerTeam"));
 		arenaBuilder.setWorld(Bukkit.getWorld((String) mapOfElements.get("world")));
 		
 		List<Map<String, Object>> spawnerList = (List<Map<String, Object>>) mapOfElements.get("spawner");

@@ -16,6 +16,8 @@ public class ArenaBuilder {
 	private List<Base> bases = new ArrayList<Base>();
 	private List<Spawner> spawner = new ArrayList<Spawner>();
 	private World world;
+	private int minPlayersToStart;
+	private int playersPerTeam;
 	
 	public ArenaBuilder addBase(@NotNull Base base) {
 		bases.add(base);
@@ -29,6 +31,16 @@ public class ArenaBuilder {
 	
 	public ArenaBuilder setMapName(@NotNull String mapName) {
 		this.mapName = mapName;
+		return this;
+	}
+	
+	public ArenaBuilder setMinPlayersToStart(int minPlayersToStart) {
+		this.minPlayersToStart = minPlayersToStart;
+		return this;
+	}
+	
+	public ArenaBuilder setPlayersPerTeam(int playersPerTeam) {
+		this.playersPerTeam = playersPerTeam;
 		return this;
 	}
 	
@@ -63,7 +75,7 @@ public class ArenaBuilder {
 	}
 	
 	public Arena build() {
-		return new Arena(mapName, world, spawner, bases);
+		return new Arena(mapName, minPlayersToStart, playersPerTeam, world, spawner, bases);
 	}
 
 }

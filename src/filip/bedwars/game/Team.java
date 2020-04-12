@@ -34,6 +34,10 @@ public class Team {
     	members.remove(uuid);
     }
     
+    public boolean containsMember(@NotNull UUID uuid) {
+    	return members.contains(uuid);
+    }
+    
     public List<UUID> getMembers() {
     	return members;
     }

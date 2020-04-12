@@ -1,7 +1,9 @@
 package filip.bedwars.utils;
 
 import java.util.List;
+import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -11,7 +13,7 @@ import filip.bedwars.config.MessagesConfig;
 public class MessageSender {
 
 	/**
-	 * Send a Message to the given sender.
+	 * Send a message to the given sender.
 	 * @param sendTo Player or Console that should receive the message
 	 * @param msg Message that should be sent
 	 */
@@ -27,7 +29,7 @@ public class MessageSender {
 	}
 	
 	/**
-	 * Send a Message to a group.
+	 * Send a message to a group.
 	 * @param receivers List of players and console that should receive the message
 	 * @param msg Message that should be sent
 	 */
@@ -43,6 +45,40 @@ public class MessageSender {
 			cs.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg).replace('&', '§'));
 		}
 		
+	}
+	
+	/**
+	 * Send a message to a player
+	 * @param receivers List of players as UUID
+	 * @param msg Message that should be sent
+	 */
+	public static void sendMessageUUID(UUID receiver, String msg) {
+
+			Player player = Bukkit.getPlayer(receiver);
+			
+			if (player != null)
+			{
+				String locale = player.getLocale();
+				player.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg).replace('&', '§'));
+			}
+		
+	}
+	
+	/**
+	 * Send a message to a group.
+	 * @param receivers List of players as UUID
+	 * @param msg Message that should be sent
+	 */
+	public static void sendMessageUUID(List<UUID> receivers, String msg) {
+		for(UUID uuid : receivers) {
+			Player player = Bukkit.getPlayer(uuid);
+			
+			if (player != null)
+			{
+				String locale = player.getLocale();
+				player.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg).replace('&', '§'));
+			}
+		}
 	}
 	
 }

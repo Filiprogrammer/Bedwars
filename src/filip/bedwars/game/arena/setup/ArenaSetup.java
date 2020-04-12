@@ -66,11 +66,13 @@ public class ArenaSetup {
 	private PlayerNPC spawnNPC;
 	private Map<ArmorStandItemNPC, IPacketListener> spawnerNPCs = new HashMap<ArmorStandItemNPC, IPacketListener>();
 	
-	public ArenaSetup(@NotNull String mapName, @NotNull Player setuper) {
+	public ArenaSetup(@NotNull String mapName, int minPlayersToStart, int playersPerTeam, @NotNull Player setuper) {
 		spawnerBuilder = new SpawnerBuilder();
 		baseBuilder = new BaseBuilder();
 		arenaBuilder = new ArenaBuilder();
 		arenaBuilder.setMapName(mapName);
+		arenaBuilder.setMinPlayersToStart(minPlayersToStart);
+		arenaBuilder.setPlayersPerTeam(playersPerTeam);
 		arenaBuilder.setWorld(setuper.getWorld());
 		this.setuper = setuper;
 		

@@ -1,9 +1,29 @@
 # If you do not want a certain sound to play at all, just remove the corresponding entry or comment it out.
 
-buy-item: ENTITY_PLAYER_BURP
-cant-afford-item: ENTITY_VILLAGER_NO
-arena-setup: BLOCK_NOTE_BLOCK_DIDGERIDOO
-bed-destroyed: ENTITY_WITHER_DEATH
-boomball-shoot: ENTITY_WITHER_SHOOT
-countdown-tick: BLOCK_STONE_BUTTON_CLICK_OFF
-error: BLOCK_FIRE_EXTINGUISH
+buy-item:
+  sound: ENTITY_PLAYER_BURP
+  pitch: 1.35
+  volume: 0.75
+cant-afford-item:
+  sound: ENTITY_VILLAGER_NO
+  pitch: 0.75
+arena-setup: 
+  sound: ENTITY_EXPERIENCE_ORB_PICKUP
+  pitch: 1.15
+bed-destroyed: 
+  sound: ENTITY_WITHER_DEATH
+boomball-shoot: 
+  sound: ENTITY_ENDER_DRAGON_SHOOT
+  pitch: 0.85
+countdown-tick:
+  sound: UI_BUTTON_CLICK
+  pitch: 0.5
+select:
+  sound: ENTITY_EXPERIENCE_ORB_PICKUP
+  pitch: 2
+error:
+  sound: BLOCK_ANVIL_LAND
+  pitch: 0.54
+victory:
+  sound: UI_TOAST_CHALLENGE_COMPLETE
+  pitch: 1.25

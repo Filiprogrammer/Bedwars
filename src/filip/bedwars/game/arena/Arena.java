@@ -12,11 +12,15 @@ public class Arena {
 	private List<Base> bases = new ArrayList<Base>();
 	private final String mapName;	
 	private World world;
+	private final int minPlayersToStart;
+	private final int playersPerTeam;
 
-	public Arena(@NotNull String mapName, @NotNull World world, @NotNull List<Spawner> spawner, @NotNull List<Base> bases) {
+	public Arena(@NotNull String mapName, int minPlayersToStart, int playersPerTeam, @NotNull World world, @NotNull List<Spawner> spawner, @NotNull List<Base> bases) {
 		this.spawner = spawner;
 		this.bases = bases;
 		this.mapName = mapName;
+		this.minPlayersToStart = minPlayersToStart;
+		this.playersPerTeam = playersPerTeam;
 		this.world = world;
 	}
 	
@@ -41,6 +45,14 @@ public class Arena {
 	
 	public String getMapName() {
 		return mapName;
+	}
+	
+	public int getMinPlayersToStart() {
+		return minPlayersToStart;
+	}
+	
+	public int getPlayersPerTeam() {
+		return playersPerTeam;
 	}
 	
 }
