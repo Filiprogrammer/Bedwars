@@ -3,6 +3,7 @@ package filip.bedwars.world;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.bukkit.World;
 
 public class GameWorldManager {
@@ -23,11 +24,11 @@ public class GameWorldManager {
 	}
 	
 	public GameWorld claimGameWorld(World loadFrom) {
-		
+		throw new NotImplementedException();
 	}
 	
 	public void removeGameWorld(GameWorld gameWorld) {
-		
+		throw new NotImplementedException();
 	}
 	
 }

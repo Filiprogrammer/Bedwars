@@ -25,6 +25,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 import filip.bedwars.BedwarsPlugin;
+import filip.bedwars.BedwarsPlugin.FinishArenaSetupResponse;
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.TeamColor;
 import filip.bedwars.game.arena.Arena;
@@ -370,8 +371,22 @@ public class ArenaSetup {
 					return;
 				
 				if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-					BedwarsPlugin.getInstance().finishArenaSetup(player);
-					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-setup-finish"));
+					FinishArenaSetupResponse finishArenaSetupResponse = BedwarsPlugin.getInstance().finishArenaSetup(player);
+					
+					switch (finishArenaSetupResponse) {
+					case ARENA_CREATED:
+						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-setup-finish"));
+						SoundPlayer.playSound("arena-setup", player);
+						break;
+					case NO_ARENA_SETTING_UP:
+						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-you-were-not-setup"));
+						SoundPlayer.playSound("error", player);
+						break;
+					case NOT_ENOUGH_BASES:
+						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-not-enough-bases"));
+						SoundPlayer.playSound("error", player);
+						break;
+					}
 				}
 			}
 		});

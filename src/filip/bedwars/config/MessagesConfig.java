@@ -13,7 +13,8 @@ public class MessagesConfig extends MultipleConfig {
 	
 	private Map<String, Map<String, String>> messages = new HashMap<String, Map<String, String>>();
 	
-	private final static Map<String, String> configFileNames  = new HashMap<String, String>() {{
+	@SuppressWarnings("serial")
+	private final static Map<String, String> configFileNames = new HashMap<String, String>() {{
 		put("en_au", "messages-en.yml");
 		put("en_ca", "messages-en.yml");
 		put("en_gb", "messages-en.yml");

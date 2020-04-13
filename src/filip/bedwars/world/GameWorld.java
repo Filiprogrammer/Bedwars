@@ -1,5 +1,6 @@
 package filip.bedwars.world;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.bukkit.World;
 
 public class GameWorld {
@@ -16,6 +17,7 @@ public class GameWorld {
 	
 	private void loadWorld(World loadFrom) {
 		// TODO: get game world name prefix from config
+		throw new NotImplementedException();
 	}
 	
 }

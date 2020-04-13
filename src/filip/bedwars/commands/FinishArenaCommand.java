@@ -4,6 +4,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import filip.bedwars.BedwarsPlugin;
+import filip.bedwars.BedwarsPlugin.FinishArenaSetupResponse;
 import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.utils.MessageSender;
@@ -22,13 +23,21 @@ public class FinishArenaCommand implements ICommand {
 		}
 		
 		Player player = (Player) sender;
+		FinishArenaSetupResponse finishArenaSetupResponse = BedwarsPlugin.getInstance().finishArenaSetup(player);
 		
-		if (BedwarsPlugin.getInstance().finishArenaSetup(player)) {
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-setup-finish"));
+		switch (finishArenaSetupResponse) {
+		case ARENA_CREATED:
+			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-setup-finish"));
 			SoundPlayer.playSound("arena-setup", player);
-		} else {
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-you-were-not-setup"));
+			break;
+		case NO_ARENA_SETTING_UP:
+			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-you-were-not-setup"));
 			SoundPlayer.playSound("error", player);
+			break;
+		case NOT_ENOUGH_BASES:
+			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-not-enough-bases"));
+			SoundPlayer.playSound("error", player);
+			break;
 		}
 		
 		return true;
