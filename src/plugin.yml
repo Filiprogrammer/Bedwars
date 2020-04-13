@@ -25,8 +25,15 @@ commands:
     description: Reload the config files
     usage: /<command>
     permission: filip.bedwars.reload
+  bw joingame:
+    description: Join a game
+    usage: /<command>
+    permission: filip.bedwars.play
 permissions:
   filip.bedwars.base:
+    description: hj
+    default: true
+  filip.bedwars.play:
     description: hj
     default: true
   filip.bedwars.setup:

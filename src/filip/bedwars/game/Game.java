@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.arena.Arena;
+import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.lobby.Lobby;
 import filip.bedwars.world.GameWorld;
 import filip.bedwars.world.GameWorldManager;
@@ -26,8 +27,12 @@ public class Game {
 	public Game(@NotNull Arena arena) {
 		this.arena = arena;
 		// TODO: Lobby setup and get lobby spawn point from config
-		this.lobby = new Lobby(new Location(Bukkit.getWorld("bw_lobby"), 0, 65, 0));
+		this.lobby = new Lobby(new Location(Bukkit.getWorld("bw_lobby"), 0, 65, 0), this);
 		
+		for (int i = 0; i < arena.getBases().size(); ++i) {
+			Base base = arena.getBase(i);
+			teams.add(new Team(i, base, new ArrayList<UUID>()));
+		}
 	}
 	
 	/**

@@ -19,8 +19,9 @@ public class Lobby {
 	private Countdown countdown;
 	private Game game;
 	
-	public Lobby(Location spawnPoint) {
+	public Lobby(Location spawnPoint, Game game) {
 		this.spawnPoint = spawnPoint;
+		this.game = game;
 		// TODO: read from config
 		this.countdown = new Countdown(60) {
 			
@@ -48,7 +49,7 @@ public class Lobby {
 				} else if ((secondsLeft % 10) == 0 || secondsLeft <= 5) {
 					for (UUID uuid : game.getPlayers()) {
 						Player player = Bukkit.getPlayer(uuid);
-						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "game-starts-in"));
+						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "game-starts-in").replace("%seconds%", "" + secondsLeft));
 						SoundPlayer.playSound("countdown-tick", player);
 					}
 				}
