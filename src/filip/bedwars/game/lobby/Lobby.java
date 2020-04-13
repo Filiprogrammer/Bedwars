@@ -112,6 +112,7 @@ public class Lobby {
 	public void leavePlayer(Player player) {
 		// TODO: Unhide the player
 		player.teleport(MainConfig.getInstance().getMainLobby());
+		countdown.cancel();
 	}
 	
 	private void updatePlayerVisibilities() {

@@ -46,11 +46,12 @@ public class Game {
 				Player player = event.getPlayer();
 				
 				if (players.contains(player.getUniqueId())) {
-					if (isRunning())
+					if (isRunning()) {
 						if (!player.getWorld().getName().equals(gameLogic.getGameWorld().getWorld().getName()))
 							leavePlayer(player); // Player left the game world and therefore leaves the game
-					else if (!player.getWorld().getName().equals(lobby.getSpawnPoint().getWorld().getName()))
-							leavePlayer(player); // Player left the game lobby and therefore leaves the game
+					} else if (!player.getWorld().getName().equals(lobby.getSpawnPoint().getWorld().getName())) {
+						leavePlayer(player); // Player left the game lobby and therefore leaves the game
+					}
 				}
 			}
 		};

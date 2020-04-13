@@ -5,34 +5,16 @@ import org.bukkit.scheduler.BukkitTask;
 
 import filip.bedwars.BedwarsPlugin;
 
-public abstract class Countdown extends BukkitRunnable {
+public abstract class Countdown {
 
 	private final int totalSeconds;
 	private int secondsLeft;
 	private BukkitTask task = null;
+	private BukkitRunnable bukkitRunnable;
 	
 	public Countdown(int totalSeconds) {
 		this.totalSeconds = totalSeconds;
 		secondsLeft = totalSeconds;
-	}
-	
-	@Override
-	public void run() {
-		if (secondsLeft == totalSeconds)
-			onStart();
-		
-		--secondsLeft;
-		
-		if (secondsLeft == 0) {
-			if (onFinish()) {
-				secondsLeft = totalSeconds;
-				onStart();
-			} else {
-				super.cancel();
-			}
-		}
-		
-		onTick();
 	}
 	
 	/**
@@ -41,17 +23,38 @@ public abstract class Countdown extends BukkitRunnable {
 	 */
 	public boolean start() {
 		if (!isRunning()) {
-			task = this.runTaskTimer(BedwarsPlugin.getInstance(), 0, 20L);
+			secondsLeft = totalSeconds;
+			bukkitRunnable = new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (secondsLeft == totalSeconds)
+						onStart();
+					
+					--secondsLeft;
+					
+					if (secondsLeft == 0) {
+						if (onFinish()) {
+							secondsLeft = totalSeconds;
+						} else {
+							bukkitRunnable.cancel();
+							task.cancel();
+							task = null;
+						}
+					}
+					
+					onTick();
+				}
+			};
+			task = bukkitRunnable.runTaskTimer(BedwarsPlugin.getInstance(), 0, 20L);
 			return true;
 		}
 		
 		return false;
     }
 	
-	@Override
 	public void cancel() {
 		if (isRunning()) {
-			super.cancel();
+			bukkitRunnable.cancel();
 			task.cancel();
 			task = null;
 			onCancel();
