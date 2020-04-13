@@ -9,7 +9,7 @@ public class Base {
 	private final Location spawn, itemShop, teamShop, bedTop, bedBottom;
 	private final TeamColor teamColor;
 	
-	public Base(@NotNull Location spawn, @NotNull Location itemShop, @NotNull Location teamShop, @NotNull Location bedTop, @NotNull Location bedBottom, @NotNull TeamColor teamColor) {
+	public Base(@NotNull Location spawn, @NotNull Location itemShop, Location teamShop, @NotNull Location bedTop, @NotNull Location bedBottom, @NotNull TeamColor teamColor) {
 		this.spawn = spawn;
 		this.itemShop = itemShop;
 		this.teamShop = teamShop;

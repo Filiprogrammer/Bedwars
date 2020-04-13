@@ -62,11 +62,14 @@ public class ArenaSerializer {
 					put("y", base.getItemShop().getBlockY());
 					put("z", base.getItemShop().getBlockZ());
 				}});
-				put("teamShop", new HashMap<String, Integer>() {{
-					put("x", base.getTeamShop().getBlockX());
-					put("y", base.getTeamShop().getBlockY());
-					put("z", base.getTeamShop().getBlockZ());
-				}});
+				
+				if(base.getTeamShop() != null) { // only write the team shop if it exists
+					put("teamShop", new HashMap<String, Integer>() {{
+						put("x", base.getTeamShop().getBlockX());
+						put("y", base.getTeamShop().getBlockY());
+						put("z", base.getTeamShop().getBlockZ());
+					}});
+				}
 			}};
 			baseList.add(baseInfo);
 		}

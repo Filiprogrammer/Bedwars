@@ -7,11 +7,16 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 
+import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.lobby.Lobby;
+import filip.bedwars.listener.player.PlayerChangedWorldHandler;
+import filip.bedwars.listener.player.PlayerQuitHandler;
 import filip.bedwars.world.GameWorld;
 import filip.bedwars.world.GameWorldManager;
 
@@ -22,7 +27,8 @@ public class Game {
 	private GameLogic gameLogic;
 	private List<UUID> players = new ArrayList<UUID>();
 	private List<Team> teams = new ArrayList<Team>();
-	private List<UUID> spectators = new ArrayList<UUID>();
+	private PlayerChangedWorldHandler playerChangedWorldHandler;
+	private PlayerQuitHandler playerQuitHandler;
 	
 	public Game(@NotNull Arena arena) {
 		this.arena = arena;
@@ -33,6 +39,34 @@ public class Game {
 			Base base = arena.getBase(i);
 			teams.add(new Team(i, base, new ArrayList<UUID>()));
 		}
+		
+		playerChangedWorldHandler = new PlayerChangedWorldHandler() {
+			@Override
+			public void onChangedWorld(PlayerChangedWorldEvent event) {
+				Player player = event.getPlayer();
+				
+				if (players.contains(player.getUniqueId())) {
+					if (isRunning())
+						if (!player.getWorld().getName().equals(gameLogic.getGameWorld().getWorld().getName()))
+							leavePlayer(player); // Player left the game world and therefore leaves the game
+					else if (!player.getWorld().getName().equals(lobby.getSpawnPoint().getWorld().getName()))
+							leavePlayer(player); // Player left the game lobby and therefore leaves the game
+				}
+			}
+		};
+		
+		playerQuitHandler = new PlayerQuitHandler() {
+			@Override
+			public void onQuit(PlayerQuitEvent event) {
+				Player player = event.getPlayer();
+				
+				if (players.contains(player.getUniqueId()))
+					leavePlayer(player);
+			}
+		};
+		
+		BedwarsPlugin.getInstance().addPlayerChangedWorldHandler(playerChangedWorldHandler);
+		BedwarsPlugin.getInstance().addPlayerQuitHandler(playerQuitHandler);
 	}
 	
 	/**
@@ -58,6 +92,8 @@ public class Game {
 	 * Cleans everything up after a game
 	 */
 	public void endGame() {
+		BedwarsPlugin.getInstance().removePlayerChangedWorldHandler(playerChangedWorldHandler);
+		BedwarsPlugin.getInstance().removePlayerQuitHandler(playerQuitHandler);
 		GameManager.getInstance().removeGame(this);
 	}
 	
@@ -69,7 +105,6 @@ public class Game {
 	
 	public void joinPlayer(Player player) {
 		if (isRunning()) {
-			spectators.add(player.getUniqueId());
 			gameLogic.joinSpectator(player);
 		} else {
 			players.add(player.getUniqueId());
@@ -82,6 +117,11 @@ public class Game {
 			joinPlayer(player);
 	}
 	
+	/**
+	 * Remove a player or spectator from the game
+	 * @param player
+	 * @return
+	 */
 	public boolean leavePlayer(Player player) {
 		if (players.remove(player.getUniqueId())) {
 			for (Team team : teams)
@@ -92,9 +132,13 @@ public class Game {
 				gameLogic.leavePlayer(player);
 			else
 				lobby.leavePlayer(player);
-		} else if (spectators.remove(player.getUniqueId())) {
-			if (isRunning())
+			
+			return true;
+		} else {
+			if (isRunning()) {
 				gameLogic.leavePlayer(player);
+				return true;
+			}
 		}
 		
 		return false;

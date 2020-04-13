@@ -27,8 +27,10 @@ import filip.bedwars.listener.inventory.InventoryClickListener;
 import filip.bedwars.listener.player.BlockPlaceListener;
 import filip.bedwars.listener.player.IPacketListener;
 import filip.bedwars.listener.player.PacketReader;
+import filip.bedwars.listener.player.PlayerChangedWorldHandler;
 import filip.bedwars.listener.player.PlayerChangedWorldListener;
 import filip.bedwars.listener.player.PlayerInteractListener;
+import filip.bedwars.listener.player.PlayerQuitHandler;
 import filip.bedwars.listener.player.PlayerQuitListener;
 
 public class BedwarsPlugin extends JavaPlugin {
@@ -44,6 +46,8 @@ public class BedwarsPlugin extends JavaPlugin {
 	private ICommand helpCommand;
 	private List<ArenaSetup> arenaSetups = new ArrayList<ArenaSetup>();
 	private List<PacketReader> packetReaders = new ArrayList<PacketReader>();
+	private PlayerQuitListener playerQuitListener;
+	private PlayerChangedWorldListener playerChangedWorldListener;
 	
 	@Override
 	public void onEnable() {
@@ -54,8 +58,8 @@ public class BedwarsPlugin extends JavaPlugin {
 		new PlayerInteractListener(this);
 		new BlockPlaceListener(this);
 		new InventoryClickListener(this);
-		new PlayerQuitListener(this);
-		new PlayerChangedWorldListener(this);
+		playerQuitListener = new PlayerQuitListener(this);
+		playerChangedWorldListener = new PlayerChangedWorldListener(this);
 		new BedwarsCommandExecutor(this);
 		commands.add(new AddArenaCommand());
 		commands.add(new FinishArenaCommand());
@@ -203,9 +207,7 @@ public class BedwarsPlugin extends JavaPlugin {
     	
     	return FinishArenaSetupResponse.NO_ARENA_SETTING_UP;
     }
-    
 
-    
     public boolean cancelArenaSetup(Player setuper) {
     	for (ArenaSetup arenaSetup : arenaSetups) {
     		if (arenaSetup.getSetuper().getUniqueId().equals(setuper.getUniqueId())) {
@@ -257,6 +259,22 @@ public class BedwarsPlugin extends JavaPlugin {
 		}
     	
     	return ret;
+    }
+    
+    public void addPlayerChangedWorldHandler(PlayerChangedWorldHandler handler) {
+    	playerChangedWorldListener.addHandler(handler);
+    }
+    
+    public boolean removePlayerChangedWorldHandler(PlayerChangedWorldHandler handler) {
+    	return playerChangedWorldListener.removeHandler(handler);
+    }
+    
+    public void addPlayerQuitHandler(PlayerQuitHandler handler) {
+    	playerQuitListener.addHandler(handler);
+    }
+    
+    public boolean removePlayerQuitHandler(PlayerQuitHandler handler) {
+    	return playerQuitListener.removeHandler(handler);
     }
     
     public MultiverseCore getMultiverse() {

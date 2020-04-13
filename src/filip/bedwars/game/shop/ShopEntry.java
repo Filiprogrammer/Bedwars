@@ -12,11 +12,9 @@ public class ShopEntry {
 	private ItemStack item;
 	
 	public ShopEntry(Material priceMaterial, int priceCount, ItemStack item) {
-		
 		this.priceMaterial = priceMaterial;
 		this.priceCount = priceCount;
 		this.item = item;
-		
 	}
 	
 	public Material getPriceMaterial() {
@@ -32,7 +30,7 @@ public class ShopEntry {
 	}
 	
 	/**
-	 * Gets the amount of priceMaterial in the players inventory (for example how much gold they have)
+	 * Get the amount of priceMaterial in the players inventory. (for example how much gold they have)
 	 * @param inv the inventory that should be checked
 	 * @return amount of items
 	 */
@@ -51,12 +49,11 @@ public class ShopEntry {
 	}
 	
 	/**
-	 * Can the player buy ONE item
+	 * Check if the player can afford one item.
 	 * @param player player that should be checked
-	 * @return true if he can buy, false if not
+	 * @return true if they can afford it, false if not
 	 */
 	public boolean canBuy(Player player) {
-		
 		Inventory inv = player.getInventory();
 		
 		int amount = getPriceItemCount(inv);
@@ -68,15 +65,15 @@ public class ShopEntry {
 	}
 	
 	/**
-	 * Can the player buy one STACK of the item
+	 * Check if the player can afford a full stack of the item.
 	 * @param player player that should be checked
-	 * @return true if he can buy, false if not
+	 * @return true if they can afford it, false if not
 	 */
 	public boolean canBuyFullStack(Player player) {
-		
 		int amount = getPriceItemCount(player.getInventory());
+		int value = 64 / item.getAmount();
 		
-		if(amount >= (priceCount*64))
+		if(amount >= (priceCount * value))
 			return true;
 		
 		return false;

@@ -48,7 +48,7 @@ public class MessageSender {
 	}
 	
 	/**
-	 * Send a message to a player
+	 * Send a message to a player.
 	 * @param receivers List of players as UUID
 	 * @param msg Message that should be sent
 	 */
@@ -79,6 +79,14 @@ public class MessageSender {
 				player.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg).replace('&', '§'));
 			}
 		}
+	}
+	
+	/**
+	 * Print a warning in the console.
+	 * @param msg Warning that is sent
+	 */
+	public static void sendWarning(String msg) {
+		Bukkit.getConsoleSender().sendMessage("§6[WARNING]: §e" + msg);
 	}
 	
 }

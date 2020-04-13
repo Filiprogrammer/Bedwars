@@ -394,24 +394,24 @@ public class ArenaSetup {
 	
 	public void addBase() {
 		if (baseBuilder.getBedBottom() == null || baseBuilder.getBedTop() == null) {
-			MessageSender.sendMessage(setuper, "Cannot add base because the bed is not set up correctly");
+			MessageSender.sendMessage(setuper, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "base-bed-missing"));
+			SoundPlayer.playSound("error", setuper);
 			return;
 		}
 		else if (baseBuilder.getItemShop() == null) {
-			MessageSender.sendMessage(setuper, "Cannot add base because item shop location is not set");
-			return;
-		}
-		else if (baseBuilder.getTeamShop() == null) {
-			MessageSender.sendMessage(setuper, "Cannot add base because team shop location is not set");
+			MessageSender.sendMessage(setuper, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "base-item-shop-missing"));
+			SoundPlayer.playSound("error", setuper);
 			return;
 		}
 		else if (baseBuilder.getSpawn() == null) {
-			MessageSender.sendMessage(setuper, "Cannot add base because spawn location is not set");
+			MessageSender.sendMessage(setuper, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "base-spawn-missing"));
+			SoundPlayer.playSound("error", setuper);
 			return;
 		}
 		else if (baseBuilder.getTeamColor() == null) {
 			// How did we get here?
-			MessageSender.sendMessage(setuper, "Cannot add base because team color is not set");
+			MessageSender.sendMessage(setuper, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "base-color-missing"));
+			SoundPlayer.playSound("error", setuper);
 			return;
 		}
 		

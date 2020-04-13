@@ -20,7 +20,7 @@ public class BaseBuilder {
 		return this;
 	}
 
-	public BaseBuilder setTeamShop(@NotNull Location teamShop) {
+	public BaseBuilder setTeamShop(Location teamShop) {
 		this.teamShop = teamShop;
 		return this;
 	}

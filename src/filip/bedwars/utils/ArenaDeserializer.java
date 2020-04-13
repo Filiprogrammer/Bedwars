@@ -61,8 +61,13 @@ public class ArenaDeserializer {
 			Location itemShopLocation = new Location(arenaBuilder.getWorld(), itemShopLocationMap.get("x"), itemShopLocationMap.get("y"), itemShopLocationMap.get("z"));
 			baseBuilder.setItemShop(itemShopLocation);
 			
-			Map<String, Integer> teamShopLocationMap = (Map<String, Integer>) serializedBase.get("teamShop");
-			Location teamShopLocation = new Location(arenaBuilder.getWorld(), teamShopLocationMap.get("x"), teamShopLocationMap.get("y"), teamShopLocationMap.get("z"));
+			Location teamShopLocation = null;
+			
+			if(serializedBase.containsKey("teamShop")) {
+				Map<String, Integer> teamShopLocationMap = (Map<String, Integer>) serializedBase.get("teamShop");
+				teamShopLocation = new Location(arenaBuilder.getWorld(), teamShopLocationMap.get("x"), teamShopLocationMap.get("y"), teamShopLocationMap.get("z"));
+			}
+			
 			baseBuilder.setTeamShop(teamShopLocation);
 			
 			baseBuilder.setTeamColor(TeamColor.valueOf((String) serializedBase.get("teamColor")));

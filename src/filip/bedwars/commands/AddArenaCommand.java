@@ -31,6 +31,7 @@ public class AddArenaCommand implements ICommand {
 		} catch (NumberFormatException e) {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "min-start-player-must-be-number"));
 			SoundPlayer.playSound("error", player);
+			return true;
 		}
 		
 		try {
@@ -38,6 +39,17 @@ public class AddArenaCommand implements ICommand {
 		} catch (NumberFormatException e) {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "player-per-team-must-be-number"));
 			SoundPlayer.playSound("error", player);
+			return true;
+		}
+		
+		if (minPlayersToStart < 2) {
+			MessageSender.sendMessage(sender, "Minimum players to start has to be 2 or bigger");
+			return true;
+		}
+		
+		if (playersPerTeam < 1) {
+			MessageSender.sendMessage(sender, "Players per Team has to be 1 or bigger");
+			return true;
 		}
 		
 		SetupArenaResponse setupArenaResponse = BedwarsPlugin.getInstance().setupArena(args[0], minPlayersToStart, playersPerTeam, (Player) sender);

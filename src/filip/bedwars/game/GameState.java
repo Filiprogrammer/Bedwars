@@ -1,6 +1,6 @@
 package filip.bedwars.game;
 
-public abstract class GameState {
+public class GameState {
 	
 	private String name;
 	private Countdown countdown;
@@ -21,7 +21,5 @@ public abstract class GameState {
 	public void initiate() {
 		countdown.start();
 	}
-	
-	public abstract void onInitiate();
 	
 }
