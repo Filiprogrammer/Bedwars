@@ -12,6 +12,7 @@ public class MainConfig extends SingleConfig {
 	
 	private String language = "en_us";
 	private Location mainLobby;
+	private String gameWorldPrefix = "bw_game_";
 	
 	protected MainConfig() {
 		super("config.yml");
@@ -26,11 +27,16 @@ public class MainConfig extends SingleConfig {
 		return mainLobby;
 	}
 	
+	public String getGameWorldPrefix() {
+		return gameWorldPrefix;
+	}
+	
 	@Override
 	public boolean saveConfig() {
 		createAndLoadConfigFileIfNotExistent(true);
 		
 		config.set("language", language);
+		config.set("game-world-prefix", gameWorldPrefix);
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
 		
 		if (mainLobbySection == null)
@@ -56,7 +62,8 @@ public class MainConfig extends SingleConfig {
 	public void reloadConfig() {
 		createAndLoadConfigFileIfNotExistent(false);
 		
-		language = config.getString("language");
+		language = config.getString("language", "en_us");
+		gameWorldPrefix = config.getString("game-world-prefix", "bw_game_");
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
 		
 		if (mainLobbySection == null)

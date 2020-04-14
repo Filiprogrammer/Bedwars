@@ -95,6 +95,7 @@ public class Game {
 	public void endGame() {
 		BedwarsPlugin.getInstance().removePlayerChangedWorldHandler(playerChangedWorldHandler);
 		BedwarsPlugin.getInstance().removePlayerQuitHandler(playerQuitHandler);
+		gameLogic.cleanup();
 		GameManager.getInstance().removeGame(this);
 	}
 	

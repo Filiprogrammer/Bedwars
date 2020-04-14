@@ -16,7 +16,6 @@ import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.arena.Spawner;
 import filip.bedwars.listener.player.UseEntityPacketListener;
-import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.VillagerNPC;
 import filip.bedwars.world.GameWorld;
 
@@ -26,58 +25,15 @@ public class GameLogic {
 	private Arena arena;
 	private GameWorld gameWorld;
 	private List<Team> teams;
-	private int currentGameStateIndex;
-	private List<GameState> gameStates = new ArrayList<GameState>();
 	private BukkitRunnable gameTicker;
+	private List<UseEntityPacketListener> itemShopNPCListeners = new ArrayList<UseEntityPacketListener>();
+	private List<UseEntityPacketListener> teamShopNPCListeners = new ArrayList<UseEntityPacketListener>();
 	
 	public GameLogic(List<Team> teams, Game game, Arena arena, GameWorld gameWorld) {
 		this.game = game;
 		this.arena = arena;
 		this.gameWorld = gameWorld;
 		this.teams = teams;
-		
-		/*new GameState("Phase 1", new Countdown(300) {
-			@Override
-			public void onTick() {
-				if ((getSecondsLeft() % 60) == 0) {
-					GameState nextGameState = getNextGameState();
-					String nextGameStateName = null;
-					
-					if (nextGameState != null)
-						nextGameStateName = nextGameState.getName();
-					
-					for (UUID uuid : game.getPlayers()) {
-						Player player = Bukkit.getPlayer(uuid);
-						
-						if (nextGameStateName == null)
-							MessageSender.sendMessage(player, (getSecondsLeft() / 60) + " minutes left the game ends");
-						else
-							MessageSender.sendMessage(player, (getSecondsLeft() / 60) + " minutes left until " + nextGameStateName);
-					}
-				}
-			}
-			
-			@Override
-			public void onStart() {}
-			
-			@Override
-			public boolean onFinish() {
-				// TODO Auto-generated method stub
-				return false;
-			}
-			
-			@Override
-			public void onCancel() {
-				// TODO Auto-generated method stub
-			}
-		});
-		
-		this.currentGameStateIndex = 0;
-		getCurrentGameState().initiate();*/
-		
-		// Teleport every player to the spawnpoint of their base
-		for (UUID uuid : game.getPlayers())
-			teleportToSpawn(Bukkit.getPlayer(uuid));
 		
 		// Setup game ticker for spawners
 		gameTicker = new BukkitRunnable() {
@@ -87,21 +43,26 @@ public class GameLogic {
 			
 			@Override
 			public void run() {
-				for (Spawner spawner : arena.getSpawner()) {
+				for (Spawner spawner : arena.getSpawner())
 					spawner.update();
-				}
 			}
 		};
 		
+		// Teleport every player to the spawnpoint of their base
+		for (UUID uuid : game.getPlayers())
+			teleportToSpawn(Bukkit.getPlayer(uuid));
+		
+		// Convert UUIDs to players
 		Player[] players = new Player[game.getPlayers().size()];
 		
+		for (int i = 0; i < game.getPlayers().size(); ++i)
+			players[i] = Bukkit.getPlayer(game.getPlayers().get(i));
+		
 		for (Base base : arena.getBases()) {
-			for (int i = 0; i < game.getPlayers().size(); ++i)
-				players[i] = Bukkit.getPlayer(game.getPlayers().get(i));
-			
+			// Setup item shop NPC
 			VillagerNPC itemShopNPC = new VillagerNPC(base.getItemShop(), "DESERT", "ARMORER", "Item Shop", players);
 			
-			new UseEntityPacketListener(itemShopNPC.getEntityId()) {
+			UseEntityPacketListener itemShopNPCListener = new UseEntityPacketListener(itemShopNPC.getEntityId()) {
 				@Override
 				public void onUse(String action) {
 					if (action.equals("INTERACT")) {
@@ -110,6 +71,29 @@ public class GameLogic {
 				}
 			};
 			
+			itemShopNPCListeners.add(itemShopNPCListener);
+			
+			for (Player player : players)
+				BedwarsPlugin.getInstance().addPacketListener(player, itemShopNPCListener);
+			
+			// Setup team shop NPC, if it is not null
+			if (base.getTeamShop() != null) {
+				VillagerNPC teamShopNPC = new VillagerNPC(base.getTeamShop(), "SNOW", "CLERIC", "Team Shop", players);
+				
+				UseEntityPacketListener teamShopNPCListener = new UseEntityPacketListener(teamShopNPC.getEntityId()) {
+					@Override
+					public void onUse(String action) {
+						if (action.equals("INTERACT")) {
+							// TODO: Open the team shop
+						}
+					}
+				};
+				
+				teamShopNPCListeners.add(teamShopNPCListener);
+				
+				for (Player player : players)
+					BedwarsPlugin.getInstance().addPacketListener(player, teamShopNPCListener);
+			}
 		}
 	}
 	
@@ -120,17 +104,6 @@ public class GameLogic {
 		Location spawnLoc = game.getTeamOfPlayer(player.getUniqueId()).getBase().getSpawn().clone();
 		spawnLoc.setWorld(gameWorld.getWorld());
 		player.teleport(spawnLoc);
-	}
-	
-	private GameState getCurrentGameState() {
-		return gameStates.get(currentGameStateIndex);
-	}
-	
-	private GameState getNextGameState() {
-		if ((currentGameStateIndex + 1) >= (gameStates.size()))
-			return null;
-		
-		return gameStates.get(currentGameStateIndex + 1);
 	}
 	
 	public void joinSpectator(Player player) {
@@ -145,6 +118,20 @@ public class GameLogic {
 	
 	public GameWorld getGameWorld() {
 		return gameWorld;
+	}
+	
+	public void cleanup() {
+		gameTicker.cancel();
+		
+		for (UUID uuid : game.getPlayers()) {
+			Player player = Bukkit.getPlayer(uuid);
+			
+			for (UseEntityPacketListener itemShopNPCListener : itemShopNPCListeners)
+				BedwarsPlugin.getInstance().removePacketListener(player, itemShopNPCListener);
+			
+			for (UseEntityPacketListener teamShopNPCListener : teamShopNPCListeners)
+				BedwarsPlugin.getInstance().removePacketListener(player, teamShopNPCListener);
+		}
 	}
 	
 }

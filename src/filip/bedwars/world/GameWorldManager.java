@@ -3,8 +3,8 @@ package filip.bedwars.world;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
 
 public class GameWorldManager {
 
@@ -12,9 +12,7 @@ public class GameWorldManager {
 	
 	private List<GameWorld> gameWorlds = new ArrayList<GameWorld>();
 	
-	private GameWorldManager() {
-		
-	}
+	private GameWorldManager() {}
 	
 	public static GameWorldManager getInstance() {
 		if (instance == null)
@@ -24,11 +22,12 @@ public class GameWorldManager {
 	}
 	
 	public GameWorld claimGameWorld(World loadFrom) {
-		throw new NotImplementedException();
+		return new GameWorld(loadFrom);
 	}
 	
-	public void removeGameWorld(GameWorld gameWorld) {
-		throw new NotImplementedException();
+	public void removeGameWorld(@NotNull GameWorld gameWorld) {
+		gameWorlds.remove(gameWorld);
+		gameWorld.unloadWorld();
 	}
 	
 }
