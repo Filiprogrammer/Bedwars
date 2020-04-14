@@ -85,7 +85,7 @@ public class ArenaSetup {
 		// TODO: Read stuff like spawner ticks and item names from config files
 		
 		// An inventory menu to select the spawner item and add the spawner to the arena
-		IClickable spawnerSelector = new ClickableInventory(Bukkit.createInventory(null, 9 * 3, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "select-spawner-item")), setuper) {
+		IClickable spawnerSelector = new ClickableInventory(Bukkit.createInventory(null, 9 * 3, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "select-spawner-item").replace("&", "§")), setuper) {
 			
 			{
 				for(int i = 0; i < SpawnerConfig.getInstance().getSpawnerTypes().size(); ++i) {

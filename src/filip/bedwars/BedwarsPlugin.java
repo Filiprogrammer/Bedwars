@@ -71,7 +71,8 @@ public class BedwarsPlugin extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
-		
+		for (PacketReader reader : packetReaders)
+			reader.uninject();
 	}
 	
 	public static BedwarsPlugin getInstance() {

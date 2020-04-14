@@ -12,11 +12,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.BedwarsPlugin;
+import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.lobby.Lobby;
 import filip.bedwars.listener.player.PlayerChangedWorldHandler;
 import filip.bedwars.listener.player.PlayerQuitHandler;
+import filip.bedwars.utils.MessageSender;
+import filip.bedwars.utils.SoundPlayer;
 import filip.bedwars.world.GameWorld;
 import filip.bedwars.world.GameWorldManager;
 
@@ -29,6 +32,7 @@ public class Game {
 	private List<Team> teams = new ArrayList<Team>();
 	private PlayerChangedWorldHandler playerChangedWorldHandler;
 	private PlayerQuitHandler playerQuitHandler;
+	private boolean isStarting = false;
 	
 	public Game(@NotNull Arena arena) {
 		this.arena = arena;
@@ -46,6 +50,9 @@ public class Game {
 				Player player = event.getPlayer();
 				
 				if (players.contains(player.getUniqueId())) {
+					if (isStarting)
+						return;
+					
 					if (isRunning()) {
 						if (!player.getWorld().getName().equals(gameLogic.getGameWorld().getWorld().getName()))
 							leavePlayer(player); // Player left the game world and therefore leaves the game
@@ -83,9 +90,11 @@ public class Game {
 			if (!playerHasTeam(uuid))
 				getSmallestTeam().addMember(uuid);
 		
+		isStarting = true;
 		GameWorld gameWorld = GameWorldManager.getInstance().claimGameWorld(arena.getWorld());
 		lobby = null;
 		gameLogic = new GameLogic(teams, this, arena, gameWorld);
+		isStarting = false;
 		return true;
 	}
 	
@@ -100,20 +109,30 @@ public class Game {
 	}
 	
 	public boolean isRunning() {
-		return (lobby == null); // Because lobby is set to null at start game
+		return (gameLogic != null);
 	}
 	
 	// TODO: Add reconnect function
 	
 	public void joinPlayer(Player player) {
-		if (players.contains(player.getUniqueId()))
-			return; // Player is already in this game
+		if (players.contains(player.getUniqueId())) {
+			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "already-in-this-game"));
+			SoundPlayer.playSound("error", player);
+			return; // Player is already in this game 
+		}
 		
 		if (isRunning()) {
 			gameLogic.joinSpectator(player);
+			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "joined-game-as-spectator"));
+			SoundPlayer.playSound("success", player);
 		} else {
 			players.add(player.getUniqueId());
 			lobby.joinPlayer(player);
+			
+			for(UUID uuid : players)
+				MessageSender.sendMessageUUID(uuid, MessagesConfig.getInstance().getStringValue(Bukkit.getPlayer(uuid).getLocale(), "player-joined").replace("%player%", player.getName()));
+			
+			SoundPlayer.playSound("success", player);
 		}
 	}
 	

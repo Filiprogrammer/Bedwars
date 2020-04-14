@@ -60,7 +60,7 @@ public class GameLogic {
 		
 		for (Base base : arena.getBases()) {
 			// Setup item shop NPC
-			VillagerNPC itemShopNPC = new VillagerNPC(base.getItemShop(), "DESERT", "ARMORER", "Item Shop", players);
+			VillagerNPC itemShopNPC = new VillagerNPC(base.getItemShop().clone().add(0.5, 0, 0.5), "DESERT", "ARMORER", "Item Shop", players);
 			
 			UseEntityPacketListener itemShopNPCListener = new UseEntityPacketListener(itemShopNPC.getEntityId()) {
 				@Override
@@ -78,7 +78,7 @@ public class GameLogic {
 			
 			// Setup team shop NPC, if it is not null
 			if (base.getTeamShop() != null) {
-				VillagerNPC teamShopNPC = new VillagerNPC(base.getTeamShop(), "SNOW", "CLERIC", "Team Shop", players);
+				VillagerNPC teamShopNPC = new VillagerNPC(base.getTeamShop().clone().add(0.5, 0, 0.5), "SNOW", "CLERIC", "Team Shop", players);
 				
 				UseEntityPacketListener teamShopNPCListener = new UseEntityPacketListener(teamShopNPC.getEntityId()) {
 					@Override

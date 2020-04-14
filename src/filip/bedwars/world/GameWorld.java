@@ -34,15 +34,33 @@ public class GameWorld {
 	}
 	
 	private void loadWorld(World loadFrom) {
-		String gameWorldName = MainConfig.getInstance().getGameWorldPrefix() + String.format("%05d", gameWorldCounter);
+		String gameWorldName = MainConfig.getInstance().getGameWorldPrefix() + String.format("%05d", gameWorldCounter++);
 		String worldContainerPath = BedwarsPlugin.getInstance().getServer().getWorldContainer().getAbsolutePath();
 		Path sourceRegionDirectory = Paths.get(worldContainerPath + File.separator + loadFrom.getName() + File.separator + "region");
         Path targetRegionDirectory = Paths.get(worldContainerPath + File.separator + gameWorldName + File.separator + "region");
 		Path sourceLevelDat = Paths.get(worldContainerPath + File.separator + loadFrom.getName() + File.separator + "level.dat");
         Path targetLevelDat = Paths.get(worldContainerPath + File.separator + gameWorldName + File.separator + "level.dat");
+        Path sourceSessionLock = Paths.get(worldContainerPath + File.separator + loadFrom.getName() + File.separator + "session.lock");
+        Path targetSessionLock = Paths.get(worldContainerPath + File.separator + gameWorldName + File.separator + "session.lock");
         
         // Create the directory of the game world
-        new File(worldContainerPath + File.separator + gameWorldName).mkdirs();
+        // If it already exists, delete it first
+        Path gameWorldDirectory = Paths.get(worldContainerPath + File.separator + gameWorldName);
+        
+        if (gameWorldDirectory.toFile().exists()) {
+        	World world = Bukkit.getWorld(gameWorldName);
+        	
+        	if (world != null)
+        		Bukkit.unloadWorld(world, false);
+        	
+        	try {
+    			deleteDirectory(gameWorldDirectory);
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
+        }
+        
+        gameWorldDirectory.toFile().mkdirs();
         
         // Copy the region files to the game world
         try {
@@ -54,6 +72,13 @@ public class GameWorld {
         // Copy the "level.dat" file to the game world
         try {
 			Files.copy(sourceLevelDat, targetLevelDat, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+        // Copy the "session.lock" file to the game world
+        try {
+			Files.copy(sourceSessionLock, targetSessionLock, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
