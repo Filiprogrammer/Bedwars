@@ -32,6 +32,8 @@ error:
 cancel:
   sound: BLOCK_FIRE_EXTINGUISH
   pitch: 1.3
+game-started:
+  sound: ENTITY_PLAYER_LEVELUP
 victory:
   sound: UI_TOAST_CHALLENGE_COMPLETE
   pitch: 1.25

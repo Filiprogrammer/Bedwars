@@ -12,10 +12,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.config.MainConfig;
+import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.arena.Spawner;
 import filip.bedwars.listener.player.UseEntityPacketListener;
+import filip.bedwars.utils.MessageSender;
+import filip.bedwars.utils.SoundPlayer;
 import filip.bedwars.utils.VillagerNPC;
 import filip.bedwars.world.GameWorld;
 
@@ -48,9 +51,12 @@ public class GameLogic {
 			}
 		};
 		
-		// Teleport every player to the spawnpoint of their base
-		for (UUID uuid : game.getPlayers())
+		// Teleport every player to the spawnpoint of their base and send a message that the game started
+		for (UUID uuid : game.getPlayers()) {
 			teleportToSpawn(Bukkit.getPlayer(uuid));
+			MessageSender.sendMessageUUID(uuid, MessagesConfig.getInstance().getStringValue(Bukkit.getPlayer(uuid).getLocale(), "game-started"));
+			SoundPlayer.playSound("game-started", Bukkit.getPlayer(uuid));
+		}
 		
 		// Convert UUIDs to players
 		Player[] players = new Player[game.getPlayers().size()];

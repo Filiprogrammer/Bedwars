@@ -410,7 +410,7 @@ public class ArenaSetup {
 	
 	public void addSpawner() {
 		arenaBuilder.addSpawner(spawnerBuilder.build());
-		spawnSpawnerNPC(spawnerBuilder.getLocation(), spawnerBuilder.getMaterial(), spawnerBuilder.getItemName());
+		spawnSpawnerNPC(spawnerBuilder.getLocation(), spawnerBuilder.getMaterial(), spawnerBuilder.getItemName().replace("&","�"));
 		MessageSender.sendMessage(setuper, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "spawner-set").replace("%itemname%", spawnerBuilder.getItemName()));
 		SoundPlayer.playSound("arena-setup", setuper);
 		spawnerBuilder = new SpawnerBuilder();
@@ -544,8 +544,8 @@ public class ArenaSetup {
 					return;
 				
 				arenaBuilder.removeSpawner(index);
-				// TODO: Get message from config
-				MessageSender.sendMessage(setuper, "Spawner was removed");
+				MessageSender.sendMessage(setuper, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "spawner-removed"));
+				SoundPlayer.playSound("success", setuper);
 				
 				// Delay Spawner despawn because otherwise the client throws an exception for some reason
 				Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), new Runnable() {

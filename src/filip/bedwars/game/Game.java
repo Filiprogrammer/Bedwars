@@ -86,9 +86,18 @@ public class Game {
 			return false; // Not enough players
 		
 		// Assign players who didn't choose a team to a team automatically.
-		for (UUID uuid : players)
-			if (!playerHasTeam(uuid))
-				getSmallestTeam().addMember(uuid);
+		for (UUID uuid : players) {
+			if (!playerHasTeam(uuid)) {
+				Team team = getSmallestTeam();
+				team.addMember(uuid);
+				
+				String colorConfigKey = "color-" + team.getBase().getTeamColor().toString().toLowerCase().replace("_", "-");
+				MessagesConfig msgConfig = MessagesConfig.getInstance();
+				Player player = Bukkit.getPlayer(uuid);
+				String colorStr = msgConfig.getStringValue(player.getLocale(), colorConfigKey);
+				MessageSender.sendMessageUUID(uuid, msgConfig.getStringValue(player.getLocale(), "team-changed").replace("%teamcolor%", colorStr));
+			}
+		}
 		
 		isStarting = true;
 		GameWorld gameWorld = GameWorldManager.getInstance().claimGameWorld(arena.getWorld());
@@ -156,6 +165,9 @@ public class Game {
 				gameLogic.leavePlayer(player);
 			else
 				lobby.leavePlayer(player);
+			
+			for(UUID uuid : players) 
+				MessageSender.sendMessageUUID(uuid, MessagesConfig.getInstance().getStringValue(Bukkit.getPlayer(uuid).getLocale(), "player-left").replace("%player%", player.getName()));
 			
 			return true;
 		} else {
