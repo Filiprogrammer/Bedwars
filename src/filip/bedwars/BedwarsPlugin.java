@@ -34,6 +34,8 @@ import filip.bedwars.listener.player.PlayerChangedWorldListener;
 import filip.bedwars.listener.player.PlayerInteractListener;
 import filip.bedwars.listener.player.PlayerQuitHandler;
 import filip.bedwars.listener.player.PlayerQuitListener;
+import filip.bedwars.listener.player.WorldInitHandler;
+import filip.bedwars.listener.player.WorldInitListener;
 
 public class BedwarsPlugin extends JavaPlugin {
 
@@ -50,6 +52,7 @@ public class BedwarsPlugin extends JavaPlugin {
 	private List<PacketReader> packetReaders = new ArrayList<PacketReader>();
 	private PlayerQuitListener playerQuitListener;
 	private PlayerChangedWorldListener playerChangedWorldListener;
+	private WorldInitListener worldInitListener;
 	
 	@Override
 	public void onEnable() {
@@ -62,6 +65,7 @@ public class BedwarsPlugin extends JavaPlugin {
 		new InventoryClickListener(this);
 		playerQuitListener = new PlayerQuitListener(this);
 		playerChangedWorldListener = new PlayerChangedWorldListener(this);
+		worldInitListener = new WorldInitListener(this);
 		new BedwarsCommandExecutor(this);
 		commands.add(new AddArenaCommand());
 		commands.add(new FinishArenaCommand());
@@ -286,6 +290,14 @@ public class BedwarsPlugin extends JavaPlugin {
     
     public boolean removePlayerQuitHandler(PlayerQuitHandler handler) {
     	return playerQuitListener.removeHandler(handler);
+    }
+    
+    public void addWorldInitHandler(WorldInitHandler handler) {
+    	worldInitListener.addHandler(handler);
+    }
+    
+    public boolean removeWorldInitHandler(WorldInitHandler handler) {
+    	return worldInitListener.removeHandler(handler);
     }
     
     public MultiverseCore getMultiverse() {

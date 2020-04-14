@@ -15,9 +15,11 @@ import org.bukkit.Difficulty;
 import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.event.world.WorldInitEvent;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.config.MainConfig;
+import filip.bedwars.listener.player.WorldInitHandler;
 
 public class GameWorld {
 
@@ -83,9 +85,24 @@ public class GameWorld {
 			e.printStackTrace();
 		}
         
+        // Make the world load pretty much instantly
+        WorldInitHandler worldInitHandler = new WorldInitHandler() {
+			@Override
+			public void onWorldInit(WorldInitEvent event) {
+				World world = event.getWorld();
+				
+				if (world.getName().equals(gameWorldName))
+					world.setKeepSpawnInMemory(false);
+			}
+		};
+        
+        BedwarsPlugin.getInstance().addWorldInitHandler(worldInitHandler);
+        
         // Load the game world into memory
         WorldCreator worldCreator = new WorldCreator(gameWorldName).copy(Bukkit.getWorld(loadFrom.getName())).generateStructures(false);
 		world = worldCreator.createWorld();
+		
+		BedwarsPlugin.getInstance().removeWorldInitHandler(worldInitHandler);
 		
 		// Change some attributes of the game world
 		world.setAutoSave(false);
