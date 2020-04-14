@@ -105,6 +105,9 @@ public class Game {
 	// TODO: Add reconnect function
 	
 	public void joinPlayer(Player player) {
+		if (players.contains(player.getUniqueId()))
+			return; // Player is already in this game
+		
 		if (isRunning()) {
 			gameLogic.joinSpectator(player);
 		} else {

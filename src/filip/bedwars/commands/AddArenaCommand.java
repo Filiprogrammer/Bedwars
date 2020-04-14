@@ -43,12 +43,14 @@ public class AddArenaCommand implements ICommand {
 		}
 		
 		if (minPlayersToStart < 2) {
-			MessageSender.sendMessage(sender, "Minimum players to start has to be 2 or bigger");
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "min-start-player-at-least-two"));
+			SoundPlayer.playSound("error", player);
 			return true;
 		}
 		
 		if (playersPerTeam < 1) {
-			MessageSender.sendMessage(sender, "Players per Team has to be 1 or bigger");
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "player-per-team-at-least-one"));
+			SoundPlayer.playSound("error", player);
 			return true;
 		}
 		
@@ -57,15 +59,23 @@ public class AddArenaCommand implements ICommand {
 		switch (setupArenaResponse) {
 		case ARENA_IN_WORLD_ALREADY_SETTING_UP:
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-in-world-already-setting-up"));
+			SoundPlayer.playSound("error", player);
 			break;
 		case ALREADY_SETTING_UP_ARENA:
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-already-setting-up"));
+			SoundPlayer.playSound("error", player);
 			break;
 		case ARENA_IN_WORLD_ALREADY_EXISTS:
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "world-has-arena"));
+			SoundPlayer.playSound("error", player);
+			break;
+		case ARENA_WITH_THAT_NAME_ALREADY_EXISTS:
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-name-already-exists"));
+			SoundPlayer.playSound("error", player);
 			break;
 		case SUCCESS:
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-setup-started").replace("%mapname%", args[0]));
+			SoundPlayer.playSound("success", player);
 			break;
 		}
 		

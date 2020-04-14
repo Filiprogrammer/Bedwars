@@ -9,6 +9,7 @@ import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.GameManager;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.utils.MessageSender;
+import filip.bedwars.utils.SoundPlayer;
 
 public class JoinGameCommand implements ICommand {
 
@@ -25,11 +26,12 @@ public class JoinGameCommand implements ICommand {
 		Arena arena = ArenaConfig.getInstance().getArena(args[0]);
 		String locale = ((Player) sender).getLocale();
 		
-		if (arena == null)
-			// TODO: Read message from config
-			MessageSender.sendMessage(sender, "Arena with the name " + args[0] + " was not found");
-		else
+		if (arena == null) {
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "arena-not-found").replace("%arenaname%", args[0]));
+			SoundPlayer.playSound("error", (Player) sender);
+		} else {
 			GameManager.getInstance().joinGame(arena, (Player) sender);
+		}
 		
 		return true;
 	}
