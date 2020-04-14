@@ -27,8 +27,10 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.BedwarsPlugin.FinishArenaSetupResponse;
 import filip.bedwars.config.MessagesConfig;
+import filip.bedwars.config.SpawnerConfig;
 import filip.bedwars.game.TeamColor;
 import filip.bedwars.game.arena.Arena;
+import filip.bedwars.game.arena.SpawnerType;
 import filip.bedwars.inventory.ClickableInventory;
 import filip.bedwars.inventory.IClickable;
 import filip.bedwars.inventory.IPlacable;
@@ -86,9 +88,10 @@ public class ArenaSetup {
 		IClickable spawnerSelector = new ClickableInventory(Bukkit.createInventory(null, 9 * 3, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "select-spawner-item")), setuper) {
 			
 			{
-				inventory.setItem(9 + 2, new ItemBuilder().setName("§r§aBronze Spawner setzen").setMaterial(Material.BRICK).build());
-                inventory.setItem(9 + 4, new ItemBuilder().setName("§r§7Eisen Spawner setzen").setMaterial(Material.IRON_INGOT).build());
-                inventory.setItem(9 + 6, new ItemBuilder().setName("§r§bGold Spawner setzen").setMaterial(Material.GOLD_INGOT).build());
+				for(int i = 0; i < SpawnerConfig.getInstance().getSpawnerTypes().size(); ++i) {
+					SpawnerType spawnerType = SpawnerConfig.getInstance().getSpawnerType(i);
+					inventory.setItem(i, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "set-spawner").replace("%itemname%", spawnerType.getName()).replace("&", "§")).setMaterial(spawnerType.getMaterial()).build());
+				}
 			}
 			
 			@Override
@@ -101,42 +104,18 @@ public class ArenaSetup {
 				
 				int slot = event.getSlot();
 				
-				switch (slot) {
-				case (9 + 2): // Bronze
-					{
-						spawnerBuilder
-								.setItem(Material.BRICK)
-								.setItemName("Bronze")
-								.setTicksPerSpawn(10);
-						
-						addSpawner();
-						event.getView().close();
-					}
-					break;
-				case (9 + 4): // Eisen
-					{
-						spawnerBuilder
-								.setItem(Material.IRON_INGOT)
-								.setItemName("Eisen")
-								.setTicksPerSpawn(40);
+				SpawnerType spawnerType = SpawnerConfig.getInstance().getSpawnerType(slot);
 				
-						addSpawner();
-						event.getView().close();
-					}
-					break;
-				case (9 + 6): // Gold
-					{
-						spawnerBuilder
-								.setItem(Material.GOLD_INGOT)
-								.setItemName("Gold")
-								.setTicksPerSpawn(100);
+				if (spawnerType == null)
+					return;
 				
-						addSpawner();
-						event.getView().close();
-					}
-					break;
-				}
+				spawnerBuilder
+					.setItem(spawnerType.getMaterial())
+					.setItemName(spawnerType.getName())
+					.setTicksPerSpawn(spawnerType.getDefaultTicksPerSpawn());
 				
+				addSpawner();
+				event.getView().close();
 			}
 		};
 		

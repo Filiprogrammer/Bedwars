@@ -25,7 +25,7 @@ public class ShopCategoryDeserializer {
 		Material categoryMaterial = Material.valueOf((String) mapOfElements.get("material"));
 		
 		if (categoryMaterial == null) {
-			MessageSender.sendWarning("A Shop Category does not have a valid material");
+			MessageSender.sendWarning("§eThe Shop Category §6\"" + categoryName + "\" §edoes not have a valid material");
 			return null;
 		}
 		
