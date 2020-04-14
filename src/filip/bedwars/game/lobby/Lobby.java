@@ -36,6 +36,7 @@ public class Lobby {
 					}
 					
 					cancel();
+					return;
 				}
 				
 				int secondsLeft = getSecondsLeft();
@@ -83,7 +84,7 @@ public class Lobby {
 			@Override
 			public void onCancel() {
 				for(UUID uuid : game.getPlayers())
-					MessageSender.sendMessageUUID(uuid, MessagesConfig.getInstance().getStringValue(Bukkit.getPlayer(uuid).getLocale(), "countdown-not-enough-player"));
+					MessageSender.sendMessageUUID(uuid, "The countdown was cancelled");
 			}
 		};
 		
@@ -112,7 +113,6 @@ public class Lobby {
 	public void leavePlayer(Player player) {
 		// TODO: Unhide the player
 		player.teleport(MainConfig.getInstance().getMainLobby());
-		countdown.cancel();
 	}
 	
 	private void updatePlayerVisibilities() {
