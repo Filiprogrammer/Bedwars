@@ -111,6 +111,9 @@ public class Game {
 	 * Cleans everything up after a game
 	 */
 	public void endGame() {
+		for (UUID uuid : new ArrayList<UUID>(players))
+			leavePlayer(Bukkit.getPlayer(uuid));
+		
 		BedwarsPlugin.getInstance().removePlayerChangedWorldHandler(playerChangedWorldHandler);
 		BedwarsPlugin.getInstance().removePlayerQuitHandler(playerQuitHandler);
 		gameLogic.cleanup();

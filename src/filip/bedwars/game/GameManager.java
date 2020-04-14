@@ -76,4 +76,8 @@ public class GameManager {
 		games.remove(game);
 	}
 	
+	public List<Game> getGames() {
+		return games;
+	}
+	
 }

@@ -18,6 +18,8 @@ import filip.bedwars.commands.ICommand;
 import filip.bedwars.commands.JoinGameCommand;
 import filip.bedwars.commands.ReloadCommand;
 import filip.bedwars.config.ArenaConfig;
+import filip.bedwars.game.Game;
+import filip.bedwars.game.GameManager;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.setup.ArenaSetup;
 import filip.bedwars.inventory.IClickable;
@@ -71,6 +73,9 @@ public class BedwarsPlugin extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
+		for (Game game : new ArrayList<Game>(GameManager.getInstance().getGames()))
+			game.endGame();
+		
 		for (PacketReader reader : packetReaders)
 			reader.uninject();
 	}

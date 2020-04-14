@@ -41,6 +41,9 @@ public class Lobby {
 				
 				int secondsLeft = getSecondsLeft();
 				
+				if (secondsLeft == 0)
+					return;
+				
 				if (secondsLeft == 1) {
 					for (UUID uuid : game.getPlayers()) {
 						Player player = Bukkit.getPlayer(uuid);

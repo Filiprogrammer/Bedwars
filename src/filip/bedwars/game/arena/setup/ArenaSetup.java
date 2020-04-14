@@ -421,6 +421,7 @@ public class ArenaSetup {
 			return null;
 		
 		cleanup();
+		setuper.getInventory().clear();
 		World w = arenaBuilder.getWorld();
 		MVWorldManager mvWorldManager = BedwarsPlugin.getInstance().getMultiverse().getMVWorldManager();
     	MultiverseWorld mvWorld = mvWorldManager.getMVWorld(w);
@@ -534,7 +535,7 @@ public class ArenaSetup {
 	}
 	
 	private void spawnSpawnerNPC(Location loc, Material material, String itemName) {
-		ArmorStandItemNPC npc = new ArmorStandItemNPC(new Location(loc.getWorld(), loc.getBlockX() + 0.5, loc.getBlockY() -0.5, loc.getBlockZ() + 0.5), itemName + " - Spawner", material, setuper);
+		ArmorStandItemNPC npc = new ArmorStandItemNPC(new Location(loc.getWorld(), loc.getBlockX() + 0.5, loc.getBlockY() - 0.4, loc.getBlockZ() + 0.5), itemName + " - Spawner", material, setuper);
 		int index = spawnerNPCs.size();
 		
 		UseEntityPacketListener listener = new UseEntityPacketListener(npc.getEntityId()) {
