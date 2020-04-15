@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public abstract class UseEntityPacketListener implements IPacketListener {
 
@@ -14,7 +15,7 @@ public abstract class UseEntityPacketListener implements IPacketListener {
 	}
 	
 	@Override
-	public void readPacket(Object packet) {
+	public void readPacket(Object packet, Player player) {
 		if (!packet.getClass().getSimpleName().equals("PacketPlayInUseEntity"))
 			return;
 		
@@ -27,12 +28,12 @@ public abstract class UseEntityPacketListener implements IPacketListener {
 			Object action = bMethod.invoke(packet);
 			
 			if (entityId == this.entityId)
-				onUse(((Enum<?>)action).toString());
+				onUse(((Enum<?>)action).toString(), player);
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public abstract void onUse(String action);
+	public abstract void onUse(String action, Player player);
 
 }

@@ -72,7 +72,7 @@ public class PacketReader {
 	
 	private void readPacket(Object packet) {
 		for (IPacketListener listener : listeners)
-			listener.readPacket(packet);
+			listener.readPacket(packet, player);
 	}
 	
 	public void addListener(IPacketListener listener) {

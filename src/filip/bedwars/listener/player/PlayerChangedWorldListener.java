@@ -9,6 +9,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import filip.bedwars.BedwarsPlugin;
+import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.utils.MessageSender;
 
 public class PlayerChangedWorldListener implements Listener {
@@ -22,8 +23,7 @@ public class PlayerChangedWorldListener implements Listener {
 	@EventHandler
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
 		if (BedwarsPlugin.getInstance().cancelArenaSetup(event.getPlayer()))
-			// TODO: Add localizations for the messages
-			MessageSender.sendMessage(event.getPlayer(), "Arena setup was cancelled");
+			MessageSender.sendMessage(event.getPlayer(), MessagesConfig.getInstance().getStringValue(event.getPlayer().getLocale(), "arena-setup-cancelled"));
 		
 		for (PlayerChangedWorldHandler handler : handlers)
 			handler.onChangedWorld(event);

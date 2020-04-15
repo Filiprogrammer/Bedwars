@@ -3,6 +3,7 @@ package filip.bedwars.game;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import filip.bedwars.BedwarsPlugin;
+import filip.bedwars.config.ItemShopConfig;
 import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.arena.Arena;
@@ -70,9 +72,16 @@ public class GameLogic {
 			
 			UseEntityPacketListener itemShopNPCListener = new UseEntityPacketListener(itemShopNPC.getEntityId()) {
 				@Override
-				public void onUse(String action) {
+				public void onUse(String action, Player player) {
 					if (action.equals("INTERACT")) {
-						// TODO: Open the item shop
+						// Call that on the main thread
+						Bukkit.getScheduler().callSyncMethod(BedwarsPlugin.getInstance(), new Callable<Void>() {
+							@Override
+							public Void call() throws Exception {
+								player.openInventory(ItemShopConfig.getInstance().getShop().getCategoryListInventory());
+								return null;
+							}
+						});
 					}
 				}
 			};
@@ -88,7 +97,7 @@ public class GameLogic {
 				
 				UseEntityPacketListener teamShopNPCListener = new UseEntityPacketListener(teamShopNPC.getEntityId()) {
 					@Override
-					public void onUse(String action) {
+					public void onUse(String action, Player player) {
 						if (action.equals("INTERACT")) {
 							// TODO: Open the team shop
 						}

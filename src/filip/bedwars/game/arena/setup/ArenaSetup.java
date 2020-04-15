@@ -82,8 +82,6 @@ public class ArenaSetup {
 		createSetupItems();
 		giveSetupItems();
 		
-		// TODO: Read stuff like spawner ticks and item names from config files
-		
 		// An inventory menu to select the spawner item and add the spawner to the arena
 		IClickable spawnerSelector = new ClickableInventory(Bukkit.createInventory(null, 9 * 3, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "select-spawner-item").replace("&", "§")), setuper) {
 			
@@ -540,8 +538,11 @@ public class ArenaSetup {
 		
 		UseEntityPacketListener listener = new UseEntityPacketListener(npc.getEntityId()) {
 			@Override
-			public void onUse(String action) {
+			public void onUse(String action, Player player) {
 				if (!action.equals("ATTACK"))
+					return;
+				
+				if (!player.getUniqueId().equals(setuper.getUniqueId()))
 					return;
 				
 				arenaBuilder.removeSpawner(index);

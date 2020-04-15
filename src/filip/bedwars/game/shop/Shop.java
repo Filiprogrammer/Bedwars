@@ -32,6 +32,17 @@ public class Shop {
             createInventory(i, categories[i]);
     }
     
+    public Inventory getCategoryListInventory() {
+    	return categoryListInventory;
+    }
+    
+    public Inventory getCategoryInventory(int categoryIndex) {
+    	if (categoryIndex >= inventories.length)
+    		return null;
+    	
+    	return inventories[categoryIndex];
+    }
+    
     /**
      * Create an Inventory for the given ShopCategory including the category list at the top and puts it in the inventories field at the specified index.
      * @param index the index of the category
