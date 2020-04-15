@@ -408,7 +408,7 @@ public class ArenaSetup {
 	
 	public void addSpawner() {
 		arenaBuilder.addSpawner(spawnerBuilder.build());
-		spawnSpawnerNPC(spawnerBuilder.getLocation(), spawnerBuilder.getMaterial(), spawnerBuilder.getItemName().replace("&","ï¿½"));
+		spawnSpawnerNPC(spawnerBuilder.getLocation(), spawnerBuilder.getMaterial(), spawnerBuilder.getItemName().replace("&","§"));
 		MessageSender.sendMessage(setuper, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "spawner-set").replace("%itemname%", spawnerBuilder.getItemName()));
 		SoundPlayer.playSound("arena-setup", setuper);
 		spawnerBuilder = new SpawnerBuilder();

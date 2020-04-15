@@ -86,17 +86,20 @@ public class Game {
 			return false; // Not enough players
 		
 		// Assign players who didn't choose a team to a team automatically.
-		for (UUID uuid : players) {
-			if (!playerHasTeam(uuid)) {
-				Team team = getSmallestTeam();
-				team.addMember(uuid);
-				
-				String colorConfigKey = "color-" + team.getBase().getTeamColor().toString().toLowerCase().replace("_", "-");
-				MessagesConfig msgConfig = MessagesConfig.getInstance();
-				Player player = Bukkit.getPlayer(uuid);
-				String colorStr = msgConfig.getStringValue(player.getLocale(), colorConfigKey);
-				MessageSender.sendMessageUUID(uuid, msgConfig.getStringValue(player.getLocale(), "team-changed").replace("%teamcolor%", colorStr));
-			}
+		assignLonelyPlayersToTeamsAutomatically();
+		
+		// Make sure there are at least two teams that contain at least one player.
+		int filledTeamsCount = 0;
+		
+		for (Team team : teams)
+			if (team.getMembers().size() > 0)
+				++filledTeamsCount;
+		
+		if (filledTeamsCount < 2) {
+			for (Team team : teams)
+				team.clearMembers();
+			
+			assignLonelyPlayersToTeamsAutomatically();
 		}
 		
 		isStarting = true;
@@ -225,6 +228,21 @@ public class Game {
 		}
 		
 		return ret;
+	}
+	
+	private void assignLonelyPlayersToTeamsAutomatically() {
+		for (UUID uuid : players) {
+			if (!playerHasTeam(uuid)) {
+				Team team = getSmallestTeam();
+				team.addMember(uuid);
+				
+				String colorConfigKey = "color-" + team.getBase().getTeamColor().toString().toLowerCase().replace("_", "-");
+				MessagesConfig msgConfig = MessagesConfig.getInstance();
+				Player player = Bukkit.getPlayer(uuid);
+				String colorStr = msgConfig.getStringValue(player.getLocale(), colorConfigKey);
+				MessageSender.sendMessageUUID(uuid, msgConfig.getStringValue(player.getLocale(), "team-changed").replace("%teamcolor%", colorStr));
+			}
+		}
 	}
 	
 }

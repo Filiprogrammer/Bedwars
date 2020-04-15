@@ -48,8 +48,10 @@ public class GameLogic {
 			
 			@Override
 			public void run() {
-				for (Spawner spawner : arena.getSpawner())
+				for (Spawner spawner : arena.getSpawner()) {
+					spawner.getLocation().setWorld(gameWorld.getWorld());
 					spawner.update();
+				}
 			}
 		};
 		

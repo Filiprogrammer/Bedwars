@@ -38,6 +38,10 @@ public class Team {
     	return members.contains(uuid);
     }
     
+    public void clearMembers() {
+    	members.clear();
+    }
+    
     public List<UUID> getMembers() {
     	return members;
     }
