@@ -161,6 +161,7 @@ public class GameLogic {
 	public void joinSpectator(Player player) {
 		// TODO: Add spectator spawn point
 		player.teleport(arena.getBase(0).getSpawn(gameWorld.getWorld()));
+		PlayerUtils.playerReset(player);
 		player.setGameMode(GameMode.SPECTATOR);
 		MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "joined-game-as-spectator"));
 	}
