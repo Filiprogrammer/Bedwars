@@ -17,6 +17,8 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.event.world.WorldInitEvent;
 
+import com.onarandombox.MultiverseCore.MultiverseCore;
+
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.config.MainConfig;
 import filip.bedwars.listener.player.WorldInitHandler;
@@ -54,6 +56,11 @@ public class GameWorld {
         	
         	if (world != null)
         		Bukkit.unloadWorld(world, false);
+        	
+        	MultiverseCore mv = BedwarsPlugin.getInstance().getMultiverse();
+        	
+        	if (mv != null)
+        		mv.getMVWorldManager().removeWorldFromConfig(gameWorldName);
         	
         	try {
     			deleteDirectory(gameWorldDirectory);

@@ -78,6 +78,7 @@ public class PlayerUtils {
 		player.setRemainingAir(player.getMaximumAir());
 		player.setNoDamageTicks(0);
 		player.setVelocity(new Vector(0, 0, 0));
+		player.getInventory().clear();
 		
 		for (PotionEffect potionEffect : player.getActivePotionEffects())
 			player.removePotionEffect(potionEffect.getType());

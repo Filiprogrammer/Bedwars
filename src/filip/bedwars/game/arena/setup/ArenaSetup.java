@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -17,9 +16,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-
-import com.onarandombox.MultiverseCore.api.MVWorldManager;
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -420,17 +416,6 @@ public class ArenaSetup {
 		
 		cleanup();
 		setuper.getInventory().clear();
-		World w = arenaBuilder.getWorld();
-		MVWorldManager mvWorldManager = BedwarsPlugin.getInstance().getMultiverse().getMVWorldManager();
-    	MultiverseWorld mvWorld = mvWorldManager.getMVWorld(w);
-    	mvWorld.setAllowAnimalSpawn(false);
-    	mvWorld.setAllowMonsterSpawn(false);
-    	mvWorld.setHunger(false);
-    	mvWorld.setBedRespawn(false);
-    	mvWorld.setEnableWeather(false);
-    	w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-    	w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
-    	w.setFullTime(6000);
 		return arenaBuilder.build();
 	}
 	

@@ -1,6 +1,7 @@
 package filip.bedwars.game;
 
 import java.util.List;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -19,6 +20,7 @@ import filip.bedwars.config.TeamShopConfig;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.arena.Spawner;
+import filip.bedwars.listener.player.IPacketListener;
 import filip.bedwars.listener.player.UseEntityPacketListener;
 import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.PlayerUtils;
@@ -34,6 +36,7 @@ public class GameLogic {
 	private BukkitRunnable gameTicker;
 	private List<UseEntityPacketListener> itemShopNPCListeners = new ArrayList<UseEntityPacketListener>();
 	private List<UseEntityPacketListener> teamShopNPCListeners = new ArrayList<UseEntityPacketListener>();
+	private IPacketListener packetListener;
 	
 	public GameLogic(Game game, Arena arena, GameWorld gameWorld) {
 		this.game = game;
@@ -54,11 +57,37 @@ public class GameLogic {
 			}
 		};
 		
-		// Teleport every player to the spawnpoint of their base and send a message that the game started
+		packetListener = new IPacketListener() {
+			public boolean writePacket(Object packet, Player player) {
+				if (packet.getClass().getSimpleName().equals("PacketPlayOutNamedEntitySpawn")) {
+					for (UUID uuid : game.getPlayers()) {
+						Player p = Bukkit.getPlayer(uuid);
+						try {
+							Field aField = packet.getClass().getDeclaredField("a");
+							aField.setAccessible(true);
+							if (p.getEntityId() == aField.getInt(packet))
+								return true;
+						} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+							e.printStackTrace();
+						}
+					}
+					
+					return false;
+				}
+				
+				return true;
+			}
+		};
+		
 		for (UUID uuid : game.getPlayers()) {
-			teleportToSpawn(Bukkit.getPlayer(uuid));
-			MessageSender.sendMessageUUID(uuid, MessagesConfig.getInstance().getStringValue(Bukkit.getPlayer(uuid).getLocale(), "game-started"));
-			SoundPlayer.playSound("game-started", Bukkit.getPlayer(uuid));
+			Player player = Bukkit.getPlayer(uuid);
+			// Add a packet listener
+			BedwarsPlugin.getInstance().addPacketListener(player, packetListener);
+			// Teleport player to the spawnpoint of their base
+			teleportToSpawn(player);
+			// Notify the player that the game has started.
+			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "game-started"));
+			SoundPlayer.playSound("game-started", player);
 		}
 		
 		// Convert UUIDs to players
@@ -133,10 +162,18 @@ public class GameLogic {
 		// TODO: Add spectator spawn point
 		player.teleport(arena.getBase(0).getSpawn(gameWorld.getWorld()));
 		player.setGameMode(GameMode.SPECTATOR);
+		MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "joined-game-as-spectator"));
 	}
 	
 	public void leavePlayer(Player player) {
 		player.teleport(MainConfig.getInstance().getMainLobby());
+		for (UseEntityPacketListener itemShopNPCListener : itemShopNPCListeners)
+			BedwarsPlugin.getInstance().removePacketListener(player, itemShopNPCListener);
+		
+		for (UseEntityPacketListener teamShopNPCListener : teamShopNPCListeners)
+			BedwarsPlugin.getInstance().removePacketListener(player, teamShopNPCListener);
+		
+		BedwarsPlugin.getInstance().removePacketListener(player, packetListener);
 	}
 	
 	public GameWorld getGameWorld() {

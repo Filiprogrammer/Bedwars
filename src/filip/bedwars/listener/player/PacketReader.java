@@ -35,7 +35,8 @@ public class PacketReader {
             
             @Override
             public void write(ChannelHandlerContext context, Object packet, ChannelPromise channelPromise) throws Exception {
-                super.write(context, packet, channelPromise);
+                if (writePacket(packet))
+                	super.write(context, packet, channelPromise);
             }
         };
 		
@@ -73,6 +74,17 @@ public class PacketReader {
 	private void readPacket(Object packet) {
 		for (IPacketListener listener : listeners)
 			listener.readPacket(packet, player);
+	}
+	
+	private boolean writePacket(Object packet) {
+		boolean ret = true;
+		
+		for (IPacketListener listener : listeners) {
+			if (!listener.writePacket(packet, player))
+				ret = false;
+		}
+		
+		return ret;
 	}
 	
 	public void addListener(IPacketListener listener) {
