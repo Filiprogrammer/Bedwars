@@ -13,10 +13,14 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
-
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 
@@ -42,7 +46,7 @@ import filip.bedwars.utils.PlayerNPC;
 import filip.bedwars.utils.SoundPlayer;
 import filip.bedwars.utils.VillagerNPC;
 
-public class ArenaSetup {
+public class ArenaSetup implements Listener {
 
 	private final List<IUsable> usables = new ArrayList<IUsable>();
 	private final List<IPlacable> placables = new ArrayList<IPlacable>();
@@ -363,6 +367,8 @@ public class ArenaSetup {
 				}
 			}
 		});
+		
+		BedwarsPlugin.getInstance().getServer().getPluginManager().registerEvents(this, BedwarsPlugin.getInstance());
 	}
 	
 	public void addBase() {
@@ -469,6 +475,8 @@ public class ArenaSetup {
 		for (IPlacable placable : placables)
 			plugin.removePlacable(placable);
 		
+		HandlerList.unregisterAll(this);
+		
 		despawnItemShopNPC();
 		despawnTeamShopNPC();
 		despawnSpawnNPC();
@@ -563,6 +571,40 @@ public class ArenaSetup {
 		}
 		
 		spawnerNPCs = new HashMap<ArmorStandItemNPC, IPacketListener>();
+	}
+	
+	@EventHandler
+	public void onPlayerDropItem(PlayerDropItemEvent event) {
+		if (event.getPlayer().getUniqueId().equals(setuper.getUniqueId())) {
+			ItemStack itemStack = event.getItemDrop().getItemStack();
+			
+			if (itemDisplayNameMatches(itemStack, spawnerItem)
+			 || itemDisplayNameMatches(itemStack, itemShopItem)
+			 || itemDisplayNameMatches(itemStack, teamShopItem)
+			 || itemDisplayNameMatches(itemStack, spawnItem)
+			 || itemDisplayNameMatches(itemStack, bedItem)
+			 || itemDisplayNameMatches(itemStack, createBaseItem)
+			 || itemDisplayNameMatches(itemStack, cancelSetupItem)
+			 || itemDisplayNameMatches(itemStack, finishSetupItem)) {
+				event.setCancelled(true);
+			}
+		}
+	}
+	
+	private boolean itemDisplayNameMatches(ItemStack itemStack1, ItemStack itemStack2) {
+		if (!itemStack1.hasItemMeta() || !itemStack2.hasItemMeta())
+			return false;
+		
+		ItemMeta itemMeta1 = itemStack1.getItemMeta();
+		ItemMeta itemMeta2 = itemStack2.getItemMeta();
+		
+		if (!itemMeta1.hasDisplayName() || !itemMeta2.hasDisplayName())
+			return false;
+		
+		if (itemMeta1.getDisplayName().equals(itemMeta2.getDisplayName()))
+			return true;
+		
+		return false;
 	}
 	
 }
