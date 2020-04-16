@@ -6,23 +6,17 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.BedwarsPlugin;
+import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
@@ -43,8 +37,7 @@ public class Game implements Listener {
 	
 	public Game(@NotNull Arena arena) {
 		this.arena = arena;
-		// TODO: Lobby setup and get lobby spawn point from config
-		this.lobby = new Lobby(new Location(Bukkit.getWorld("bw_lobby"), 0, 65, 0), this);
+		this.lobby = new Lobby(MainConfig.getInstance().getGameLobby(), this);
 		
 		for (int i = 0; i < arena.getBases().size(); ++i) {
 			Base base = arena.getBase(i);
@@ -261,90 +254,8 @@ public class Game implements Listener {
 				return;
 			}
 			
-			if (isRunning()) {
-				
-			} else if (!player.getWorld().getName().equals(lobby.getSpawnPoint().getWorld().getName())) {
+			if (!isRunning() && !player.getWorld().getName().equals(lobby.getSpawnPoint().getWorld().getName())) {
 				if (player.getGameMode() != GameMode.CREATIVE)
-					event.setCancelled(true);
-			}
-		} else {
-			if (isRunning()) {
-				if (player.getWorld().getName().equals(gameLogic.getGameWorld().getWorld().getName()))
-					event.setCancelled(true);
-			}
-		}
-	}
-	
-	@EventHandler
-	public void onPlayerBedEnter(PlayerBedEnterEvent event) {
-		Player player = event.getPlayer();
-		
-		if (players.contains(player.getUniqueId())) {
-			if (isStarting || isRunning())
-				event.setCancelled(true);
-		}
-	}
-	
-	@EventHandler
-	public void onPlayerPickupItem(EntityPickupItemEvent event) {
-		if (event.getEntityType() != EntityType.PLAYER)
-			return;
-		
-		Player player = (Player) event.getEntity();
-		
-		if (!players.contains(player.getUniqueId())) {
-			if (isRunning()) {
-				if (player.getWorld().getName().equals(gameLogic.getGameWorld().getWorld().getName()))
-					event.setCancelled(true);
-			}
-		}
-	}
-	
-	@EventHandler
-	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-		if (event.getDamager().getType() != EntityType.PLAYER)
-			return;
-		
-		Player damager = (Player) event.getDamager();
-		
-		if (players.contains(damager.getUniqueId())) {
-			if (event.getEntity().getType() != EntityType.PLAYER)
-				return;
-			
-			Player player = (Player) event.getEntity();
-			
-			if (getTeamOfPlayer(damager.getUniqueId()) == getTeamOfPlayer(player.getUniqueId()))
-				event.setCancelled(true);
-		} else {
-			if (isRunning()) {
-				if (damager.getWorld().getName().equals(gameLogic.getGameWorld().getWorld().getName()))
-					event.setCancelled(true);
-			}
-		}
-	}
-	
-	@EventHandler
-	public void onPlayerDropItem(PlayerDropItemEvent event) {
-		Player player = event.getPlayer();
-		
-		if (!players.contains(player.getUniqueId())) {
-			if (isRunning()) {
-				if (player.getWorld().getName().equals(gameLogic.getGameWorld().getWorld().getName()))
-					event.setCancelled(true);
-			}
-		}
-	}
-	
-	@EventHandler
-	public void onEntityDamage(EntityDamageEvent event) {
-		if (event.getEntityType() != EntityType.PLAYER)
-			return;
-		
-		Player player = (Player) event.getEntity();
-		
-		if (!players.contains(player.getUniqueId())) {
-			if (isRunning()) {
-				if (player.getWorld().getName().equals(gameLogic.getGameWorld().getWorld().getName()))
 					event.setCancelled(true);
 			}
 		}

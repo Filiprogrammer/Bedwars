@@ -45,12 +45,25 @@ public class ArenaConfig extends SingleConfig {
 		return arenas.get(index);
 	}
 	
+	public int getArenaCount() {
+		return arenas.size();
+	}
+	
 	public void addArena(Arena arena) {
 		arenas.add(arena);
 	}
 	
-	public void removeArena(Arena arena) {
-		arenas.remove(arena);
+	public boolean removeArena(Arena arena) {
+		return arenas.remove(arena);
+	}
+	
+	public boolean removeArena(String mapName) {
+		Arena arena = getArena(mapName);
+		
+		if (arena == null)
+			return false;
+		
+		return arenas.remove(arena);
 	}
 	
 	public static ArenaConfig getInstance() {

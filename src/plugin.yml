@@ -11,7 +11,7 @@ commands:
     permission: filip.bedwars.base
   bw addarena:
     description: Add a new arena in the world you are currently in
-    usage: /<command> [mapName]
+    usage: /<command> [mapName] [minPlayersToStart] [maxPlayersPerTeam]
     permission: filip.bedwars.setup
   bw finisharena:
     description: Finish adding the new arena
@@ -29,6 +29,22 @@ commands:
     description: Join a game
     usage: /<command>
     permission: filip.bedwars.play
+  bw setmainlobby:
+    description: Set the main lobby
+    usage: /<command>
+    permission: filip.bedwars.setup
+  bw setgamelobby:
+    description: Set the game lobby
+    usage: /<command>
+    permission: filip.bedwars.setup
+  bw removearena:
+    description: Removes an arena
+    usage: /<command> [mapName]
+    permission: filip.bedwars.setup
+  bw listarenas:
+    description: List all arenas
+    usage: /<command>
+    permission: filip.bedwars.base
 permissions:
   filip.bedwars.base:
     description: hj

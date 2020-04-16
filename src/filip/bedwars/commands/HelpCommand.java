@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.config.MainConfig;
+import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.utils.MessageSender;
 
 public class HelpCommand implements ICommand {
@@ -15,16 +16,16 @@ public class HelpCommand implements ICommand {
 	public boolean execute(CommandSender sender, String[] args) {
 		String locale;
 		
-		if (sender instanceof Player)
-			locale = ((Player)sender).getLocale();
-		else
+		if (sender instanceof Player) {
+			Player player = (Player) sender;
+			locale = player.getLocale();
+		} else {
 			locale = MainConfig.getInstance().getLanguage();
+		}
 		
-		// TODO: print help
-		// MessageSender.sendMessage(sender, msg);
 		List<ICommand> commands = BedwarsPlugin.getInstance().getCommands();
 		
-		MessageSender.sendMessage(sender, "Available Commands:");
+		MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "available-commands"));
 		for (ICommand command : commands) {
 			if (sender.hasPermission("filip.bedwars." + command.getPermission())) {
 				StringBuilder sb = new StringBuilder();

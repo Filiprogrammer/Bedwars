@@ -12,6 +12,7 @@ public class MainConfig extends SingleConfig {
 	
 	private String language = "en_us";
 	private Location mainLobby;
+	private Location gameLobby;
 	private String gameWorldPrefix = "bw_game_";
 	
 	protected MainConfig() {
@@ -27,8 +28,20 @@ public class MainConfig extends SingleConfig {
 		return mainLobby;
 	}
 	
+	public Location getGameLobby() {
+		return gameLobby;
+	}
+	
 	public String getGameWorldPrefix() {
 		return gameWorldPrefix;
+	}
+	
+	public void setMainLobby(Location loc) {
+		mainLobby = loc;
+	}
+	
+	public void setGameLobby(Location loc) {
+		gameLobby = loc;
 	}
 	
 	@Override
@@ -48,6 +61,18 @@ public class MainConfig extends SingleConfig {
 		mainLobbySection.set("z", mainLobby.getZ());
 		mainLobbySection.set("yaw", mainLobby.getYaw());
 		mainLobbySection.set("pitch", mainLobby.getPitch());
+		
+		ConfigurationSection gameLobbySection = config.getConfigurationSection("game-lobby");
+		
+		if (gameLobbySection == null)
+			gameLobbySection = config.createSection("game-lobby");
+		
+		gameLobbySection.set("w", gameLobby.getWorld().getName());
+		gameLobbySection.set("x", gameLobby.getX());
+		gameLobbySection.set("y", gameLobby.getY());
+		gameLobbySection.set("z", gameLobby.getZ());
+		gameLobbySection.set("yaw", gameLobby.getYaw());
+		gameLobbySection.set("pitch", gameLobby.getPitch());
 		
 		try {
 			config.save(configFile);
@@ -76,6 +101,19 @@ public class MainConfig extends SingleConfig {
 		float mainLobbyYaw = (float) mainLobbySection.getDouble("yaw", 0.0);
 		float mainLobbyPitch = (float) mainLobbySection.getDouble("pitch", 0.0);
 		mainLobby = new Location(Bukkit.getWorld(mainLobbyWorld), mainLobbyX, mainLobbyY, mainLobbyZ, mainLobbyYaw, mainLobbyPitch);
+		
+		ConfigurationSection gameLobbySection = config.getConfigurationSection("game-lobby");
+		
+		if (gameLobbySection == null)
+			gameLobbySection = config.createSection("game-lobby");
+			
+		String gameLobbyWorld = gameLobbySection.getString("w", "world");
+		double gameLobbyX = gameLobbySection.getDouble("x", 0.0);
+		double gameLobbyY = gameLobbySection.getDouble("y", 65.0);
+		double gameLobbyZ = gameLobbySection.getDouble("z", 0.0);
+		float gameLobbyYaw = (float) gameLobbySection.getDouble("yaw", 0.0);
+		float gameLobbyPitch = (float) gameLobbySection.getDouble("pitch", 0.0);
+		gameLobby = new Location(Bukkit.getWorld(gameLobbyWorld), gameLobbyX, gameLobbyY, gameLobbyZ, gameLobbyYaw, gameLobbyPitch);
 	}
 	
 	public static MainConfig getInstance() {

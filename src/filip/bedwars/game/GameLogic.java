@@ -9,7 +9,17 @@ import java.util.concurrent.Callable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import filip.bedwars.BedwarsPlugin;
@@ -28,7 +38,7 @@ import filip.bedwars.utils.SoundPlayer;
 import filip.bedwars.utils.VillagerNPC;
 import filip.bedwars.world.GameWorld;
 
-public class GameLogic {
+public class GameLogic implements Listener {
 
 	private Game game;
 	private Arena arena;
@@ -78,6 +88,8 @@ public class GameLogic {
 				return true;
 			}
 		};
+		
+		BedwarsPlugin.getInstance().getServer().getPluginManager().registerEvents(this, BedwarsPlugin.getInstance());
 		
 		for (UUID uuid : game.getPlayers()) {
 			Player player = Bukkit.getPlayer(uuid);
@@ -193,6 +205,78 @@ public class GameLogic {
 			for (UseEntityPacketListener teamShopNPCListener : teamShopNPCListeners)
 				BedwarsPlugin.getInstance().removePacketListener(player, teamShopNPCListener);
 		}
+		
+		HandlerList.unregisterAll(this);
+	}
+	
+	@EventHandler
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		Player player = event.getPlayer();
+		
+		// Check if the player is a spectator
+		if (!game.getPlayers().contains(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
+			event.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onPlayerBedEnter(PlayerBedEnterEvent event) {
+		// Check if the player is a part of this game
+		if (game.getPlayers().contains(event.getPlayer().getUniqueId()))
+			event.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onPlayerPickupItem(EntityPickupItemEvent event) {
+		if (event.getEntityType() != EntityType.PLAYER)
+			return;
+		
+		Player player = (Player) event.getEntity();
+		
+		// Check if the player is a spectator
+		if (!game.getPlayers().contains(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
+			event.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onPlayerDropItem(PlayerDropItemEvent event) {
+		Player player = event.getPlayer();
+		
+		// Check if the player is a spectator
+		if (!game.getPlayers().contains(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
+			event.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+		if (event.getDamager().getType() != EntityType.PLAYER)
+			return;
+		
+		Player damager = (Player) event.getDamager();
+		
+		if (game.getPlayers().contains(damager.getUniqueId())) {
+			if (event.getEntity().getType() != EntityType.PLAYER)
+				return;
+			
+			Player player = (Player) event.getEntity();
+			
+			if (game.getTeamOfPlayer(damager.getUniqueId()) == game.getTeamOfPlayer(player.getUniqueId()))
+				event.setCancelled(true);
+		} else {
+			if (damager.getWorld().getName().equals(getGameWorld().getWorld().getName()))
+				event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onEntityDamage(EntityDamageEvent event) {
+		if (event.getEntityType() != EntityType.PLAYER)
+			return;
+		
+		Player player = (Player) event.getEntity();
+		
+		// Check if the player is a spectator
+		if (!game.getPlayers().contains(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
+			event.setCancelled(true);
 	}
 	
 }

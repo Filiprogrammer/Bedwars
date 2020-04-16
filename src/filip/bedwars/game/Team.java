@@ -11,6 +11,7 @@ public class Team {
     private final int id;
     private final Base base;
     private final List<UUID> members;
+    private boolean hasBed = true;
     
     public Team(int id, @NotNull Base base, @NotNull List<UUID> members) {
         this.id = id;
@@ -44,6 +45,14 @@ public class Team {
     
     public List<UUID> getMembers() {
     	return members;
+    }
+    
+    public boolean hasBed() {
+    	return hasBed;
+    }
+    
+    public void setHasBed(boolean hasBed) {
+    	this.hasBed = hasBed;
     }
     
 }
