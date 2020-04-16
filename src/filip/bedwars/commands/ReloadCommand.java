@@ -14,7 +14,7 @@ public class ReloadCommand implements ICommand {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		if (args.length != 0)
+		if (args.length != getArguments().length)
 			return false;
 		
 		MainConfig.getInstance().reloadConfig();
@@ -33,14 +33,16 @@ public class ReloadCommand implements ICommand {
 		return true;
 	}
 
-	@Override
 	public String getPermission() {
 		return "reload";
 	}
 
-	@Override
 	public String getName() {
 		return "reload";
+	}
+	
+	public String[] getArguments() {
+		return new String[0];
 	}
 	
 }

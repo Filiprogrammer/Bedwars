@@ -14,7 +14,7 @@ public class FinishArenaCommand implements ICommand {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		if (args.length != 0)
+		if (args.length != getArguments().length)
 			return false;
 		
 		if (!(sender instanceof Player)) {
@@ -43,14 +43,16 @@ public class FinishArenaCommand implements ICommand {
 		return true;
 	}
 
-	@Override
 	public String getPermission() {
 		return "setup";
 	}
 
-	@Override
 	public String getName() {
 		return "finisharena";
+	}
+	
+	public String[] getArguments() {
+		return new String[0];
 	}
 
 }

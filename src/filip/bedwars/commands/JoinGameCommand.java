@@ -15,7 +15,7 @@ public class JoinGameCommand implements ICommand {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		if (args.length != 1)
+		if (args.length != getArguments().length)
 			return false;
 		
 		if (!(sender instanceof Player)) {
@@ -36,14 +36,16 @@ public class JoinGameCommand implements ICommand {
 		return true;
 	}
 
-	@Override
 	public String getPermission() {
 		return "play";
 	}
 
-	@Override
 	public String getName() {
 		return "joingame";
+	}
+	
+	public String[] getArguments() {
+		return new String[] { "mapname" };
 	}
 	
 }

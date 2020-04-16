@@ -25,34 +25,36 @@ public class BedwarsCommandExecutor implements CommandExecutor {
 		if (!sender.hasPermission("filip.bedwars." + BedwarsPlugin.getInstance().getHelpCommand().getPermission()))
 			return false;
 		
-		if (args.length == 0)
-			return BedwarsPlugin.getInstance().getHelpCommand().execute(sender, args);
-		
-		List<ICommand> commands = BedwarsPlugin.getInstance().getCommands();
-		
-		for (ICommand cmd : commands) {
-			if (cmd.getName().equals(args[0])) {
-				if (sender.hasPermission("filip.bedwars." + cmd.getPermission())) {
-					String[] cmdArgs = new String[args.length - 1];
+		if (args.length != 0) {
+			List<ICommand> commands = BedwarsPlugin.getInstance().getCommands();
+			
+			for (ICommand cmd : commands) {
+				if (cmd.getName().equals(args[0])) {
+					if (sender.hasPermission("filip.bedwars." + cmd.getPermission())) {
+						String[] cmdArgs = new String[args.length - 1];
+						
+						for (int i = 0; i < cmdArgs.length; ++i)
+							cmdArgs[i] = args[1 + i];
+						
+						if (!cmd.execute(sender, cmdArgs))
+							break;
+						
+						return true;
+					}
 					
-					for (int i = 0; i < cmdArgs.length; ++i)
-						cmdArgs[i] = args[1 + i];
+					String locale;
 					
-					return cmd.execute(sender, cmdArgs);
+					if (sender instanceof Player)
+						locale = ((Player)sender).getLocale();
+					else
+						locale = MainConfig.getInstance().getLanguage();
+					
+					MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "no-permission"));
 				}
-				
-				String locale;
-				
-				if (sender instanceof Player)
-					locale = ((Player)sender).getLocale();
-				else
-					locale = MainConfig.getInstance().getLanguage();
-				
-				MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "no-permission"));
 			}
 		}
 		
-		return false;
+		return BedwarsPlugin.getInstance().getHelpCommand().execute(sender, args);
 	}
 	
 }

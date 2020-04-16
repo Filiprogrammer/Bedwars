@@ -82,14 +82,16 @@ public class AddArenaCommand implements ICommand {
 		return true;
 	}
 
-	@Override
 	public String getPermission() {
 		return "setup";
 	}
 
-	@Override
 	public String getName() {
 		return "addarena";
+	}
+	
+	public String[] getArguments() {
+		return new String[] { "mapname", "minPlayersToStart", "playersPerTeam" };
 	}
 	
 }

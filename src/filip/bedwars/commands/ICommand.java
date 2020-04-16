@@ -10,4 +10,6 @@ public interface ICommand {
 	
 	String getName();
 	
+	String[] getArguments();
+	
 }
