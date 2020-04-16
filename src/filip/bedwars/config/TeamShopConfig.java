@@ -7,9 +7,9 @@ import filip.bedwars.game.shop.Shop;
 import filip.bedwars.game.shop.ShopCategory;
 import filip.bedwars.utils.ShopCategoryDeserializer;
 
-public class ItemShopConfig extends SingleConfig{
+public class TeamShopConfig extends SingleConfig{
 
-	private static ItemShopConfig instance = null;
+	private static TeamShopConfig instance = null;
 	
 	private Shop shop;
 	
@@ -17,8 +17,8 @@ public class ItemShopConfig extends SingleConfig{
 		return shop;
 	}
 	
-	private ItemShopConfig() {
-		super("itemshop.yml");
+	private TeamShopConfig() {
+		super("teamshop.yml");
 		reloadConfig();
 	}
 
@@ -40,14 +40,14 @@ public class ItemShopConfig extends SingleConfig{
 			for (Object serializedCategory : serializedCategories)
 				shopCategories.add(ShopCategoryDeserializer.deserializeCategory(serializedCategory));
 			
-			shop = new Shop("§1Item Shop", shopCategories.toArray(new ShopCategory[0]));
+			shop = new Shop("§2Team Shop", shopCategories.toArray(new ShopCategory[0]));
 		}
 		
 	}
 	
-	public static ItemShopConfig getInstance() {
+	public static TeamShopConfig getInstance() {
 		if (instance == null)
-			instance = new ItemShopConfig();
+			instance = new TeamShopConfig();
 		
 		return instance;
 	}

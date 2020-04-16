@@ -15,11 +15,13 @@ import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.config.ItemShopConfig;
 import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
+import filip.bedwars.config.TeamShopConfig;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.arena.Spawner;
 import filip.bedwars.listener.player.UseEntityPacketListener;
 import filip.bedwars.utils.MessageSender;
+import filip.bedwars.utils.PlayerUtils;
 import filip.bedwars.utils.SoundPlayer;
 import filip.bedwars.utils.VillagerNPC;
 import filip.bedwars.world.GameWorld;
@@ -29,16 +31,14 @@ public class GameLogic {
 	private Game game;
 	private Arena arena;
 	private GameWorld gameWorld;
-	private List<Team> teams;
 	private BukkitRunnable gameTicker;
 	private List<UseEntityPacketListener> itemShopNPCListeners = new ArrayList<UseEntityPacketListener>();
 	private List<UseEntityPacketListener> teamShopNPCListeners = new ArrayList<UseEntityPacketListener>();
 	
-	public GameLogic(List<Team> teams, Game game, Arena arena, GameWorld gameWorld) {
+	public GameLogic(Game game, Arena arena, GameWorld gameWorld) {
 		this.game = game;
 		this.arena = arena;
 		this.gameWorld = gameWorld;
-		this.teams = teams;
 		
 		// Setup game ticker for spawners
 		gameTicker = new BukkitRunnable() {
@@ -49,8 +49,7 @@ public class GameLogic {
 			@Override
 			public void run() {
 				for (Spawner spawner : arena.getSpawner()) {
-					spawner.getLocation().setWorld(gameWorld.getWorld());
-					spawner.update();
+					spawner.update(gameWorld.getWorld());
 				}
 			}
 		};
@@ -70,7 +69,7 @@ public class GameLogic {
 		
 		for (Base base : arena.getBases()) {
 			// Setup item shop NPC
-			VillagerNPC itemShopNPC = new VillagerNPC(base.getItemShop().clone().add(0.5, 0, 0.5), "DESERT", "ARMORER", "Item Shop", players);
+			VillagerNPC itemShopNPC = new VillagerNPC(base.getItemShop(gameWorld.getWorld()).clone().add(0.5, 0, 0.5), "DESERT", "ARMORER", "Item Shop", players);
 			
 			UseEntityPacketListener itemShopNPCListener = new UseEntityPacketListener(itemShopNPC.getEntityId()) {
 				@Override
@@ -94,14 +93,21 @@ public class GameLogic {
 				BedwarsPlugin.getInstance().addPacketListener(player, itemShopNPCListener);
 			
 			// Setup team shop NPC, if it is not null
-			if (base.getTeamShop() != null) {
-				VillagerNPC teamShopNPC = new VillagerNPC(base.getTeamShop().clone().add(0.5, 0, 0.5), "SNOW", "CLERIC", "Team Shop", players);
+			if (base.getTeamShop(gameWorld.getWorld()) != null) {
+				VillagerNPC teamShopNPC = new VillagerNPC(base.getTeamShop(gameWorld.getWorld()).clone().add(0.5, 0, 0.5), "SNOW", "CLERIC", "Team Shop", players);
 				
 				UseEntityPacketListener teamShopNPCListener = new UseEntityPacketListener(teamShopNPC.getEntityId()) {
 					@Override
 					public void onUse(String action, Player player) {
 						if (action.equals("INTERACT")) {
-							// TODO: Open the team shop
+							// Call that on the main thread
+							Bukkit.getScheduler().callSyncMethod(BedwarsPlugin.getInstance(), new Callable<Void>() {
+								@Override
+								public Void call() throws Exception {
+									player.openInventory(TeamShopConfig.getInstance().getShop().getCategoryListInventory());
+									return null;
+								}
+							});
 						}
 					}
 				};
@@ -118,14 +124,14 @@ public class GameLogic {
 		if (player == null)
 			return;
 		
-		Location spawnLoc = game.getTeamOfPlayer(player.getUniqueId()).getBase().getSpawn().clone();
-		spawnLoc.setWorld(gameWorld.getWorld());
+		Location spawnLoc = game.getTeamOfPlayer(player.getUniqueId()).getBase().getSpawn(gameWorld.getWorld());
 		player.teleport(spawnLoc);
+		PlayerUtils.playerReset(player);
 	}
 	
 	public void joinSpectator(Player player) {
 		// TODO: Add spectator spawn point
-		player.teleport(arena.getBase(0).getSpawn());
+		player.teleport(arena.getBase(0).getSpawn(gameWorld.getWorld()));
 		player.setGameMode(GameMode.SPECTATOR);
 	}
 	

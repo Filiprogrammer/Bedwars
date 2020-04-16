@@ -5,9 +5,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.util.Vector;
 
-public class PlayerEntityHider {
+public class PlayerUtils {
 
 	public static void hidePlayerEntity(Player toHide, Player viewer) {
 		try {
@@ -51,6 +55,32 @@ public class PlayerEntityHider {
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void playerReset(Player player) {
+		player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(4);
+		player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
+		player.setAbsorptionAmount(0);
+		player.setBedSpawnLocation(null);
+		player.setExhaustion(0);
+		player.setSaturation(20);
+		player.setFoodLevel(20);
+		player.setExp(0);
+		player.setFallDistance(0);
+		player.setFireTicks(0);
+		player.setFlying(false);
+		player.setGameMode(GameMode.SURVIVAL);
+		player.setGlowing(false);
+		player.setHealth(20);
+		player.setHealthScaled(false);
+		player.setItemOnCursor(null);
+		player.setLevel(0);
+		player.setRemainingAir(player.getMaximumAir());
+		player.setNoDamageTicks(0);
+		player.setVelocity(new Vector(0, 0, 0));
+		
+		for (PotionEffect potionEffect : player.getActivePotionEffects())
+			player.removePotionEffect(potionEffect.getType());
 	}
 	
 	private static void sendPacket(Player player, Object packet) {

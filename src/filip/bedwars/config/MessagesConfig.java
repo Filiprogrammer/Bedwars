@@ -61,7 +61,7 @@ public class MessagesConfig extends MultipleConfig {
 			Set<String> keys = config.getKeys(false);
 			
 			for (String key : keys)
-				msgs.put(key, config.getString(key));
+				msgs.put(key, config.getString(key).replace('&', '§'));
 		}
 	}
 	

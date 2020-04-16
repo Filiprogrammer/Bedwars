@@ -139,22 +139,22 @@ public class ArenaConfig extends SingleConfig {
 				continue;
 			}
 			
-			if(base.getBedTop() == null) {
+			if(base.getBedTop(null) == null) {
 				ret = false;
 				MessageSender.sendWarning("§eArena §6\"" + mapName + "\" §ecould not be loaded! In base §6" + base.getTeamColor().toString() + "§e the bed top was null! Please delete the arena from the config and set it up with the ingame-commands again!");
 			}
 			
-			if(base.getBedBottom() == null) {
+			if(base.getBedBottom(null) == null) {
 				ret = false;
 				MessageSender.sendWarning("§eArena §6\"" + mapName + "\" §ecould not be loaded! In base §6" + base.getTeamColor().toString() + "§e the bed bottom was null! Please delete the arena from the config and set it up with the ingame-commands again!");
 			}
 			
-			if(base.getItemShop() == null) {
+			if(base.getItemShop(null) == null) {
 				ret = false;
 				MessageSender.sendWarning("§eArena §6\"" + mapName + "\" §ecould not be loaded! In base §6" + base.getTeamColor().toString() + "§e the item shop was null! Please delete the arena from the config and set it up with the ingame-commands again!");
 			}
 			
-			if(base.getSpawn() == null) {
+			if(base.getSpawn(null) == null) {
 				ret = false;
 				MessageSender.sendWarning("§eArena §6\"" + mapName + "\" §ecould not be loaded! In base §6" + base.getTeamColor().toString() + "§e the spawn point was null! Please delete the arena from the config and set it up with the ingame-commands again!");
 			}

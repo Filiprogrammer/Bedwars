@@ -25,7 +25,7 @@ public class MessageSender {
 		else
 			locale = MainConfig.getInstance().getLanguage();
 		
-		sendTo.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg).replace('&', '§'));
+		sendTo.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg));
 	}
 	
 	/**
@@ -42,7 +42,7 @@ public class MessageSender {
 			else
 				locale = MainConfig.getInstance().getLanguage();
 			
-			cs.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg).replace('&', '§'));
+			cs.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg));
 		}
 		
 	}
@@ -59,7 +59,7 @@ public class MessageSender {
 			if (player != null)
 			{
 				String locale = player.getLocale();
-				player.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg).replace('&', '§'));
+				player.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg));
 			}
 		
 	}
@@ -76,7 +76,7 @@ public class MessageSender {
 			if (player != null)
 			{
 				String locale = player.getLocale();
-				player.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg).replace('&', '§'));
+				player.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg));
 			}
 		}
 	}

@@ -1,0 +1,24 @@
+categories:
+- name: dev-team-test
+  material: BIRCH_SAPLING
+  shopentries:
+  - priceMaterial: GOLD_INGOT
+    priceCount: 1
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      type: STONE_SWORD
+  - priceMaterial: GOLD_INGOT
+    priceCount: 2
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      type: IRON_SWORD
+  - priceMaterial: GOLD_INGOT
+    priceCount: 3
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      type: DIAMOND_SWORD
+  - priceMaterial: DIAMOND
+    priceCount: 10
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      type: DIAMOND_CHESTPLATE

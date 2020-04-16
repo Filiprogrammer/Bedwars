@@ -11,7 +11,7 @@ import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.Countdown;
 import filip.bedwars.game.Game;
 import filip.bedwars.utils.MessageSender;
-import filip.bedwars.utils.PlayerEntityHider;
+import filip.bedwars.utils.PlayerUtils;
 import filip.bedwars.utils.SoundPlayer;
 
 public class Lobby {
@@ -104,12 +104,13 @@ public class Lobby {
 	 */
 	public void joinPlayer(Player player) {
 		player.teleport(spawnPoint);
+		PlayerUtils.playerReset(player);
 		
 		// Make sure only players of the same game see each other
 		for (Player p : spawnPoint.getWorld().getPlayers()) {
 			if (!game.getPlayers().contains(p.getUniqueId())) {
-				PlayerEntityHider.hidePlayerEntity(p, player);
-				PlayerEntityHider.hidePlayerEntity(player, p);
+				PlayerUtils.hidePlayerEntity(p, player);
+				PlayerUtils.hidePlayerEntity(player, p);
 			}
 		}
 		

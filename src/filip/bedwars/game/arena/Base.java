@@ -1,6 +1,7 @@
 package filip.bedwars.game.arena;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.TeamColor;
@@ -18,27 +19,30 @@ public class Base {
 		this.teamColor = teamColor;
 	}
 	
-	public Location getSpawn() {
-    	return spawn;
-    }
-    
-    public Location getItemShop() {
-    	return itemShop;
-    }
-    
-    public Location getTeamShop() {
-    	return teamShop;
-    }
-    
-    public Location getBedTop() {
-    	return bedTop;
-    }
-    
-    public Location getBedBottom() {
-    	return bedBottom;
-    }
-    
-    public TeamColor getTeamColor() {
-    	return teamColor;
-    }
+	public Location getSpawn(World world) {
+		return new Location(world, spawn.getX(), spawn.getY(), spawn.getZ());
+	}
+	
+	public Location getItemShop(World world) {
+		return new Location(world, itemShop.getX(), itemShop.getY(), itemShop.getZ());
+	}
+	
+	public Location getTeamShop(World world) {
+		if (teamShop == null)
+			return null;
+		
+		return new Location(world, teamShop.getX(), teamShop.getY(), teamShop.getZ());
+	}
+	
+	public Location getBedTop(World world) {
+		return new Location(world, bedTop.getX(), bedTop.getY(), bedTop.getZ());
+	}
+	
+	public Location getBedBottom(World world) {
+		return new Location(world, bedBottom.getX(), bedBottom.getY(), bedBottom.getZ());
+	}
+	
+	public TeamColor getTeamColor() {
+		return teamColor;
+	}
 }

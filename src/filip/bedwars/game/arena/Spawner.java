@@ -2,6 +2,7 @@ package filip.bedwars.game.arena;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,8 +24,8 @@ public class Spawner {
     			.build();
     }
     
-    public Location getLocation() {
-    	return location;
+    public Location getLocation(World world) {
+    	return new Location(world, location.getX(), location.getY(), location.getZ());
     }
     
     public int getTicksPerSpawn() {
@@ -38,10 +39,10 @@ public class Spawner {
     /**
      * Execute one tick and if ticksPerSpawn is reached spawn the item.
      */
-    public void update() {
+    public void update(World world) {
         currentTick++;
         if (currentTick > ticksPerSpawn) {
-            spawnItem();
+            spawnItem(world);
             currentTick = 0;
         }
     }
@@ -49,7 +50,7 @@ public class Spawner {
     /**
      * Spawn the item at the location.
      */
-    private void spawnItem() {
-    	location.getWorld().dropItemNaturally(location, itemStack);
+    private void spawnItem(World world) {
+    	world.dropItemNaturally(location, itemStack);
     }
 }

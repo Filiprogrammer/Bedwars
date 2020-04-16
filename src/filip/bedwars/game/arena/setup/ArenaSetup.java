@@ -83,12 +83,12 @@ public class ArenaSetup {
 		giveSetupItems();
 		
 		// An inventory menu to select the spawner item and add the spawner to the arena
-		IClickable spawnerSelector = new ClickableInventory(Bukkit.createInventory(null, 9 * 3, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "select-spawner-item").replace("&", "§")), setuper) {
+		IClickable spawnerSelector = new ClickableInventory(Bukkit.createInventory(null, 9 * 3, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "select-spawner-item")), setuper) {
 			
 			{
 				for(int i = 0; i < SpawnerConfig.getInstance().getSpawnerTypes().size(); ++i) {
 					SpawnerType spawnerType = SpawnerConfig.getInstance().getSpawnerType(i);
-					inventory.setItem(i, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "set-spawner").replace("%itemname%", spawnerType.getName()).replace("&", "§")).setMaterial(spawnerType.getMaterial()).build());
+					inventory.setItem(i, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "set-spawner").replace("%itemname%", spawnerType.getName())).setMaterial(spawnerType.getMaterial()).build());
 				}
 			}
 			
@@ -120,25 +120,25 @@ public class ArenaSetup {
 		clickables.add(spawnerSelector);
 		
 		// An inventory menu to select the team color and add the base to the arena
-		IClickable teamColorSelector = new ClickableInventory(Bukkit.createInventory(null, 9 * 3, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "select-team-color").replace("&", "§")), setuper) {
+		IClickable teamColorSelector = new ClickableInventory(Bukkit.createInventory(null, 9 * 3, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "select-team-color")), setuper) {
 			
 			{
-				inventory.setItem(0, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-white").replace("&", "§")).setMaterial(Material.WHITE_WOOL).build());
-				inventory.setItem(1, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-orange").replace("&", "§")).setMaterial(Material.ORANGE_WOOL).build());
-				inventory.setItem(2, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-magenta").replace("&", "§")).setMaterial(Material.MAGENTA_WOOL).build());
-				inventory.setItem(3, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-light-blue").replace("&", "§")).setMaterial(Material.LIGHT_BLUE_WOOL).build());
-				inventory.setItem(4, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-yellow").replace("&", "§")).setMaterial(Material.YELLOW_WOOL).build());
-				inventory.setItem(5, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-lime").replace("&", "§")).setMaterial(Material.LIME_WOOL).build());
-				inventory.setItem(6, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-pink").replace("&", "§")).setMaterial(Material.PINK_WOOL).build());
-				inventory.setItem(7, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-gray").replace("&", "§")).setMaterial(Material.GRAY_WOOL).build());
-				inventory.setItem(8, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-light-gray").replace("&", "§")).setMaterial(Material.LIGHT_GRAY_WOOL).build());
-				inventory.setItem(9, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-cyan").replace("&", "§")).setMaterial(Material.CYAN_WOOL).build());
-				inventory.setItem(10, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-blue").replace("&", "§")).setMaterial(Material.BLUE_WOOL).build());
-				inventory.setItem(11, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-purple").replace("&", "§")).setMaterial(Material.PURPLE_WOOL).build());
-				inventory.setItem(12, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-green").replace("&", "§")).setMaterial(Material.GREEN_WOOL).build());
-				inventory.setItem(13, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-brown").replace("&", "§")).setMaterial(Material.BROWN_WOOL).build());
-				inventory.setItem(14, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-red").replace("&", "§")).setMaterial(Material.RED_WOOL).build());
-				inventory.setItem(15,new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-black").replace("&", "§")).setMaterial(Material.BLACK_WOOL).build());
+				inventory.setItem(0, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-white")).setMaterial(Material.WHITE_WOOL).build());
+				inventory.setItem(1, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-orange")).setMaterial(Material.ORANGE_WOOL).build());
+				inventory.setItem(2, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-magenta")).setMaterial(Material.MAGENTA_WOOL).build());
+				inventory.setItem(3, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-light-blue")).setMaterial(Material.LIGHT_BLUE_WOOL).build());
+				inventory.setItem(4, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-yellow")).setMaterial(Material.YELLOW_WOOL).build());
+				inventory.setItem(5, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-lime")).setMaterial(Material.LIME_WOOL).build());
+				inventory.setItem(6, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-pink")).setMaterial(Material.PINK_WOOL).build());
+				inventory.setItem(7, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-gray")).setMaterial(Material.GRAY_WOOL).build());
+				inventory.setItem(8, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-light-gray")).setMaterial(Material.LIGHT_GRAY_WOOL).build());
+				inventory.setItem(9, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-cyan")).setMaterial(Material.CYAN_WOOL).build());
+				inventory.setItem(10, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-blue")).setMaterial(Material.BLUE_WOOL).build());
+				inventory.setItem(11, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-purple")).setMaterial(Material.PURPLE_WOOL).build());
+				inventory.setItem(12, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-green")).setMaterial(Material.GREEN_WOOL).build());
+				inventory.setItem(13, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-brown")).setMaterial(Material.BROWN_WOOL).build());
+				inventory.setItem(14, new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-red")).setMaterial(Material.RED_WOOL).build());
+				inventory.setItem(15,new ItemBuilder().setName(MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "color-black")).setMaterial(Material.BLACK_WOOL).build());
 			}
 			
 			@Override
@@ -408,7 +408,7 @@ public class ArenaSetup {
 	
 	public void addSpawner() {
 		arenaBuilder.addSpawner(spawnerBuilder.build());
-		spawnSpawnerNPC(spawnerBuilder.getLocation(), spawnerBuilder.getMaterial(), spawnerBuilder.getItemName().replace("&","§"));
+		spawnSpawnerNPC(spawnerBuilder.getLocation(), spawnerBuilder.getMaterial(), spawnerBuilder.getItemName());
 		MessageSender.sendMessage(setuper, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "spawner-set").replace("%itemname%", spawnerBuilder.getItemName()));
 		SoundPlayer.playSound("arena-setup", setuper);
 		spawnerBuilder = new SpawnerBuilder();

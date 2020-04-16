@@ -63,7 +63,7 @@ public class MainConfig extends SingleConfig {
 		createAndLoadConfigFileIfNotExistent(false);
 		
 		language = config.getString("language", "en_us");
-		gameWorldPrefix = config.getString("game-world-prefix", "bw_game_");
+		gameWorldPrefix = config.getString("game-world-prefix", "bw_game_").replace("/", "").replace("\\", "");
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
 		
 		if (mainLobbySection == null)

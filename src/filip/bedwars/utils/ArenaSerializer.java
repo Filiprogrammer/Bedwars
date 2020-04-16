@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Location;
+
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.arena.Spawner;
@@ -25,12 +27,13 @@ public class ArenaSerializer {
 			Map<String, Object> spawnerInfo = new HashMap<String, Object>() {{
 				put("ticksPerSpawn", spawner.getTicksPerSpawn());
 				put("location", new HashMap<String, Integer>() {{
-					put("x", spawner.getLocation().getBlockX());
-					put("y", spawner.getLocation().getBlockY());
-					put("z", spawner.getLocation().getBlockZ());
+					Location loc = spawner.getLocation(null);
+					put("x", loc.getBlockX());
+					put("y", loc.getBlockY());
+					put("z", loc.getBlockZ());
 				}});
 				put("itemMaterial", spawner.getItemStack().getType().toString());
-				put("itemName", spawner.getItemStack().getItemMeta().getDisplayName());
+				put("itemName", spawner.getItemStack().getItemMeta().getDisplayName().replace('§', '&'));
 			}};
 			spawnerList.add(spawnerInfo);
 		}
@@ -42,32 +45,37 @@ public class ArenaSerializer {
 		for (Base base : arena.getBases()) {
 			Map<String, Object> baseInfo = new HashMap<String, Object>() {{
 				put("spawn", new HashMap<String, Integer>() {{
-					put("x", base.getSpawn().getBlockX());
-					put("y", base.getSpawn().getBlockY());
-					put("z", base.getSpawn().getBlockZ());
+					Location loc = base.getSpawn(null);
+					put("x", loc.getBlockX());
+					put("y", loc.getBlockY());
+					put("z", loc.getBlockZ());
 				}});
 				put("teamColor", base.getTeamColor().toString());
 				put("bedBottom", new HashMap<String, Integer>() {{
-					put("x", base.getBedBottom().getBlockX());
-					put("y", base.getBedBottom().getBlockY());
-					put("z", base.getBedBottom().getBlockZ());
+					Location loc = base.getBedBottom(null);
+					put("x", loc.getBlockX());
+					put("y", loc.getBlockY());
+					put("z", loc.getBlockZ());
 				}});
 				put("bedTop", new HashMap<String, Integer>() {{
-					put("x", base.getBedTop().getBlockX());
-					put("y", base.getBedTop().getBlockY());
-					put("z", base.getBedTop().getBlockZ());
+					Location loc = base.getBedTop(null);
+					put("x", loc.getBlockX());
+					put("y", loc.getBlockY());
+					put("z", loc.getBlockZ());
 				}});
 				put("itemShop", new HashMap<String, Integer>() {{
-					put("x", base.getItemShop().getBlockX());
-					put("y", base.getItemShop().getBlockY());
-					put("z", base.getItemShop().getBlockZ());
+					Location loc = base.getItemShop(null);
+					put("x", loc.getBlockX());
+					put("y", loc.getBlockY());
+					put("z", loc.getBlockZ());
 				}});
 				
-				if(base.getTeamShop() != null) { // only write the team shop if it exists
+				if(base.getTeamShop(null) != null) { // only write the team shop if it exists
 					put("teamShop", new HashMap<String, Integer>() {{
-						put("x", base.getTeamShop().getBlockX());
-						put("y", base.getTeamShop().getBlockY());
-						put("z", base.getTeamShop().getBlockZ());
+						Location loc = base.getTeamShop(null);
+						put("x", loc.getBlockX());
+						put("y", loc.getBlockY());
+						put("z", loc.getBlockZ());
 					}});
 				}
 			}};

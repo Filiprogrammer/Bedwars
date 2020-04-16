@@ -59,6 +59,11 @@ public class Game {
 					} else if (!player.getWorld().getName().equals(lobby.getSpawnPoint().getWorld().getName())) {
 						leavePlayer(player); // Player left the game lobby and therefore leaves the game
 					}
+				} else {
+					if (isRunning()) {
+						if (player.getWorld().getName().equals(gameLogic.getGameWorld().getWorld().getName()))
+							gameLogic.joinSpectator(player);
+					}
 				}
 			}
 		};
@@ -105,7 +110,7 @@ public class Game {
 		isStarting = true;
 		GameWorld gameWorld = GameWorldManager.getInstance().claimGameWorld(arena.getWorld());
 		lobby = null;
-		gameLogic = new GameLogic(teams, this, arena, gameWorld);
+		gameLogic = new GameLogic(this, arena, gameWorld);
 		isStarting = false;
 		return true;
 	}

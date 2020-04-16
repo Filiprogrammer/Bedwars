@@ -31,10 +31,10 @@ public class ArenaDeserializer {
 			SpawnerBuilder spawnerBuilder = new SpawnerBuilder();
 			spawnerBuilder.setTicksPerSpawn((int) serializedSpawner.get("ticksPerSpawn"));
 			spawnerBuilder.setItem(Material.valueOf((String) serializedSpawner.get("itemMaterial")));
-			spawnerBuilder.setItemName((String) serializedSpawner.get("itemName"));
+			spawnerBuilder.setItemName(((String) serializedSpawner.get("itemName")).replace('&', '§'));
 			
 			Map<String, Integer> spawnerLocationMap = (Map<String, Integer>) serializedSpawner.get("location");
-			Location spawnerLocation = new Location(arenaBuilder.getWorld(), spawnerLocationMap.get("x"), spawnerLocationMap.get("y"), spawnerLocationMap.get("z"));
+			Location spawnerLocation = new Location(null, spawnerLocationMap.get("x"), spawnerLocationMap.get("y"), spawnerLocationMap.get("z"));
 			spawnerBuilder.setLocation(spawnerLocation);
 			
 			arenaBuilder.addSpawner(spawnerBuilder.build());
@@ -46,26 +46,26 @@ public class ArenaDeserializer {
 			BaseBuilder baseBuilder = new BaseBuilder();
 			
 			Map<String, Integer> spawnLocationMap = (Map<String, Integer>) serializedBase.get("spawn");
-			Location spawnLocation = new Location(arenaBuilder.getWorld(), spawnLocationMap.get("x"), spawnLocationMap.get("y"), spawnLocationMap.get("z"));
+			Location spawnLocation = new Location(null, spawnLocationMap.get("x"), spawnLocationMap.get("y"), spawnLocationMap.get("z"));
 			baseBuilder.setSpawn(spawnLocation);
 			
 			Map<String, Integer> bedTopLocationMap = (Map<String, Integer>) serializedBase.get("bedTop");
-			Location bedTopLocation = new Location(arenaBuilder.getWorld(), bedTopLocationMap.get("x"), bedTopLocationMap.get("y"), bedTopLocationMap.get("z"));
+			Location bedTopLocation = new Location(null, bedTopLocationMap.get("x"), bedTopLocationMap.get("y"), bedTopLocationMap.get("z"));
 			baseBuilder.setBedTop(bedTopLocation);
 			
 			Map<String, Integer> bedBottomLocationMap = (Map<String, Integer>) serializedBase.get("bedBottom");
-			Location bedBottomLocation = new Location(arenaBuilder.getWorld(), bedBottomLocationMap.get("x"), bedBottomLocationMap.get("y"), bedBottomLocationMap.get("z"));
+			Location bedBottomLocation = new Location(null, bedBottomLocationMap.get("x"), bedBottomLocationMap.get("y"), bedBottomLocationMap.get("z"));
 			baseBuilder.setBedBottom(bedBottomLocation);
 			
 			Map<String, Integer> itemShopLocationMap = (Map<String, Integer>) serializedBase.get("itemShop");
-			Location itemShopLocation = new Location(arenaBuilder.getWorld(), itemShopLocationMap.get("x"), itemShopLocationMap.get("y"), itemShopLocationMap.get("z"));
+			Location itemShopLocation = new Location(null, itemShopLocationMap.get("x"), itemShopLocationMap.get("y"), itemShopLocationMap.get("z"));
 			baseBuilder.setItemShop(itemShopLocation);
 			
 			Location teamShopLocation = null;
 			
 			if(serializedBase.containsKey("teamShop")) {
 				Map<String, Integer> teamShopLocationMap = (Map<String, Integer>) serializedBase.get("teamShop");
-				teamShopLocation = new Location(arenaBuilder.getWorld(), teamShopLocationMap.get("x"), teamShopLocationMap.get("y"), teamShopLocationMap.get("z"));
+				teamShopLocation = new Location(null, teamShopLocationMap.get("x"), teamShopLocationMap.get("y"), teamShopLocationMap.get("z"));
 			}
 			
 			baseBuilder.setTeamShop(teamShopLocation);

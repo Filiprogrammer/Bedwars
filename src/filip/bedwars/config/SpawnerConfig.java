@@ -47,7 +47,7 @@ public class SpawnerConfig extends SingleConfig{
 			for (Object serializedSpawner : serializedSpawners) {
 				Map<String, Object> mapOfElements = (Map<String, Object>) serializedSpawner;
 				
-				String spawnerName = (String) mapOfElements.get("name");
+				String spawnerName = ((String) mapOfElements.get("name")).replace('&', '§');
 				
 				if(spawnerName == null) {
 					MessageSender.sendWarning("One Spawner could not be loaded! The Spawner-name is invalid! Please check your spawner.yml!");
