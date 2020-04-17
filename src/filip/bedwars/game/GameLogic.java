@@ -3,6 +3,7 @@ package filip.bedwars.game;
 import java.util.List;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -70,15 +71,20 @@ public class GameLogic implements Listener {
 		packetListener = new IPacketListener() {
 			public boolean writePacket(Object packet, Player player) {
 				if (packet.getClass().getSimpleName().equals("PacketPlayOutNamedEntitySpawn")) {
-					for (UUID uuid : game.getPlayers()) {
-						Player p = Bukkit.getPlayer(uuid);
-						try {
-							Field aField = packet.getClass().getDeclaredField("a");
-							aField.setAccessible(true);
-							if (p.getEntityId() == aField.getInt(packet))
-								return true;
-						} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-							e.printStackTrace();
+					List<UUID> syncPlayersList = game.getPlayers();
+					synchronized (syncPlayersList) {
+						Iterator<UUID> i = syncPlayersList.iterator();
+						while (i.hasNext()) {
+							UUID uuid = i.next();
+							Player p = Bukkit.getPlayer(uuid);
+							try {
+								Field aField = packet.getClass().getDeclaredField("a");
+								aField.setAccessible(true);
+								if (p.getEntityId() == aField.getInt(packet))
+									return true;
+							} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+								e.printStackTrace();
+							}
 						}
 					}
 					

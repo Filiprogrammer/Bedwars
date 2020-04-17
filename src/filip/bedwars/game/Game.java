@@ -1,6 +1,7 @@
 package filip.bedwars.game;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +32,7 @@ public class Game implements Listener {
 	private Lobby lobby;
 	private Arena arena;
 	private GameLogic gameLogic;
-	private List<UUID> players = new ArrayList<UUID>();
+	private List<UUID> players = Collections.synchronizedList(new ArrayList<UUID>());
 	private List<Team> teams = new ArrayList<Team>();
 	private boolean isStarting = false;
 	
