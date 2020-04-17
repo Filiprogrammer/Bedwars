@@ -40,6 +40,9 @@ public class ShopEntry {
 		for (int i = 0; i < 36; ++i) {
 			ItemStack itemStack = inv.getItem(i);
 			
+			if (itemStack == null)
+				continue;
+			
 			if (itemStack.getType().equals(priceMaterial)) {
 				amount += itemStack.getAmount();
 			}

@@ -14,6 +14,7 @@ public class MainConfig extends SingleConfig {
 	private Location mainLobby;
 	private Location gameLobby;
 	private String gameWorldPrefix = "bw_game_";
+	private boolean hunger = false;
 	
 	protected MainConfig() {
 		super("config.yml");
@@ -36,6 +37,10 @@ public class MainConfig extends SingleConfig {
 		return gameWorldPrefix;
 	}
 	
+	public boolean getHunger() {
+		return hunger;
+	}
+	
 	public void setMainLobby(Location loc) {
 		mainLobby = loc;
 	}
@@ -50,6 +55,7 @@ public class MainConfig extends SingleConfig {
 		
 		config.set("language", language);
 		config.set("game-world-prefix", gameWorldPrefix);
+		config.set("hunger", hunger);
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
 		
 		if (mainLobbySection == null)
@@ -89,6 +95,7 @@ public class MainConfig extends SingleConfig {
 		
 		language = config.getString("language", "en_us");
 		gameWorldPrefix = config.getString("game-world-prefix", "bw_game_").replace("/", "").replace("\\", "");
+		hunger = config.getBoolean("hunger", false);
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
 		
 		if (mainLobbySection == null)

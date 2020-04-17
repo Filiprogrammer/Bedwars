@@ -2,6 +2,7 @@ package filip.bedwars.inventory;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 
 import filip.bedwars.BedwarsPlugin;
@@ -31,6 +32,8 @@ public interface IClickable {
      * @param playerWrapper
      */
     void click(InventoryClickEvent event);
+    
+    void drag(InventoryDragEvent event);
     
     /**
      * Registers the clickable

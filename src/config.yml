@@ -18,3 +18,5 @@ game-lobby:
   pitch: 0.0
 
 game-world-prefix: bw_game_
+
+hunger: false

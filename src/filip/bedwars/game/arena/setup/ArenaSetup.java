@@ -13,6 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -115,6 +116,9 @@ public class ArenaSetup implements Listener {
 				addSpawner();
 				event.getView().close();
 			}
+			
+			@Override
+			public void drag(InventoryDragEvent event) {}
 		};
 		
 		clickables.add(spawnerSelector);
@@ -157,6 +161,9 @@ public class ArenaSetup implements Listener {
 					event.getView().close();
 				}
 			}
+			
+			@Override
+			public void drag(InventoryDragEvent event) {}
 		};
 		
 		clickables.add(teamColorSelector);

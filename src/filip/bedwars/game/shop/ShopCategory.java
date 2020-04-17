@@ -33,6 +33,9 @@ public class ShopCategory {
 	}
 	
 	public ShopEntry getShopEntry(int index) {
+		if (index >= shopEntries.size() || index < 0)
+			return null;
+		
 		return shopEntries.get(index);
 	}
 	

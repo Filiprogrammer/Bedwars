@@ -1,8 +1,10 @@
 package filip.bedwars.game;
 
 import java.util.List;
+import java.util.Map;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -11,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -18,6 +21,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -31,6 +37,8 @@ import filip.bedwars.config.TeamShopConfig;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.arena.Spawner;
+import filip.bedwars.inventory.ClickableInventory;
+import filip.bedwars.inventory.IClickable;
 import filip.bedwars.listener.player.IPacketListener;
 import filip.bedwars.listener.player.UseEntityPacketListener;
 import filip.bedwars.utils.MessageSender;
@@ -47,6 +55,8 @@ public class GameLogic implements Listener {
 	private BukkitRunnable gameTicker;
 	private List<UseEntityPacketListener> itemShopNPCListeners = new ArrayList<UseEntityPacketListener>();
 	private List<UseEntityPacketListener> teamShopNPCListeners = new ArrayList<UseEntityPacketListener>();
+	private List<IClickable> itemShopClickables = new ArrayList<IClickable>();
+	private Map<UUID, Integer> selectedItemShopCategory = new HashMap<UUID, Integer>();
 	private IPacketListener packetListener;
 	
 	public GameLogic(Game game, Arena arena, GameWorld gameWorld) {
@@ -136,8 +146,20 @@ public class GameLogic implements Listener {
 			
 			itemShopNPCListeners.add(itemShopNPCListener);
 			
-			for (Player player : players)
+			for (Player player : players) {
+				itemShopClickables.add(new ClickableInventory(ItemShopConfig.getInstance().getShop().getCategoryListInventory(), player) {
+					@Override
+					public void click(InventoryClickEvent event) {
+						HumanEntity player = event.getWhoClicked();
+						selectedItemShopCategory.put(player.getUniqueId(), ItemShopConfig.getInstance().getShop().handleClick(selectedItemShopCategory.getOrDefault(player.getUniqueId(), -1), event));
+					}
+
+					@Override
+					public void drag(InventoryDragEvent event) {}
+				});
+				
 				BedwarsPlugin.getInstance().addPacketListener(player, itemShopNPCListener);
+			}
 			
 			// Setup team shop NPC, if it is not null
 			if (base.getTeamShop(gameWorld.getWorld()) != null) {
@@ -192,6 +214,13 @@ public class GameLogic implements Listener {
 		for (UseEntityPacketListener teamShopNPCListener : teamShopNPCListeners)
 			BedwarsPlugin.getInstance().removePacketListener(player, teamShopNPCListener);
 		
+		for (IClickable itemShopClickable : itemShopClickables) {
+			if (itemShopClickable.getPlayer().equals(player)) {
+				BedwarsPlugin.getInstance().removeClickable(itemShopClickable);
+				break;
+			}
+		}
+		
 		BedwarsPlugin.getInstance().removePacketListener(player, packetListener);
 	}
 	
@@ -202,15 +231,8 @@ public class GameLogic implements Listener {
 	public void cleanup() {
 		gameTicker.cancel();
 		
-		for (UUID uuid : game.getPlayers()) {
-			Player player = Bukkit.getPlayer(uuid);
-			
-			for (UseEntityPacketListener itemShopNPCListener : itemShopNPCListeners)
-				BedwarsPlugin.getInstance().removePacketListener(player, itemShopNPCListener);
-			
-			for (UseEntityPacketListener teamShopNPCListener : teamShopNPCListeners)
-				BedwarsPlugin.getInstance().removePacketListener(player, teamShopNPCListener);
-		}
+		for (UUID uuid : game.getPlayers())
+			leavePlayer(Bukkit.getPlayer(uuid));
 		
 		HandlerList.unregisterAll(this);
 	}
@@ -283,6 +305,14 @@ public class GameLogic implements Listener {
 		// Check if the player is a spectator
 		if (!game.getPlayers().contains(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
 			event.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onFoodLevelChange(FoodLevelChangeEvent event) {
+		if (!MainConfig.getInstance().getHunger()) {
+			event.setCancelled(true);
+			event.setFoodLevel(20);
+		}
 	}
 	
 }
