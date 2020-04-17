@@ -12,12 +12,15 @@ import java.util.concurrent.Callable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -44,6 +47,7 @@ import filip.bedwars.listener.player.UseEntityPacketListener;
 import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.PlayerUtils;
 import filip.bedwars.utils.SoundPlayer;
+import filip.bedwars.utils.TeamColorConverter;
 import filip.bedwars.utils.VillagerNPC;
 import filip.bedwars.world.GameWorld;
 
@@ -309,9 +313,72 @@ public class GameLogic implements Listener {
 	
 	@EventHandler
 	public void onFoodLevelChange(FoodLevelChangeEvent event) {
+		if (!(event.getEntity() instanceof Player))
+			return;
+		
+		Player player = (Player) event.getEntity();
+		
+		if (!game.getPlayers().contains(player.getUniqueId()))
+			return;
+		
 		if (!MainConfig.getInstance().getHunger()) {
 			event.setCancelled(true);
 			event.setFoodLevel(20);
+		}
+	}
+	
+	@EventHandler
+	public void onBlockBreak(BlockBreakEvent event) {
+		Player player = event.getPlayer();
+		
+		if (!game.getPlayers().contains(player.getUniqueId()))
+			return;
+		
+		Location blockLocation = event.getBlock().getLocation();
+		Team teamOfPlayer = game.getTeamOfPlayer(player.getUniqueId());
+		
+		// Check if the broken block is a bed
+		if (event.getBlock().getBlockData() instanceof Bed) {
+			for (Team team : game.getTeams()) {
+				// Check if the team still has a bed
+				if (!team.hasBed())
+					continue;
+				
+				Base base = team.getBase();
+				Location bedBottom = base.getBedBottom(gameWorld.getWorld());
+				Location bedTop = base.getBedTop(gameWorld.getWorld());
+				
+				// Check if the broken block was the bed of the team
+				if ((blockLocation.getBlockX() == bedBottom.getBlockX()
+				  && blockLocation.getBlockY() == bedBottom.getBlockY()
+				  && blockLocation.getBlockZ() == bedBottom.getBlockZ())
+				 || (blockLocation.getBlockX() == bedTop.getBlockX()
+				  && blockLocation.getBlockY() == bedTop.getBlockY()
+				  && blockLocation.getBlockZ() == bedTop.getBlockZ())) {
+					if (teamOfPlayer.getId() == team.getId()) {
+						event.setCancelled(true);
+						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "you-cant-destroy-own-bed"));
+					} else {
+						team.setHasBed(false);
+						event.setCancelled(true);
+						gameWorld.getWorld().getBlockAt(bedBottom).setType(Material.AIR);
+						gameWorld.getWorld().getBlockAt(bedTop).setType(Material.AIR);
+						
+						for (Player p : gameWorld.getWorld().getPlayers()) {
+							String colorStr = TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale());
+							
+							MessageSender.sendMessage(p,
+									MessagesConfig.getInstance().getStringValue(p.getLocale(), "bed-destroyed")
+									.replace("%player%", player.getName())
+									.replace("%teamcolor%", colorStr));
+							
+							SoundPlayer.playSound("bed-destroyed", p);
+						}
+					}
+					
+					break;
+				}
+			}
 		}
 	}
 	

@@ -48,7 +48,6 @@ public class MessageSender {
 			
 			cs.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg));
 		}
-		
 	}
 	
 	/**
@@ -57,17 +56,16 @@ public class MessageSender {
 	 * @param msg Message that should be sent
 	 */
 	public static void sendMessageUUID(UUID receiver, String msg) {
-			Player player = Bukkit.getPlayer(receiver);
-			
-			if (player != null) {
-				String locale = player.getLocale();
-				
-				if(msg == null) 
-					msg = "§cA message was not found! Please check your messages.yml for §d\"" + locale + "\" §cor contact the server administrator!";
-				
-				player.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg));
-			}
+		Player player = Bukkit.getPlayer(receiver);
 		
+		if (player != null) {
+			String locale = player.getLocale();
+			
+			if(msg == null) 
+				msg = "§cA message was not found! Please check your messages.yml for §d\"" + locale + "\" §cor contact the server administrator!";
+			
+			player.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg));
+		}
 	}
 	
 	/**

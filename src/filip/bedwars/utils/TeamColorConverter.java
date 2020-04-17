@@ -2,6 +2,7 @@ package filip.bedwars.utils;
 
 import org.bukkit.Material;
 
+import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.TeamColor;
 
 public class TeamColorConverter {
@@ -24,6 +25,11 @@ public class TeamColorConverter {
 		}
 		
 		return ret;
+	}
+	
+	public static String convertTeamColorToStringForMessages(TeamColor teamColor, String locale) {
+		String colorConfigKey = "color-" + teamColor.toString().toLowerCase().replace("_", "-");
+		return MessagesConfig.getInstance().getStringValue(locale, colorConfigKey);
 	}
 	
 }

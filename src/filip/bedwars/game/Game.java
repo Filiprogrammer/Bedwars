@@ -24,6 +24,7 @@ import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.lobby.Lobby;
 import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.SoundPlayer;
+import filip.bedwars.utils.TeamColorConverter;
 import filip.bedwars.world.GameWorld;
 import filip.bedwars.world.GameWorldManager;
 
@@ -206,11 +207,9 @@ public class Game implements Listener {
 				Team team = getSmallestTeam();
 				team.addMember(uuid);
 				
-				String colorConfigKey = "color-" + team.getBase().getTeamColor().toString().toLowerCase().replace("_", "-");
-				MessagesConfig msgConfig = MessagesConfig.getInstance();
-				Player player = Bukkit.getPlayer(uuid);
-				String colorStr = msgConfig.getStringValue(player.getLocale(), colorConfigKey);
-				MessageSender.sendMessageUUID(uuid, msgConfig.getStringValue(player.getLocale(), "team-changed").replace("%teamcolor%", colorStr));
+				Player p = Bukkit.getPlayer(uuid);
+				String colorStr = TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale());
+				MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "team-changed").replace("%teamcolor%", colorStr));
 			}
 		}
 	}
