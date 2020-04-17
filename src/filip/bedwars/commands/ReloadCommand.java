@@ -4,9 +4,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import filip.bedwars.config.ArenaConfig;
+import filip.bedwars.config.ItemShopConfig;
 import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.config.SoundsConfig;
+import filip.bedwars.config.SpawnerConfig;
+import filip.bedwars.config.TeamShopConfig;
 import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.SoundPlayer;
 
@@ -21,6 +24,9 @@ public class ReloadCommand implements ICommand {
 		MessagesConfig.getInstance().reloadConfig();
 		ArenaConfig.getInstance().reloadConfig();
 		SoundsConfig.getInstance().reloadConfig();
+		SpawnerConfig.getInstance().reloadConfig();
+		ItemShopConfig.getInstance().reloadConfig();
+		TeamShopConfig.getInstance().reloadConfig();
 		
 		if(sender instanceof Player) {
 			Player player = (Player) sender;

@@ -8,3 +8,9 @@ spawner:
 - name: '&eGold'
   material: GOLD_INGOT
   defaultTicksPerSpawn: 600
+- name: '&bDiamond'
+  material: DIAMOND
+  defaultTicksPerSpawn: 400
+- name: '&2Emerald'
+  material: EMERALD
+  defaultTicksPerSpawn: 800

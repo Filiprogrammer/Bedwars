@@ -15,7 +15,7 @@ public class ShopCategoryDeserializer {
 	public static ShopCategory deserializeCategory(Object serializedCategory) {
 		Map<String, Object> mapOfElements = (Map<String, Object>) serializedCategory;
 		
-		String categoryName = (String) mapOfElements.get("name");
+		String categoryName = ((String) mapOfElements.get("name")).replace('&', '§');
 		
 		if (categoryName == null) {
 			MessageSender.sendWarning("A Shop Category does not have a name");
@@ -35,6 +35,13 @@ public class ShopCategoryDeserializer {
 		for (Map<String, Object> serializedShopEntry : shopEntriesList) {
 			Material priceMaterial = Material.valueOf((String) serializedShopEntry.get("priceMaterial"));
 			int priceCount = (int) serializedShopEntry.get("priceCount");
+			Object itemObject = serializedShopEntry.get("item");
+			
+			if (!(itemObject instanceof ItemStack)) {
+				MessageSender.sendWarning("An item in the shop category §6\"" + categoryName + "\" §eis not valid");
+				return null;
+			}
+			
 			ItemStack item = (ItemStack) serializedShopEntry.get("item");
 			shopEntries.add(new ShopEntry(priceMaterial, priceCount, item));
 		}

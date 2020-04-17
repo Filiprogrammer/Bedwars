@@ -25,6 +25,10 @@ public class ShopEntry {
 		return priceCount;
 	}
 	
+	public int getPriceCountFullStack() {
+		return (item.getMaxStackSize() / item.getAmount()) * priceCount;
+	}
+	
 	public ItemStack getItem() {
 		return item;
 	}
@@ -74,7 +78,7 @@ public class ShopEntry {
 	 */
 	public boolean canBuyFullStack(Player player) {
 		int amount = getPriceItemCount(player.getInventory());
-		int value = 64 / item.getAmount();
+		int value = item.getMaxStackSize() / item.getAmount();
 		
 		if(amount >= (priceCount * value))
 			return true;

@@ -9,8 +9,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.inventory.ItemBuilder;
+import filip.bedwars.utils.MessageSender;
+import filip.bedwars.utils.SoundPlayer;
 
 public class Shop {
 	
@@ -71,12 +75,45 @@ public class Shop {
 		if (entry == null)
 			return shopCategoryIndex;
 		
-		if (entry.canBuy(player)) {
-			removeItems(player.getInventory(), entry.getPriceMaterial(), entry.getPriceCount());
-	    	HashMap<Integer, ItemStack> didNotFit = player.getInventory().addItem(entry.getItem());
-	    	
-	    	for (ItemStack is : didNotFit.values())
+		HashMap<Integer, ItemStack> didNotFit = null;
+		int itemAmount = 0;
+		
+		if (event.isShiftClick()) {
+			if (entry.canBuyFullStack(player)) {
+				removeItems(player.getInventory(), entry.getPriceMaterial(), entry.getPriceCountFullStack());
+				ItemStack itemStack = entry.getItem().clone();
+				itemAmount = entry.getItem().getAmount() * (entry.getPriceCountFullStack() / entry.getPriceCount());
+				itemStack.setAmount(itemAmount);
+				didNotFit = player.getInventory().addItem(itemStack);
+			}
+		} else {
+			if (entry.canBuy(player)) {
+				removeItems(player.getInventory(), entry.getPriceMaterial(), entry.getPriceCount());
+				itemAmount = entry.getItem().getAmount();
+		    	didNotFit = player.getInventory().addItem(entry.getItem());
+			}
+		}
+		
+		if (didNotFit == null) {
+			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "cant-afford-item"));
+			SoundPlayer.playSound("cant-afford-item", player);
+		} else {
+			for (ItemStack is : didNotFit.values())
 	    		player.getWorld().dropItemNaturally(player.getLocation(), is).setVelocity(player.getLocation().getDirection().multiply(0.5));
+			
+			String itemName = entry.getItem().getType().toString();
+			
+			if (entry.getItem().hasItemMeta()) {
+				ItemMeta itemMeta = entry.getItem().getItemMeta();
+				if (itemMeta.hasDisplayName())
+					itemName = itemMeta.getDisplayName();
+			}
+			
+			MessageSender.sendMessage(player, 
+				MessagesConfig.getInstance().getStringValue(player.getLocale(), "bought-item")
+					.replace("%amount%", "" + itemAmount)
+					.replace("%item%", itemName));
+			SoundPlayer.playSound("buy-item", player);
 		}
 		
 		return shopCategoryIndex;
