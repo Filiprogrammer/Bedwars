@@ -80,4 +80,12 @@ public class GameManager {
 		return games;
 	}
 	
+	public Game getGameOfPlayer(Player player) {
+		for (Game game : games)
+			if (game.getPlayers().contains(player.getUniqueId()))
+				return game;
+		
+		return null;
+	}
+	
 }

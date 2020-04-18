@@ -5,7 +5,6 @@ import java.util.Map;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -87,9 +86,7 @@ public class GameLogic implements Listener {
 				if (packet.getClass().getSimpleName().equals("PacketPlayOutNamedEntitySpawn")) {
 					List<UUID> syncPlayersList = game.getPlayers();
 					synchronized (syncPlayersList) {
-						Iterator<UUID> i = syncPlayersList.iterator();
-						while (i.hasNext()) {
-							UUID uuid = i.next();
+						for (UUID uuid : syncPlayersList) {
 							Player p = Bukkit.getPlayer(uuid);
 							try {
 								Field aField = packet.getClass().getDeclaredField("a");
@@ -111,26 +108,29 @@ public class GameLogic implements Listener {
 		
 		BedwarsPlugin.getInstance().getServer().getPluginManager().registerEvents(this, BedwarsPlugin.getInstance());
 		
-		for (UUID uuid : game.getPlayers()) {
-			Player player = Bukkit.getPlayer(uuid);
-			// Add a packet listener
-			BedwarsPlugin.getInstance().addPacketListener(player, packetListener);
-			// Teleport player to the spawnpoint of their base
-			teleportToSpawn(player);
-			// Notify the player that the game has started.
-			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "game-started"));
-			SoundPlayer.playSound("game-started", player);
+		List<UUID> syncPlayersList = game.getPlayers();
+		Player[] players;
+		synchronized (syncPlayersList) {
+			players = new Player[game.getPlayers().size()];
+			int i = 0;
+			
+			for (UUID uuid : syncPlayersList) {
+				Player player = Bukkit.getPlayer(uuid);
+				players[i] = player;
+				// Add a packet listener
+				BedwarsPlugin.getInstance().addPacketListener(player, packetListener);
+				// Teleport player to the spawnpoint of their base
+				teleportToSpawn(player);
+				// Notify the player that the game has started.
+				MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "game-started"));
+				SoundPlayer.playSound("game-started", player);
+				++i;
+			}
 		}
-		
-		// Convert UUIDs to players
-		Player[] players = new Player[game.getPlayers().size()];
-		
-		for (int i = 0; i < game.getPlayers().size(); ++i)
-			players[i] = Bukkit.getPlayer(game.getPlayers().get(i));
 		
 		for (Base base : arena.getBases()) {
 			// Setup item shop NPC
-			VillagerNPC itemShopNPC = new VillagerNPC(base.getItemShop(gameWorld.getWorld()).clone().add(0.5, 0, 0.5), "DESERT", "ARMORER", "Item Shop", players);
+			VillagerNPC itemShopNPC = new VillagerNPC(base.getItemShop(gameWorld.getWorld()).clone().add(0.5, 0, 0.5), "DESERT", "ARMORER", MainConfig.getInstance().getItemShopName(), players);
 			
 			UseEntityPacketListener itemShopNPCListener = new UseEntityPacketListener(itemShopNPC.getEntityId()) {
 				@Override
@@ -167,7 +167,7 @@ public class GameLogic implements Listener {
 			
 			// Setup team shop NPC, if it is not null
 			if (base.getTeamShop(gameWorld.getWorld()) != null) {
-				VillagerNPC teamShopNPC = new VillagerNPC(base.getTeamShop(gameWorld.getWorld()).clone().add(0.5, 0, 0.5), "SNOW", "CLERIC", "Team Shop", players);
+				VillagerNPC teamShopNPC = new VillagerNPC(base.getTeamShop(gameWorld.getWorld()).clone().add(0.5, 0, 0.5), "SNOW", "CLERIC", MainConfig.getInstance().getTeamShopName(), players);
 				
 				UseEntityPacketListener teamShopNPCListener = new UseEntityPacketListener(teamShopNPC.getEntityId()) {
 					@Override
@@ -235,8 +235,11 @@ public class GameLogic implements Listener {
 	public void cleanup() {
 		gameTicker.cancel();
 		
-		for (UUID uuid : game.getPlayers())
-			leavePlayer(Bukkit.getPlayer(uuid));
+		List<UUID> syncPlayersList = game.getPlayers();
+		synchronized (syncPlayersList) {
+			for (UUID uuid : syncPlayersList)
+				leavePlayer(Bukkit.getPlayer(uuid));
+		}
 		
 		HandlerList.unregisterAll(this);
 	}

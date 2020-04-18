@@ -40,7 +40,7 @@ public class TeamShopConfig extends SingleConfig{
 			for (Object serializedCategory : serializedCategories)
 				shopCategories.add(ShopCategoryDeserializer.deserializeCategory(serializedCategory));
 			
-			shop = new Shop("§2Team Shop", shopCategories.toArray(new ShopCategory[0]));
+			shop = new Shop(MainConfig.getInstance().getTeamShopName(), shopCategories.toArray(new ShopCategory[0]));
 		}
 		
 	}

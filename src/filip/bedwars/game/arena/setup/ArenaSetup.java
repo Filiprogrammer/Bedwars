@@ -27,6 +27,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.BedwarsPlugin.FinishArenaSetupResponse;
+import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.config.SpawnerConfig;
 import filip.bedwars.game.TeamColor;
@@ -207,7 +208,7 @@ public class ArenaSetup implements Listener {
 				if (block != null) {
 					baseBuilder.setItemShop(block.getLocation());
 					spawnItemShopNPC(block.getLocation());
-					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "shop-set").replace("%type%", "Item"));
+					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "setup-set").replace("%type%", MainConfig.getInstance().getItemShopName()));
 					SoundPlayer.playSound("arena-setup", setuper);
 				}
 			}
@@ -230,7 +231,7 @@ public class ArenaSetup implements Listener {
 				if (block != null) {
 					baseBuilder.setTeamShop(block.getLocation());
 					spawnTeamShopNPC(block.getLocation());
-					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "shop-set").replace("%type%", "Team"));
+					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "setup-set").replace("%type%", MainConfig.getInstance().getTeamShopName()));
 					SoundPlayer.playSound("arena-setup", setuper);
 				}
 			}
@@ -253,7 +254,7 @@ public class ArenaSetup implements Listener {
 				if (block != null) {
 					baseBuilder.setSpawn(block.getLocation());
 					spawnSpawnNPC(block.getLocation());
-					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "spawn-set"));
+					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "setup-set").replace("%type%", MainConfig.getInstance().getBaseSpawnPointName()));
 					SoundPlayer.playSound("arena-setup", setuper);
 				}
 			}
@@ -297,7 +298,7 @@ public class ArenaSetup implements Listener {
 							return;
 						}
 						
-						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "bed-set"));
+						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "setup-set").replace("%type%", "§3Bed"));
 						SoundPlayer.playSound("arena-setup", player);
 					} else {
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "bed-set-error"));
@@ -450,13 +451,13 @@ public class ArenaSetup implements Listener {
 	
 	private void createSetupItems() {
 		spawnerItem = new ItemBuilder().setName("§rSpawner").setMaterial(Material.SPAWNER).build();
-		itemShopItem = new ItemBuilder().setName("§rItem Shop").setMaterial(Material.EMERALD_BLOCK).build();
-		teamShopItem = new ItemBuilder().setName("§rTeam Shop").setMaterial(Material.DIAMOND_BLOCK).build();
-		spawnItem = new ItemBuilder().setName("§rSpawn").setMaterial(Material.BEACON).build();
+		itemShopItem = new ItemBuilder().setName(MainConfig.getInstance().getItemShopName()).setMaterial(Material.EMERALD_BLOCK).build();
+		teamShopItem = new ItemBuilder().setName(MainConfig.getInstance().getTeamShopName()).setMaterial(Material.DIAMOND_BLOCK).build();
+		spawnItem = new ItemBuilder().setName(MainConfig.getInstance().getBaseSpawnPointName()).setMaterial(Material.BEACON).build();
 		bedItem = new ItemBuilder().setName("§rBed").setMaterial(Material.WHITE_BED).build();
 		createBaseItem = new ItemBuilder().setName("§rCreate Base").setMaterial(Material.WHITE_WOOL).build();
-		cancelSetupItem = new ItemBuilder().setName("§rCancel Setup").setMaterial(Material.BARRIER).build();
-		finishSetupItem = new ItemBuilder().setName("§rFinish Setup").setMaterial(Material.GREEN_DYE).build();
+		cancelSetupItem = new ItemBuilder().setName("§r§cCancel Setup").setMaterial(Material.BARRIER).build();
+		finishSetupItem = new ItemBuilder().setName("§r§aFinish Setup").setMaterial(Material.GREEN_DYE).build();
 	}
 	
 	private void giveSetupItems() {
@@ -492,7 +493,7 @@ public class ArenaSetup implements Listener {
 	
 	private void spawnItemShopNPC(Location loc) {
 		if (itemShopNPC == null)
-			itemShopNPC = new VillagerNPC(loc.clone().add(0.5, 0, 0.5), "DESERT", "ARMORER", "Item Shop", setuper);
+			itemShopNPC = new VillagerNPC(loc.clone().add(0.5, 0, 0.5), "DESERT", "ARMORER", MainConfig.getInstance().getItemShopName(), setuper);
 		else
 			itemShopNPC.teleport(loc.getBlockX() + 0.5, loc.getBlockY(), loc.getBlockZ() + 0.5, setuper);
 	}
@@ -506,7 +507,7 @@ public class ArenaSetup implements Listener {
 	
 	private void spawnTeamShopNPC(Location loc) {
 		if (teamShopNPC == null)
-			teamShopNPC = new VillagerNPC(loc.clone().add(0.5, 0, 0.5), "SNOW", "CLERIC", "Team Shop", setuper);
+			teamShopNPC = new VillagerNPC(loc.clone().add(0.5, 0, 0.5), "SNOW", "CLERIC", MainConfig.getInstance().getTeamShopName(), setuper);
 		else
 			teamShopNPC.teleport(loc.getBlockX() + 0.5, loc.getBlockY(), loc.getBlockZ() + 0.5, setuper);
 	}
@@ -520,7 +521,7 @@ public class ArenaSetup implements Listener {
 	
 	private void spawnSpawnNPC(Location loc) {
 		if (spawnNPC == null)
-			spawnNPC = new PlayerNPC(loc.clone().add(0.5, 0, 0.5), "Spawn", setuper);
+			spawnNPC = new PlayerNPC(loc.clone().add(0.5, 0, 0.5), MainConfig.getInstance().getBaseSpawnPointName(), setuper);
 		else
 			spawnNPC.teleport(loc.getBlockX() + 0.5, loc.getBlockY(), loc.getBlockZ() + 0.5, setuper);
 	}

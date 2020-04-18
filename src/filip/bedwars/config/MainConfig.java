@@ -6,6 +6,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 
+import filip.bedwars.utils.MessageSender;
+
 public class MainConfig extends SingleConfig {
 
 	private static MainConfig instance = null;
@@ -15,6 +17,9 @@ public class MainConfig extends SingleConfig {
 	private Location gameLobby;
 	private String gameWorldPrefix = "bw_game_";
 	private boolean hunger = false;
+	private String itemShopName = "§2Item Shop";
+	private String teamShopName = "§1Team Shop";
+	private String baseSpawnPointName = "§dSpawn-Point";
 	
 	protected MainConfig() {
 		super("config.yml");
@@ -41,6 +46,18 @@ public class MainConfig extends SingleConfig {
 		return hunger;
 	}
 	
+	public String getItemShopName() {
+		return itemShopName;
+	}
+	
+	public String getTeamShopName() {
+		return teamShopName;
+	}
+	
+	public String getBaseSpawnPointName() {
+		return baseSpawnPointName;
+	}
+	
 	public void setMainLobby(Location loc) {
 		mainLobby = loc;
 	}
@@ -56,6 +73,10 @@ public class MainConfig extends SingleConfig {
 		config.set("language", language);
 		config.set("game-world-prefix", gameWorldPrefix);
 		config.set("hunger", hunger);
+		config.set("item-shop-name", itemShopName.replace('§', '&'));
+		config.set("team-shop-name", teamShopName.replace('§', '&'));
+		config.set("base-spawn-point-name", baseSpawnPointName.replace('§', '&'));
+		
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
 		
 		if (mainLobbySection == null)
@@ -96,11 +117,30 @@ public class MainConfig extends SingleConfig {
 		language = config.getString("language", "en_us");
 		gameWorldPrefix = config.getString("game-world-prefix", "bw_game_").replace("/", "").replace("\\", "");
 		hunger = config.getBoolean("hunger", false);
+		itemShopName = config.getString("item-shop-name", "&2Item Shop").replace('&', '§');
+		teamShopName = config.getString("team-shop-name", "&1Team Shop").replace('&', '§');
+		baseSpawnPointName = config.getString("base-spawn-point-name", "&dSpawn-Point").replace('&', '§');
+		
+		if (itemShopName.length() > 16) {
+			MessageSender.sendWarning("item-shop-name must not be longer than 16 characters. Check your config.yml!");
+			itemShopName = "§2Item Shop";
+		}
+		
+		if (teamShopName.length() > 16) {
+			MessageSender.sendWarning("team-shop-name must not be longer than 16 characters. Check your config.yml!");
+			teamShopName = "§1Team Shop";
+		}
+		
+		if (baseSpawnPointName.length() > 16) {
+			MessageSender.sendWarning("base-spawn-point-name must not be longer than 16 characters. Check your config.yml!");
+			baseSpawnPointName = "§dSpawn-Point";
+		}
+		
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
 		
 		if (mainLobbySection == null)
 			mainLobbySection = config.createSection("main-lobby");
-			
+		
 		String mainLobbyWorld = mainLobbySection.getString("w", "world");
 		double mainLobbyX = mainLobbySection.getDouble("x", 0.0);
 		double mainLobbyY = mainLobbySection.getDouble("y", 65.0);

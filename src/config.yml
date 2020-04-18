@@ -20,3 +20,7 @@ game-lobby:
 game-world-prefix: bw_game_
 
 hunger: false
+
+item-shop-name: '&2Item Shop'
+team-shop-name: '&1Team Shop'
+base-spawn-point-name: '&dSpawn-Point'

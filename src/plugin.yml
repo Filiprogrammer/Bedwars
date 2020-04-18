@@ -45,6 +45,10 @@ commands:
     description: List all arenas
     usage: /<command>
     permission: filip.bedwars.base
+  bw leave:
+    description: Leave a game
+    usage: /<command>
+    permission: filip.bedwars.play
 permissions:
   filip.bedwars.base:
     description: hj

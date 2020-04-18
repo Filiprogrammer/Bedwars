@@ -16,6 +16,7 @@ import filip.bedwars.commands.FinishArenaCommand;
 import filip.bedwars.commands.HelpCommand;
 import filip.bedwars.commands.ICommand;
 import filip.bedwars.commands.JoinGameCommand;
+import filip.bedwars.commands.LeaveCommand;
 import filip.bedwars.commands.ListArenasCommand;
 import filip.bedwars.commands.ReloadCommand;
 import filip.bedwars.commands.RemoveArenaCommand;
@@ -76,6 +77,7 @@ public class BedwarsPlugin extends JavaPlugin {
 		commands.add(new SetGameLobbyCommand());
 		commands.add(new RemoveArenaCommand());
 		commands.add(new ListArenasCommand());
+		commands.add(new LeaveCommand());
 		helpCommand = new HelpCommand();
 	}
 	
