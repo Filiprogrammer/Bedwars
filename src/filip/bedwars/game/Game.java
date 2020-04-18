@@ -172,6 +172,12 @@ public class Game implements Listener {
 		return players;
 	}
 	
+	public boolean containsPlayer(UUID uuid) {
+		synchronized (players) {
+			return players.contains(uuid);
+		}
+	}
+	
 	private boolean playerHasTeam(UUID uuid) {
 		for (Team team : teams)
 			if (team.containsMember(uuid))

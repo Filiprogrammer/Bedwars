@@ -551,12 +551,7 @@ public class ArenaSetup implements Listener {
 				SoundPlayer.playSound("success", setuper);
 				
 				// Delay Spawner despawn because otherwise the client throws an exception for some reason
-				Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), new Runnable() {
-					@Override
-					public void run() {
-						despawnSpawnerNPC(npc);
-					}
-				}, 1L);
+				Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), () -> despawnSpawnerNPC(npc), 1L);
 			}
 		};
 		

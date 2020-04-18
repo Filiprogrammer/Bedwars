@@ -128,14 +128,11 @@ public class PlayerNPC {
 				sendPacketMethod.invoke(connection, packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)enumPlayerInfoActionClass, "ADD_PLAYER"), entityPlayerArray));
 				sendPacketMethod.invoke(connection, packetPlayOutNamedEntitySpawnConstructor.newInstance(entity));
 				
-				Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), new Runnable() {
-					@Override
-					public void run() {
-						try {
-							sendPacketMethod.invoke(connection, packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)enumPlayerInfoActionClass, "REMOVE_PLAYER"), entityPlayerArray));
-						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
-							e.printStackTrace();
-						}
+				Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), () -> {
+					try {
+						sendPacketMethod.invoke(connection, packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)enumPlayerInfoActionClass, "REMOVE_PLAYER"), entityPlayerArray));
+					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+						e.printStackTrace();
 					}
 				}, 5L);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {

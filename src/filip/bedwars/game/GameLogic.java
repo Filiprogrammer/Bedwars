@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
@@ -20,12 +21,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -33,6 +36,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
@@ -119,7 +123,7 @@ public class GameLogic implements Listener {
 		List<UUID> syncPlayersList = game.getPlayers();
 		Player[] players;
 		synchronized (syncPlayersList) {
-			players = new Player[game.getPlayers().size()];
+			players = new Player[syncPlayersList.size()];
 			int i = 0;
 			
 			for (UUID uuid : syncPlayersList) {
@@ -228,20 +232,7 @@ public class GameLogic implements Listener {
 	
 	public void leavePlayer(Player player) {
 		player.teleport(MainConfig.getInstance().getMainLobby());
-		for (UseEntityPacketListener itemShopNPCListener : itemShopNPCListeners)
-			BedwarsPlugin.getInstance().removePacketListener(player, itemShopNPCListener);
-		
-		for (UseEntityPacketListener teamShopNPCListener : teamShopNPCListeners)
-			BedwarsPlugin.getInstance().removePacketListener(player, teamShopNPCListener);
-		
-		for (IClickable itemShopClickable : itemShopClickables) {
-			if (itemShopClickable.getPlayer().equals(player)) {
-				BedwarsPlugin.getInstance().removeClickable(itemShopClickable);
-				break;
-			}
-		}
-		
-		BedwarsPlugin.getInstance().removePacketListener(player, packetListener);
+		removePlayerListeners(player);
 	}
 	
 	public GameWorld getGameWorld() {
@@ -265,14 +256,14 @@ public class GameLogic implements Listener {
 		Player player = event.getPlayer();
 		
 		// Check if the player is a spectator
-		if (!game.getPlayers().contains(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
+		if (!game.containsPlayer(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
 			event.setCancelled(true);
 	}
 	
 	@EventHandler
 	public void onPlayerBedEnter(PlayerBedEnterEvent event) {
 		// Check if the player is a part of this game
-		if (game.getPlayers().contains(event.getPlayer().getUniqueId()))
+		if (game.containsPlayer(event.getPlayer().getUniqueId()))
 			event.setCancelled(true);
 	}
 	
@@ -284,7 +275,7 @@ public class GameLogic implements Listener {
 		Player player = (Player) event.getEntity();
 		
 		// Check if the player is a spectator
-		if (!game.getPlayers().contains(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
+		if (!game.containsPlayer(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
 			event.setCancelled(true);
 	}
 	
@@ -293,7 +284,7 @@ public class GameLogic implements Listener {
 		Player player = event.getPlayer();
 		
 		// Check if the player is a spectator
-		if (!game.getPlayers().contains(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
+		if (!game.containsPlayer(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
 			event.setCancelled(true);
 	}
 	
@@ -304,7 +295,7 @@ public class GameLogic implements Listener {
 		
 		Player damager = (Player) event.getDamager();
 		
-		if (game.getPlayers().contains(damager.getUniqueId())) {
+		if (game.containsPlayer(damager.getUniqueId())) {
 			if (event.getEntity().getType() != EntityType.PLAYER)
 				return;
 			
@@ -326,7 +317,7 @@ public class GameLogic implements Listener {
 		Player player = (Player) event.getEntity();
 		
 		// Check if the player is a spectator
-		if (!game.getPlayers().contains(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
+		if (!game.containsPlayer(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
 			event.setCancelled(true);
 	}
 	
@@ -337,7 +328,7 @@ public class GameLogic implements Listener {
 		
 		Player player = (Player) event.getEntity();
 		
-		if (!game.getPlayers().contains(player.getUniqueId()))
+		if (!game.containsPlayer(player.getUniqueId()))
 			return;
 		
 		if (!MainConfig.getInstance().getHunger()) {
@@ -347,10 +338,20 @@ public class GameLogic implements Listener {
 	}
 	
 	@EventHandler
+	public void onBlockPlace(BlockPlaceEvent event) {
+		Player player = event.getPlayer();
+		
+		if (!game.containsPlayer(player.getUniqueId()))
+			return;
+		
+		event.getBlock().setMetadata("bedwars_placed", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
+	}
+	
+	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
 		Player player = event.getPlayer();
 		
-		if (!game.getPlayers().contains(player.getUniqueId()))
+		if (!game.containsPlayer(player.getUniqueId()))
 			return;
 		
 		Location blockLocation = event.getBlock().getLocation();
@@ -399,6 +400,26 @@ public class GameLogic implements Listener {
 				}
 			}
 		}
+		
+		if (!event.getBlock().hasMetadata("bedwars_placed"))
+			event.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onEntityExplode(EntityExplodeEvent event) {
+		// Check if the explosion is in the game world
+		if (event.getLocation().getWorld().getName().equals(getGameWorld().getWorld().getName())) {
+			List<Block> blockListCopy = new ArrayList<Block>();
+	        blockListCopy.addAll(event.blockList());
+	        
+	        for (Block block : blockListCopy) {
+	        	if (block.getBlockData() instanceof Bed)
+	        		event.blockList().remove(block);
+	        	
+	        	if (!block.hasMetadata("bedwars_placed"))
+	        		event.blockList().remove(block);
+	        }
+		}
 	}
 	
 	@EventHandler
@@ -411,12 +432,7 @@ public class GameLogic implements Listener {
 			event.setDeathMessage(null);
 			Team team = game.getTeamOfPlayer(player.getUniqueId());
 			
-			if (team == null) {
-				
-			} else {
-				for (Player p : gameWorld.getWorld().getPlayers())
-					MessageSender.sendMessage(p, deathMsg);
-				
+			if (team != null) {
 				EntityDamageEvent entityDamageEvent = player.getLastDamageCause();
 				
 				if (entityDamageEvent != null) {
@@ -439,6 +455,25 @@ public class GameLogic implements Listener {
 						}
 					}
 				}
+				
+				if (!team.hasBed()) {
+					deathMsg += " §lFINAL KILL!";
+					removePlayerListeners(player);
+					team.removeMember(player.getUniqueId());
+					
+					List<UUID> syncPlayersList = game.getPlayers();
+					synchronized (syncPlayersList) {
+						syncPlayersList.remove(player.getUniqueId());
+					}
+					
+					Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), () -> {
+						player.spigot().respawn();
+						joinSpectator(player);
+					}, 1L);
+				}
+				
+				for (Player p : gameWorld.getWorld().getPlayers())
+					MessageSender.sendMessage(p, deathMsg);
 			}
 		}
 	}
@@ -451,11 +486,11 @@ public class GameLogic implements Listener {
 		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
 			Team team = game.getTeamOfPlayer(player.getUniqueId());
 			
-			if (team == null) {
-				// TODO: do something about this
-			} else {
+			if (team == null)
+				// TODO: use spectator specific respawn location
+				event.setRespawnLocation(game.getTeams().get(0).getBase().getSpawn(gameWorld.getWorld()));
+			else
 				event.setRespawnLocation(team.getBase().getSpawn(gameWorld.getWorld()));
-			}
 		}
 	}
 	
@@ -471,6 +506,23 @@ public class GameLogic implements Listener {
 			for (VillagerNPC teamShopNPC : teamShopNPCs)
 				teamShopNPC.respawn(player);
 		}
+	}
+	
+	private void removePlayerListeners(Player player) {
+		for (UseEntityPacketListener itemShopNPCListener : itemShopNPCListeners)
+			BedwarsPlugin.getInstance().removePacketListener(player, itemShopNPCListener);
+		
+		for (UseEntityPacketListener teamShopNPCListener : teamShopNPCListeners)
+			BedwarsPlugin.getInstance().removePacketListener(player, teamShopNPCListener);
+		
+		for (IClickable itemShopClickable : itemShopClickables) {
+			if (itemShopClickable.getPlayer().equals(player)) {
+				BedwarsPlugin.getInstance().removeClickable(itemShopClickable);
+				break;
+			}
+		}
+		
+		BedwarsPlugin.getInstance().removePacketListener(player, packetListener);
 	}
 	
 }
