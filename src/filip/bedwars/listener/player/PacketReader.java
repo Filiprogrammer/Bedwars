@@ -12,12 +12,13 @@ import org.bukkit.entity.Player;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 
 public class PacketReader {
 	
 	private Player player;
-	private Channel channel;
+	private ChannelPipeline channelPipeline;
 	private List<IPacketListener> listeners = new ArrayList<IPacketListener>();
 	
 	public PacketReader(Player player) {
@@ -55,16 +56,17 @@ public class PacketReader {
 			Object entityPlayer = getHandleMethod.invoke(cPlayer);
 			Object playerConnection = playerConnectionField.get(entityPlayer);
 			Object networkManager = networkManagerField.get(playerConnection);
-			channel = (Channel) channelField.get(networkManager);
-			channel.pipeline().addBefore("packet_handler", "bedwars_handler_" + player.getName(), channelDuplexHandler);
+			channelPipeline = ((Channel) channelField.get(networkManager)).pipeline();
+			uninject(); // Avoid duplicate handler
+			channelPipeline.addBefore("packet_handler", "bedwars_handler_" + player.getName(), channelDuplexHandler);
 		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public void uninject() {
-		if(channel.pipeline().get("bedwars_handler_" + player.getName()) != null)
-			channel.pipeline().remove("bedwars_handler_" + player.getName());
+		if(channelPipeline.get("bedwars_handler_" + player.getName()) != null)
+			channelPipeline.remove("bedwars_handler_" + player.getName());
 	}
 	
 	public Player getPlayer() {

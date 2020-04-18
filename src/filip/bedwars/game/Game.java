@@ -90,7 +90,10 @@ public class Game implements Listener {
 			leavePlayer(Bukkit.getPlayer(uuid));
 		
 		HandlerList.unregisterAll(this);
-		gameLogic.cleanup();
+		
+		if (gameLogic != null)
+			gameLogic.cleanup();
+		
 		GameManager.getInstance().removeGame(this);
 	}
 	
