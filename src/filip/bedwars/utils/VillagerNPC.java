@@ -110,13 +110,7 @@ public class VillagerNPC {
 			Object villagerData = villagerDataConstructor.newInstance(desertVillagerTypeField.get(null), armorerVillagerProfessionField.get(null), 5);
 			setVillagerDataMethod.invoke(entity, villagerData);
 			
-			for (Player p : viewers) {
-				Object packet = packetPlayOutSpawnEntityLivingConstructor.newInstance(entity);
-				Object craftPlayer = craftPlayerClass.cast(p);
-				Object entityPlayer = getHandleCraftPlayerMethod.invoke(craftPlayer);
-				Object playerConnection = playerConnectionField.get(entityPlayer);
-				sendPacketMethod.invoke(playerConnection, packet);
-			}
+			respawn(viewers);
 		} catch (SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
@@ -141,6 +135,20 @@ public class VillagerNPC {
 		for (Player p : viewers) {
 			try {
 				Object packet = packetPlayOutEntityDestroyConstructor.newInstance(new int[] {(int) getIdMethod.invoke(entity)});
+				Object craftPlayer = craftPlayerClass.cast(p);
+				Object entityPlayer = getHandleCraftPlayerMethod.invoke(craftPlayer);
+				Object playerConnection = playerConnectionField.get(entityPlayer);
+				sendPacketMethod.invoke(playerConnection, packet);
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void respawn(Player... viewers) {
+		for (Player p : viewers) {
+			try {
+				Object packet = packetPlayOutSpawnEntityLivingConstructor.newInstance(entity);
 				Object craftPlayer = craftPlayerClass.cast(p);
 				Object entityPlayer = getHandleCraftPlayerMethod.invoke(craftPlayer);
 				Object playerConnection = playerConnectionField.get(entityPlayer);

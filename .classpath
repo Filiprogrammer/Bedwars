@@ -6,9 +6,9 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="C:/bedwarslib/Spigot-API-1.14.4-94af569-20190911-0820.jar"/>
 	<classpathentry kind="lib" path="C:/bedwarslib/annotations-16.0.2.jar"/>
 	<classpathentry kind="lib" path="C:/bedwarslib/Multiverse-Core-4.0.0.jar"/>
 	<classpathentry kind="lib" path="C:/bedwarslib/patched_1.14.4.jar"/>
+	<classpathentry kind="lib" path="C:/bedwarslib/Paper-API-1.14.4-7caed1a-20190924-2319.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

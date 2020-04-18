@@ -24,12 +24,18 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.config.ItemShopConfig;
@@ -56,6 +62,8 @@ public class GameLogic implements Listener {
 	private Arena arena;
 	private GameWorld gameWorld;
 	private BukkitRunnable gameTicker;
+	private List<VillagerNPC> itemShopNPCs = new ArrayList<VillagerNPC>();
+	private List<VillagerNPC> teamShopNPCs = new ArrayList<VillagerNPC>();
 	private List<UseEntityPacketListener> itemShopNPCListeners = new ArrayList<UseEntityPacketListener>();
 	private List<UseEntityPacketListener> teamShopNPCListeners = new ArrayList<UseEntityPacketListener>();
 	private List<IClickable> itemShopClickables = new ArrayList<IClickable>();
@@ -131,6 +139,7 @@ public class GameLogic implements Listener {
 		for (Base base : arena.getBases()) {
 			// Setup item shop NPC
 			VillagerNPC itemShopNPC = new VillagerNPC(base.getItemShop(gameWorld.getWorld()).clone().add(0.5, 0, 0.5), "DESERT", "ARMORER", MainConfig.getInstance().getItemShopName(), players);
+			itemShopNPCs.add(itemShopNPC);
 			
 			UseEntityPacketListener itemShopNPCListener = new UseEntityPacketListener(itemShopNPC.getEntityId()) {
 				@Override
@@ -168,6 +177,7 @@ public class GameLogic implements Listener {
 			// Setup team shop NPC, if it is not null
 			if (base.getTeamShop(gameWorld.getWorld()) != null) {
 				VillagerNPC teamShopNPC = new VillagerNPC(base.getTeamShop(gameWorld.getWorld()).clone().add(0.5, 0, 0.5), "SNOW", "CLERIC", MainConfig.getInstance().getTeamShopName(), players);
+				teamShopNPCs.add(teamShopNPC);
 				
 				UseEntityPacketListener teamShopNPCListener = new UseEntityPacketListener(teamShopNPC.getEntityId()) {
 					@Override
@@ -208,6 +218,12 @@ public class GameLogic implements Listener {
 		PlayerUtils.playerReset(player);
 		player.setGameMode(GameMode.SPECTATOR);
 		MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "joined-game-as-spectator"));
+		
+		for (VillagerNPC itemShopNPC : itemShopNPCs)
+			itemShopNPC.respawn(player);
+		
+		for (VillagerNPC teamShopNPC : teamShopNPCs)
+			teamShopNPC.respawn(player);
 	}
 	
 	public void leavePlayer(Player player) {
@@ -382,6 +398,78 @@ public class GameLogic implements Listener {
 					break;
 				}
 			}
+		}
+	}
+	
+	@EventHandler
+	public void onPlayerDeath(PlayerDeathEvent event) {
+		Player player = event.getEntity();
+		
+		// Check if the player is in the game world
+		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
+			String deathMsg = event.getDeathMessage();
+			event.setDeathMessage(null);
+			Team team = game.getTeamOfPlayer(player.getUniqueId());
+			
+			if (team == null) {
+				
+			} else {
+				for (Player p : gameWorld.getWorld().getPlayers())
+					MessageSender.sendMessage(p, deathMsg);
+				
+				EntityDamageEvent entityDamageEvent = player.getLastDamageCause();
+				
+				if (entityDamageEvent != null) {
+					if (entityDamageEvent.getCause() == DamageCause.PROJECTILE) {
+						Player killer = player.getKiller();
+						
+						if (killer != null) {
+							for (ItemStack itemStack : player.getInventory().getContents()) {
+								if (itemStack == null)
+									continue;
+								
+								if (!event.getItemsToKeep().contains(itemStack)) {
+									event.getDrops().remove(itemStack);
+									HashMap<Integer, ItemStack> didNotFit = killer.getInventory().addItem(itemStack);
+									
+									for (ItemStack is : didNotFit.values())
+							    		killer.getWorld().dropItemNaturally(killer.getLocation(), is).setVelocity(killer.getLocation().getDirection().multiply(0.5));
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onPlayerRespawn(PlayerRespawnEvent event) {
+		Player player = event.getPlayer();
+		
+		// Check if the player is in the game world
+		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
+			Team team = game.getTeamOfPlayer(player.getUniqueId());
+			
+			if (team == null) {
+				// TODO: do something about this
+			} else {
+				event.setRespawnLocation(team.getBase().getSpawn(gameWorld.getWorld()));
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onPlayerPostRespawn(PlayerPostRespawnEvent event) {
+		Player player = event.getPlayer();
+		
+		// Check if the player is in the game world
+		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
+			for (VillagerNPC itemShopNPC : itemShopNPCs)
+				itemShopNPC.respawn(player);
+			
+			for (VillagerNPC teamShopNPC : teamShopNPCs)
+				teamShopNPC.respawn(player);
 		}
 	}
 	
