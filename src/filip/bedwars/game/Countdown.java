@@ -1,5 +1,6 @@
 package filip.bedwars.game;
 
+import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -45,7 +46,11 @@ public abstract class Countdown {
 					onTick();
 				}
 			};
-			task = bukkitRunnable.runTaskTimer(BedwarsPlugin.getInstance(), 0, 20L);
+			
+			try {
+				task = bukkitRunnable.runTaskTimer(BedwarsPlugin.getInstance(), 0, 20L);
+			} catch (IllegalPluginAccessException e) {}
+			
 			return true;
 		}
 		

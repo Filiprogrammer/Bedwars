@@ -2,7 +2,7 @@ spawner:
 - name: '&6Bronze'
   material: BRICK
   defaultTicksPerSpawn: 20
-- name: '&fIron'
+- name: '&r&fIron'
   material: IRON_INGOT
   defaultTicksPerSpawn: 200
 - name: '&eGold'

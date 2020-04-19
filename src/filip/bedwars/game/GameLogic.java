@@ -680,7 +680,6 @@ public class GameLogic implements Listener {
 		
 		// Initiate game over phase
 		gameState = gameStates.getLast();
-		// TODO: Do something about this onDisable (IllegalPluginAccessException)
 		gameState.initiate();
 	}
 	
