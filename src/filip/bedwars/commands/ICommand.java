@@ -1,5 +1,7 @@
 package filip.bedwars.commands;
 
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 
 public interface ICommand {
@@ -11,5 +13,9 @@ public interface ICommand {
 	String getName();
 	
 	String[] getArguments();
+	
+	default List<String> getSuggestions(int argIndex, String arg) {
+		return null;
+	}
 	
 }

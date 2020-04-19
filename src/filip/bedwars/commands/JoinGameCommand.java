@@ -1,5 +1,8 @@
 package filip.bedwars.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -46,6 +49,23 @@ public class JoinGameCommand implements ICommand {
 	
 	public String[] getArguments() {
 		return new String[] { "mapname" };
+	}
+	
+	public List<String> getSuggestions(int argIndex, String arg) {
+		if (argIndex == 0) {
+			List<String> ret = new ArrayList<String>();
+			
+			for (int i = 0; i < ArenaConfig.getInstance().getArenaCount(); ++i) {
+				String mapName = ArenaConfig.getInstance().getArena(i).getMapName();
+				
+				if (mapName.startsWith(arg))
+					ret.add(mapName);
+			}
+			
+			return ret;
+		}
+		
+		return null;
 	}
 	
 }
