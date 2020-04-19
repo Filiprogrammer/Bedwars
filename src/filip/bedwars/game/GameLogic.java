@@ -146,8 +146,13 @@ public class GameLogic implements Listener {
 			@Override
 			public boolean onFinish() {
 				// Initiate Game End phase
-				gameState = gameStates.remove();
+				gameState = gameStates.getLast(); // Must not be .remove() because it would invalidate the game over checks
 				gameState.initiate();
+				
+				// No Team wins
+				for (Player p : gameWorld.getWorld().getPlayers())
+					MessageSender.sendMessage(p, "The game is over and noone wins");
+				
 				return false;
 			}
 			
@@ -327,6 +332,7 @@ public class GameLogic implements Listener {
 	}
 	
 	public void leavePlayer(Player player) {
+		player.spigot().respawn();
 		player.teleport(MainConfig.getInstance().getMainLobby());
 		removePlayerListeners(player);
 		checkGameOver();
@@ -643,6 +649,10 @@ public class GameLogic implements Listener {
 	}
 	
 	private void checkGameOver() {
+		if (gameState == gameStates.getLast())
+			// Game is already over
+			return;
+		
 		Team winnerTeam = game.isOver();
 		
 		if (winnerTeam != null)
