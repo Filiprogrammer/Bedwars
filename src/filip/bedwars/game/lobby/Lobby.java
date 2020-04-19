@@ -24,7 +24,7 @@ public class Lobby {
 		this.spawnPoint = spawnPoint;
 		this.game = game;
 		// TODO: read from config
-		this.countdown = new Countdown(60) {
+		this.countdown = new Countdown(MainConfig.getInstance().getGameLobbyCountdown()) {
 			
 			@Override
 			public void onTick() {

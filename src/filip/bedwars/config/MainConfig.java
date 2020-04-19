@@ -15,6 +15,7 @@ public class MainConfig extends SingleConfig {
 	private String language = "en_us";
 	private Location mainLobby;
 	private Location gameLobby;
+	private int gameLobbyCountdown;
 	private String gameWorldPrefix = "bw_game_";
 	private boolean hunger = false;
 	private String itemShopName = "§2Item Shop";
@@ -36,6 +37,10 @@ public class MainConfig extends SingleConfig {
 	
 	public Location getGameLobby() {
 		return gameLobby;
+	}
+	
+	public int getGameLobbyCountdown() {
+		return gameLobbyCountdown;
 	}
 	
 	public String getGameWorldPrefix() {
@@ -71,6 +76,7 @@ public class MainConfig extends SingleConfig {
 		createAndLoadConfigFileIfNotExistent(true);
 		
 		config.set("language", language);
+		config.set("game-lobby-countdown", gameLobbyCountdown);
 		config.set("game-world-prefix", gameWorldPrefix);
 		config.set("hunger", hunger);
 		config.set("item-shop-name", itemShopName.replace('§', '&'));
@@ -115,6 +121,7 @@ public class MainConfig extends SingleConfig {
 		createAndLoadConfigFileIfNotExistent(false);
 		
 		language = config.getString("language", "en_us");
+		gameLobbyCountdown = config.getInt("game-lobby-countdown", 60);
 		gameWorldPrefix = config.getString("game-world-prefix", "bw_game_").replace("/", "").replace("\\", "");
 		hunger = config.getBoolean("hunger", false);
 		itemShopName = config.getString("item-shop-name", "&2Item Shop").replace('&', '§');

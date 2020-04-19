@@ -27,6 +27,7 @@ import filip.bedwars.game.Game;
 import filip.bedwars.game.GameManager;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.setup.ArenaSetup;
+import filip.bedwars.game.lobby.LobbyListener;
 import filip.bedwars.inventory.IClickable;
 import filip.bedwars.inventory.IPlacable;
 import filip.bedwars.inventory.IUsable;
@@ -67,6 +68,7 @@ public class BedwarsPlugin extends JavaPlugin {
 		new PlayerQuitListener(this);
 		new PlayerChangedWorldListener(this);
 		worldInitListener = new WorldInitListener(this);
+		new LobbyListener(this);
 		new BedwarsCommandExecutor(this);
 		commands.add(new AddArenaCommand());
 		commands.add(new FinishArenaCommand());
