@@ -41,6 +41,8 @@ public class SpawnerConfig extends SingleConfig{
 	public void reloadConfig() {
 		createAndLoadConfigFileIfNotExistent(false);
 		
+		spawnerTypes.clear();
+		
 		if (config.isList("spawner")) {
 			List<Object> serializedSpawners = (List<Object>) config.getList("spawner");
 			

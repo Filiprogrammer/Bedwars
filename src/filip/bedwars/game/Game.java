@@ -63,13 +63,17 @@ public class Game implements Listener {
 		// Make sure there are at least two teams that contain at least one player.
 		int filledTeamsCount = 0;
 		
-		for (Team team : teams)
-			if (team.getMembers().size() > 0)
-				++filledTeamsCount;
+		synchronized (teams) {
+			for (Team team : teams)
+				if (team.getMembers().size() > 0)
+					++filledTeamsCount;
+		}
 		
 		if (filledTeamsCount < 2) {
-			for (Team team : teams)
-				team.clearMembers();
+			synchronized (teams) {
+				for (Team team : teams)
+					team.clearMembers();
+			}
 			
 			assignLonelyPlayersToTeamsAutomatically();
 		}
@@ -194,17 +198,21 @@ public class Game implements Listener {
 	}
 	
 	private boolean playerHasTeam(UUID uuid) {
-		for (Team team : teams)
-			if (team.containsMember(uuid))
-				return true;
+		synchronized (teams) {
+			for (Team team : teams)
+				if (team.containsMember(uuid))
+					return true;
+		}
 		
 		return false;
 	}
 	
 	public Team getTeamOfPlayer(UUID uuid) {
-		for (Team team : teams)
-			if (team.containsMember(uuid))
-				return team;
+		synchronized (teams) {
+			for (Team team : teams)
+				if (team.containsMember(uuid))
+					return team;
+		}
 		
 		return null;
 	}
@@ -212,28 +220,32 @@ public class Game implements Listener {
 	private Team getSmallestTeam() {
 		Team ret = null;
 		
-		for(Team team : teams){
-			if(ret == null) {
-				ret = team;
-				continue;
+		synchronized (teams) {
+			for(Team team : teams){
+				if(ret == null) {
+					ret = team;
+					continue;
+				}
+				
+				if(team.getMembers().size() < ret.getMembers().size())
+					ret = team;
 			}
-			
-			if(team.getMembers().size() < ret.getMembers().size())
-				ret = team;
 		}
 		
 		return ret;
 	}
 	
 	private void assignLonelyPlayersToTeamsAutomatically() {
-		for (UUID uuid : players) {
-			if (!playerHasTeam(uuid)) {
-				Team team = getSmallestTeam();
-				team.addMember(uuid);
-				
-				Player p = Bukkit.getPlayer(uuid);
-				String colorStr = TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale());
-				MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "team-changed").replace("%teamcolor%", colorStr));
+		synchronized (players) {
+			for (UUID uuid : players) {
+				if (!playerHasTeam(uuid)) {
+					Team team = getSmallestTeam();
+					team.addMember(uuid);
+					
+					Player p = Bukkit.getPlayer(uuid);
+					String colorStr = TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale());
+					MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "team-changed").replace("%teamcolor%", colorStr));
+				}
 			}
 		}
 	}
@@ -242,8 +254,12 @@ public class Game implements Listener {
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		
-		if (players.contains(player.getUniqueId()))
-				leavePlayer(player);
+		synchronized (players) {
+			if (!players.contains(player.getUniqueId()))
+				return;
+		}
+		
+		leavePlayer(player);
 	}
 	
 	@EventHandler

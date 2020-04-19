@@ -484,32 +484,35 @@ public class GameLogic implements Listener {
 		
 		// Check if the broken block is a bed
 		if (event.getBlock().getBlockData() instanceof Bed) {
-			for (Team team : game.getTeams()) {
-				// Check if the team still has a bed
-				if (!team.hasBed())
-					continue;
-				
-				Base base = team.getBase();
-				Location bedBottom = base.getBedBottom(gameWorld.getWorld());
-				Location bedTop = base.getBedTop(gameWorld.getWorld());
-				
-				// Check if the broken block was the bed of the team
-				if ((blockLocation.getBlockX() == bedBottom.getBlockX()
-				  && blockLocation.getBlockY() == bedBottom.getBlockY()
-				  && blockLocation.getBlockZ() == bedBottom.getBlockZ())
-				 || (blockLocation.getBlockX() == bedTop.getBlockX()
-				  && blockLocation.getBlockY() == bedTop.getBlockY()
-				  && blockLocation.getBlockZ() == bedTop.getBlockZ())) {
-					if (teamOfPlayer.getId() == team.getId()) {
-						event.setCancelled(true);
-						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "you-cant-destroy-own-bed"));
-					} else {
-						team.destroyBed(gameWorld.getWorld());
-						event.setCancelled(true);
-						broadcastBedDestroyed(player, team);
-					}
+			List<Team> teamsSyncList = game.getTeams();
+			synchronized (teamsSyncList) {
+				for (Team team : teamsSyncList) {
+					// Check if the team still has a bed
+					if (!team.hasBed())
+						continue;
 					
-					break;
+					Base base = team.getBase();
+					Location bedBottom = base.getBedBottom(gameWorld.getWorld());
+					Location bedTop = base.getBedTop(gameWorld.getWorld());
+					
+					// Check if the broken block was the bed of the team
+					if ((blockLocation.getBlockX() == bedBottom.getBlockX()
+					  && blockLocation.getBlockY() == bedBottom.getBlockY()
+					  && blockLocation.getBlockZ() == bedBottom.getBlockZ())
+					 || (blockLocation.getBlockX() == bedTop.getBlockX()
+					  && blockLocation.getBlockY() == bedTop.getBlockY()
+					  && blockLocation.getBlockZ() == bedTop.getBlockZ())) {
+						if (teamOfPlayer.getId() == team.getId()) {
+							event.setCancelled(true);
+							MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "you-cant-destroy-own-bed"));
+						} else {
+							team.destroyBed(gameWorld.getWorld());
+							event.setCancelled(true);
+							broadcastBedDestroyed(player, team);
+						}
+						
+						break;
+					}
 				}
 			}
 		}

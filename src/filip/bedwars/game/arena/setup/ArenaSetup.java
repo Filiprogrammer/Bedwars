@@ -16,6 +16,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
@@ -489,6 +490,16 @@ public class ArenaSetup implements Listener {
 		despawnTeamShopNPC();
 		despawnSpawnNPC();
 		despawnAllSpawnerNPCs();
+		
+		Inventory setuperInv = setuper.getInventory();
+		setuperInv.remove(spawnerItem);
+		setuperInv.remove(itemShopItem);
+		setuperInv.remove(teamShopItem);
+		setuperInv.remove(spawnItem);
+		setuperInv.remove(bedItem);
+		setuperInv.remove(createBaseItem);
+		setuperInv.remove(cancelSetupItem);
+		setuperInv.remove(finishSetupItem);
 	}
 	
 	private void spawnItemShopNPC(Location loc) {
