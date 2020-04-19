@@ -15,8 +15,8 @@ arena-setup:
 bed-destroyed: 
   sound: ENTITY_WITHER_DEATH
 boomball-shoot: 
-  sound: ENTITY_ENDER_DRAGON_SHOOT
-  pitch: 0.85
+  sound: ENTITY_ZOMBIE_INFECT
+  pitch: 0.8
 countdown-tick:
   sound: UI_BUTTON_CLICK
   pitch: 0.5

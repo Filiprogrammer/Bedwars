@@ -3,6 +3,7 @@ package filip.bedwars.game;
 import java.util.List;
 import java.util.Map;
 import java.lang.reflect.Field;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -39,6 +40,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.destroystokyo.paper.Title;
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 
 import filip.bedwars.BedwarsPlugin;
@@ -59,12 +61,15 @@ import filip.bedwars.utils.SoundPlayer;
 import filip.bedwars.utils.TeamColorConverter;
 import filip.bedwars.utils.VillagerNPC;
 import filip.bedwars.world.GameWorld;
+import filip.bedwars.world.GameWorldManager;
 
 public class GameLogic implements Listener {
 
 	private Game game;
 	private Arena arena;
 	private GameWorld gameWorld;
+	private GameState gameState;
+	private ArrayDeque<GameState> gameStates = new ArrayDeque<GameState>();
 	private BukkitRunnable gameTicker;
 	private List<VillagerNPC> itemShopNPCs = new ArrayList<VillagerNPC>();
 	private List<VillagerNPC> teamShopNPCs = new ArrayList<VillagerNPC>();
@@ -78,6 +83,97 @@ public class GameLogic implements Listener {
 		this.game = game;
 		this.arena = arena;
 		this.gameWorld = gameWorld;
+		
+		gameStates.add(new GameState("Phase 1", new Countdown(60 * 2) {
+			@Override
+			public void onTick() {
+				int secondsLeft = getSecondsLeft();
+				
+				if (secondsLeft != 0 && (secondsLeft % 60) == 0) {
+					for (Player p : gameWorld.getWorld().getPlayers())
+						MessageSender.sendMessage(p, "§7Beds will be destroyed in §3" + (secondsLeft / 60) + " minutes");
+				}
+			}
+			
+			@Override
+			public void onStart() {}
+			
+			@Override
+			public boolean onFinish() {
+				// Destroy all beds
+				List<Team> teamsSyncList = game.getTeams();
+				synchronized (teamsSyncList) {
+					for (Team team : teamsSyncList) {
+						team.destroyBed(gameWorld.getWorld());
+						
+						for (UUID uuid : team.getMembers()) {
+							Player p = Bukkit.getPlayer(uuid);
+							Title title = new Title(MessagesConfig.getInstance().getStringValue(p.getLocale(), "your-bed-destroyed"), MessagesConfig.getInstance().getStringValue(p.getLocale(), "you-cant-respawn-anymore"));
+							p.sendTitle(title);
+						}
+					}
+				}
+				
+				for (Player p : gameWorld.getWorld().getPlayers()) {
+					MessageSender.sendMessage(p, "§4All beds have been destroyed");
+					SoundPlayer.playSound("bed-destroyed", p);
+				}
+				
+				// Initiate Phase 2
+				gameState = gameStates.remove();
+				gameState.initiate();
+				return false;
+			}
+			
+			@Override
+			public void onCancel() {}
+		}));
+		
+		gameStates.add(new GameState("Phase 2", new Countdown(60 * 1) {
+			@Override
+			public void onTick() {
+				int secondsLeft = getSecondsLeft();
+				
+				if (secondsLeft != 0 && (secondsLeft % 60) == 0) {
+					for (Player p : gameWorld.getWorld().getPlayers())
+						MessageSender.sendMessage(p, "§7Game will end in §3" + (secondsLeft / 60) + " minutes");
+				}
+			}
+			
+			@Override
+			public void onStart() {}
+			
+			@Override
+			public boolean onFinish() {
+				// Initiate Game End phase
+				gameState = gameStates.remove();
+				gameState.initiate();
+				return false;
+			}
+			
+			@Override
+			public void onCancel() {}
+		}));
+		
+		gameStates.add(new GameState("Game End", new Countdown(10) {
+			@Override
+			public void onTick() {}
+			
+			@Override
+			public void onStart() {}
+			
+			@Override
+			public boolean onFinish() {
+				game.endGame();
+				return false;
+			}
+			
+			@Override
+			public void onCancel() {}
+		}));
+		
+		gameState = gameStates.remove();
+		gameState.initiate();
 		
 		// Setup game ticker for spawners
 		gameTicker = new BukkitRunnable() {
@@ -233,6 +329,7 @@ public class GameLogic implements Listener {
 	public void leavePlayer(Player player) {
 		player.teleport(MainConfig.getInstance().getMainLobby());
 		removePlayerListeners(player);
+		checkGameOver();
 	}
 	
 	public GameWorld getGameWorld() {
@@ -248,7 +345,12 @@ public class GameLogic implements Listener {
 				leavePlayer(Bukkit.getPlayer(uuid));
 		}
 		
+		for (Player p : gameWorld.getWorld().getPlayers())
+			p.teleport(MainConfig.getInstance().getMainLobby());
+		
 		HandlerList.unregisterAll(this);
+		
+		GameWorldManager.getInstance().removeGameWorld(gameWorld);
 	}
 	
 	@EventHandler
@@ -316,9 +418,17 @@ public class GameLogic implements Listener {
 		
 		Player player = (Player) event.getEntity();
 		
-		// Check if the player is a spectator
-		if (!game.containsPlayer(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
-			event.setCancelled(true);
+		// Check if the player is in the game world
+		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
+			if (game.containsPlayer(player.getUniqueId())) {
+				// Player is a game player
+				if (gameState == gameStates.getLast())
+					event.setCancelled(true);
+			} else {
+				// Player is a spectator
+				event.setCancelled(true);
+			}
+		}
 	}
 	
 	@EventHandler
@@ -344,7 +454,16 @@ public class GameLogic implements Listener {
 		if (!game.containsPlayer(player.getUniqueId()))
 			return;
 		
-		event.getBlock().setMetadata("bedwars_placed", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
+		Block block = event.getBlock();
+		
+		if (block.getType() == Material.TNT) {
+			Location loc = block.getLocation();
+			loc.getWorld().spawnEntity(loc.clone().add(0.5, 0, 0.5), EntityType.PRIMED_TNT);
+			block.setType(Material.AIR);
+			return;
+		}
+		
+		block.setMetadata("bedwars_placed", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
 	}
 	
 	@EventHandler
@@ -379,21 +498,9 @@ public class GameLogic implements Listener {
 						event.setCancelled(true);
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "you-cant-destroy-own-bed"));
 					} else {
-						team.setHasBed(false);
+						team.destroyBed(gameWorld.getWorld());
 						event.setCancelled(true);
-						gameWorld.getWorld().getBlockAt(bedBottom).setType(Material.AIR);
-						gameWorld.getWorld().getBlockAt(bedTop).setType(Material.AIR);
-						
-						for (Player p : gameWorld.getWorld().getPlayers()) {
-							String colorStr = TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale());
-							
-							MessageSender.sendMessage(p,
-									MessagesConfig.getInstance().getStringValue(p.getLocale(), "bed-destroyed")
-									.replace("%player%", player.getName())
-									.replace("%teamcolor%", colorStr));
-							
-							SoundPlayer.playSound("bed-destroyed", p);
-						}
+						broadcastBedDestroyed(player, team);
 					}
 					
 					break;
@@ -456,15 +563,19 @@ public class GameLogic implements Listener {
 					}
 				}
 				
+				boolean isFinalKill = false;
+				
 				if (!team.hasBed()) {
-					deathMsg += " §lFINAL KILL!";
 					removePlayerListeners(player);
 					team.removeMember(player.getUniqueId());
+					isFinalKill = true;
 					
 					List<UUID> syncPlayersList = game.getPlayers();
 					synchronized (syncPlayersList) {
 						syncPlayersList.remove(player.getUniqueId());
 					}
+					
+					checkGameOver();
 					
 					Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), () -> {
 						player.spigot().respawn();
@@ -472,8 +583,14 @@ public class GameLogic implements Listener {
 					}, 1L);
 				}
 				
-				for (Player p : gameWorld.getWorld().getPlayers())
-					MessageSender.sendMessage(p, deathMsg);
+				for (Player p : gameWorld.getWorld().getPlayers()) {
+					String deathMessage = deathMsg;
+					
+					if(isFinalKill)
+						deathMessage += MessagesConfig.getInstance().getStringValue(p.getLocale(), "final-kill");
+					
+					MessageSender.sendMessage(p, deathMessage);
+				}
 			}
 		}
 	}
@@ -523,6 +640,53 @@ public class GameLogic implements Listener {
 		}
 		
 		BedwarsPlugin.getInstance().removePacketListener(player, packetListener);
+	}
+	
+	private void checkGameOver() {
+		Team winnerTeam = game.isOver();
+		
+		if (winnerTeam != null)
+			// Game is over
+			runGameOver(winnerTeam);
+	}
+	
+	private void runGameOver(Team winnerTeam) {
+		for (Player p : gameWorld.getWorld().getPlayers()) {
+			String teamHasWonMsg = MessagesConfig.getInstance().getStringValue(p.getLocale(), "team-has-won").replace("%teamcolor%", TeamColorConverter.convertTeamColorToStringForMessages(winnerTeam.getBase().getTeamColor(), p.getLocale()));
+			MessageSender.sendMessage(p, teamHasWonMsg);
+			SoundPlayer.playSound("victory", p);
+			
+			if(winnerTeam.containsMember(p.getUniqueId())) {
+				Title title = new Title(MessagesConfig.getInstance().getStringValue(p.getLocale(), "victory"), teamHasWonMsg);
+				p.sendTitle(title);
+			}
+		}
+		
+		// Make sure that the countdown of the current game state is cancelled
+		gameState.getCountdown().cancel();
+		
+		// Initiate game over phase
+		gameState = gameStates.getLast();
+		// TODO: Do something about this onDisable (IllegalPluginAccessException)
+		gameState.initiate();
+	}
+	
+	private void broadcastBedDestroyed(Player destroyer, Team team) {
+		for (Player p : gameWorld.getWorld().getPlayers()) {
+			String colorStr = TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale());
+			
+			MessageSender.sendMessage(p,
+					MessagesConfig.getInstance().getStringValue(p.getLocale(), "bed-destroyed")
+					.replace("%player%", destroyer.getName())
+					.replace("%teamcolor%", colorStr));
+			
+			SoundPlayer.playSound("bed-destroyed", p);
+			
+			if(team.containsMember(p.getUniqueId())) {
+				Title title = new Title(MessagesConfig.getInstance().getStringValue(p.getLocale(), "your-bed-destroyed"), MessagesConfig.getInstance().getStringValue(p.getLocale(), "you-cant-respawn-anymore"));
+				p.sendTitle(title);
+			}
+		}
 	}
 	
 }

@@ -3,6 +3,8 @@ package filip.bedwars.game;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.arena.Base;
@@ -51,8 +53,10 @@ public class Team {
     	return hasBed;
     }
     
-    public void setHasBed(boolean hasBed) {
-    	this.hasBed = hasBed;
+    public void destroyBed(World world) {
+    	hasBed = false;
+    	world.getBlockAt(base.getBedBottom(world)).setType(Material.AIR);
+    	world.getBlockAt(base.getBedTop(world)).setType(Material.AIR);
     }
     
 }

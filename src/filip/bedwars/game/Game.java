@@ -34,7 +34,7 @@ public class Game implements Listener {
 	private Arena arena;
 	private GameLogic gameLogic;
 	private List<UUID> players = Collections.synchronizedList(new ArrayList<UUID>());
-	private List<Team> teams = new ArrayList<Team>();
+	private List<Team> teams = Collections.synchronizedList(new ArrayList<Team>());
 	private boolean isStarting = false;
 	
 	public Game(@NotNull Arena arena) {
@@ -99,6 +99,21 @@ public class Game implements Listener {
 	
 	public boolean isRunning() {
 		return (gameLogic != null);
+	}
+	
+	public Team isOver() {
+		List<Team> aliveTeams = new ArrayList<Team>();
+		
+		synchronized (teams) {
+			for (Team team : teams)
+				if (team.getMembers().size() != 0)
+					aliveTeams.add(team);
+		}
+		
+		if (aliveTeams.size() == 1)
+			return aliveTeams.get(0);
+		
+		return null;
 	}
 	
 	// TODO: Add reconnect function
