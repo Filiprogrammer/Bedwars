@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Sign;
 
 import filip.bedwars.sign.GameJoinSign;
 
@@ -74,8 +75,11 @@ public class JoinSignConfig extends SingleConfig {
 						(int) serializedLocation.get("y"),
 						(int) serializedLocation.get("z"));
 				
-				joinSigns.add(new GameJoinSign(location, mapName));
+				if (location.getBlock().getState() instanceof Sign)
+					joinSigns.add(new GameJoinSign(location, mapName));
 			}
+			
+			saveConfig();
 		}
 	}
 	

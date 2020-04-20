@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -67,6 +68,22 @@ public class GameJoinSignListener implements Listener {
 		}
 		
 		GameManager.getInstance().joinGame(arena, event.getPlayer());
+	}
+	
+	@EventHandler
+	public void onSignBreak(BlockBreakEvent event) {
+		Block block = event.getBlock();
+		
+		if (!(block.getState() instanceof Sign))
+			return;
+		
+		GameJoinSign joinSign = JoinSignConfig.getInstance().getGameJoinSignAt(block.getLocation());
+		
+		if (joinSign == null)
+			return;
+		
+		JoinSignConfig.getInstance().removeJoinSign(joinSign);
+		JoinSignConfig.getInstance().saveConfig();
 	}
 	
 }

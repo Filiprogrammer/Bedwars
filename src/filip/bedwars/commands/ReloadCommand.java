@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 import filip.bedwars.config.ArenaConfig;
 import filip.bedwars.config.ItemShopConfig;
+import filip.bedwars.config.JoinSignConfig;
 import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.config.SoundsConfig;
@@ -27,6 +28,7 @@ public class ReloadCommand implements ICommand {
 		SpawnerConfig.getInstance().reloadConfig();
 		ItemShopConfig.getInstance().reloadConfig();
 		TeamShopConfig.getInstance().reloadConfig();
+		JoinSignConfig.getInstance().reloadConfig();
 		
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
