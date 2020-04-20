@@ -35,6 +35,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -631,6 +632,23 @@ public class GameLogic implements Listener {
 			
 			for (VillagerNPC teamShopNPC : teamShopNPCs)
 				teamShopNPC.respawn(player);
+		}
+	}
+	
+	@EventHandler
+	public void onPlayerMove(PlayerMoveEvent event) {
+		Player player = event.getPlayer();
+		
+		// Check if the player is in the game world
+		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
+			if (event.getTo().getY() < 0) {
+				// Check if the player is a game player
+				if (game.containsPlayer(player.getUniqueId()))
+					PlayerUtils.damagePlayer(player, "OUT_OF_WORLD", 999);
+				else
+					// TODO: use spectator specific respawn location
+					player.teleport(game.getTeams().get(0).getBase().getSpawn(gameWorld.getWorld()));
+			}
 		}
 	}
 	

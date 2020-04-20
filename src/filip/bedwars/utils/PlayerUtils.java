@@ -1,6 +1,7 @@
 package filip.bedwars.utils;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -53,6 +54,23 @@ public class PlayerUtils {
 			Object packetPlayOutNamedEntitySpawn = packetPlayOutNamedEntitySpawnConstructor.newInstance(toHideEntityPlayer);
 			sendPacket(viewer, packetPlayOutNamedEntitySpawn);
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void damagePlayer(Player player, String cause, float amount) {
+		try {
+			Class<?> craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3] + ".entity.CraftPlayer");
+			Method getHandleMethod = craftPlayerClass.getMethod("getHandle");
+			Class<?> entityPlayerClass = getNMSClass("EntityPlayer");
+			Class<?> damageSourceClass = getNMSClass("DamageSource");
+			Field damageSourceField = damageSourceClass.getField(cause);
+			Method damageEntityMethod = entityPlayerClass.getMethod("damageEntity", damageSourceClass, float.class);
+			
+			Object craftPlayer = craftPlayerClass.cast(player);
+			Object entityPlayer = getHandleMethod.invoke(craftPlayer);
+			damageEntityMethod.invoke(entityPlayer, damageSourceField.get(null), amount);
+		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchFieldException e) {
 			e.printStackTrace();
 		}
 	}

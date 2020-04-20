@@ -55,8 +55,8 @@ public class Team {
     
     public void destroyBed(World world) {
     	hasBed = false;
-    	world.getBlockAt(base.getBedBottom(world)).setType(Material.AIR);
-    	world.getBlockAt(base.getBedTop(world)).setType(Material.AIR);
+    	base.getBedBottom(world).getBlock().setType(Material.AIR);
+    	base.getBedTop(world).getBlock().setType(Material.AIR);
     }
     
 }

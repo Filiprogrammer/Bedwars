@@ -275,16 +275,15 @@ public class ArenaSetup implements Listener {
 					Block block = event.getClickedBlock();
 					
 					if (block.getBlockData() instanceof Bed) {
-						World w = block.getWorld();
 						Location loc = block.getLocation();
 						baseBuilder.setBedTop(loc);
 						baseBuilder.setBedBottom(null);
 						
 						List<Block> surroundingBlocks = new ArrayList<Block>();
-						surroundingBlocks.add(w.getBlockAt(loc.clone().add(1, 0, 0)));
-						surroundingBlocks.add(w.getBlockAt(loc.clone().add(0, 0, 1)));
-						surroundingBlocks.add(w.getBlockAt(loc.clone().add(-1, 0, 0)));
-						surroundingBlocks.add(w.getBlockAt(loc.clone().add(0, 0, -1)));
+						surroundingBlocks.add(loc.clone().add(1, 0, 0).getBlock());
+						surroundingBlocks.add(loc.clone().add(0, 0, 1).getBlock());
+						surroundingBlocks.add(loc.clone().add(-1, 0, 0).getBlock());
+						surroundingBlocks.add(loc.clone().add(0, 0, -1).getBlock());
 						
 						for (Block b : surroundingBlocks) {
 							if (b.getBlockData() instanceof Bed) {

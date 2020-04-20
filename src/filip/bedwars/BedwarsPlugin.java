@@ -40,6 +40,7 @@ import filip.bedwars.listener.player.PlayerInteractListener;
 import filip.bedwars.listener.player.PlayerQuitListener;
 import filip.bedwars.listener.player.WorldInitHandler;
 import filip.bedwars.listener.player.WorldInitListener;
+import filip.bedwars.sign.GameJoinSignListener;
 
 public class BedwarsPlugin extends JavaPlugin {
 
@@ -69,6 +70,7 @@ public class BedwarsPlugin extends JavaPlugin {
 		new PlayerChangedWorldListener(this);
 		worldInitListener = new WorldInitListener(this);
 		new LobbyListener(this);
+		new GameJoinSignListener(this);
 		new BedwarsCommandExecutor(this);
 		commands.add(new AddArenaCommand());
 		commands.add(new FinishArenaCommand());
