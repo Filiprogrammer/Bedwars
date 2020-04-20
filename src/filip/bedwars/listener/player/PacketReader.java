@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -19,7 +20,7 @@ public class PacketReader {
 	
 	private Player player;
 	private ChannelPipeline channelPipeline;
-	private List<IPacketListener> listeners = new ArrayList<IPacketListener>();
+	private List<IPacketListener> listeners = Collections.synchronizedList(new ArrayList<IPacketListener>());
 	
 	public PacketReader(Player player) {
 		this.player = player;
@@ -74,35 +75,47 @@ public class PacketReader {
 	}
 	
 	private void readPacket(Object packet) {
-		for (IPacketListener listener : listeners)
-			listener.readPacket(packet, player);
+		synchronized (listeners) {
+			for (IPacketListener listener : listeners)
+				listener.readPacket(packet, player);
+		}
 	}
 	
 	private boolean writePacket(Object packet) {
 		boolean ret = true;
 		
-		for (IPacketListener listener : listeners) {
-			if (!listener.writePacket(packet, player))
-				ret = false;
+		synchronized (listeners) {
+			for (IPacketListener listener : listeners) {
+				if (!listener.writePacket(packet, player))
+					ret = false;
+			}
 		}
 		
 		return ret;
 	}
 	
 	public void addListener(IPacketListener listener) {
-		listeners.add(listener);
+		synchronized (listeners) {
+			listeners.add(listener);
+		}
 	}
 	
 	public boolean removeListener(IPacketListener listener) {
-		return listeners.remove(listener);
+		synchronized (listeners) {
+			return listeners.remove(listener);
+		}
 	}
 	
 	public int getListenersCount() {
-		return listeners.size();
+		synchronized (listeners) {
+			return listeners.size();
+		}
 	}
 	
 	public boolean hasListeners() {
-		return !listeners.isEmpty();
+		synchronized (listeners) {
+			return !listeners.isEmpty();
+		}
 	}
 	
 }

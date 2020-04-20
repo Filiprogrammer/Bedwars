@@ -156,9 +156,11 @@ public class Game implements Listener {
 	 */
 	public boolean leavePlayer(Player player) {
 		if (players.remove(player.getUniqueId())) {
-			for (Team team : teams)
-				if (team.removeMember(player.getUniqueId()))
-					break;
+			synchronized (teams) {
+				for (Team team : teams)
+					if (team.removeMember(player.getUniqueId()))
+						break;
+			}
 			
 			if (isRunning())
 				gameLogic.leavePlayer(player);
