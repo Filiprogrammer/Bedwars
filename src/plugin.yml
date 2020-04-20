@@ -28,7 +28,7 @@ commands:
   bw joingame:
     description: Join a game
     usage: /<command>
-    permission: filip.bedwars.play
+    permission: filip.bedwars.play.command
   bw setmainlobby:
     description: Set the main lobby
     usage: /<command>
@@ -48,12 +48,15 @@ commands:
   bw leave:
     description: Leave a game
     usage: /<command>
-    permission: filip.bedwars.play
+    permission: filip.bedwars.play.command
 permissions:
   filip.bedwars.base:
     description: hj
     default: true
-  filip.bedwars.play:
+  filip.bedwars.play.command:
+    description: hj
+    default: true
+  filip.bedwars.play.sign:
     description: hj
     default: true
   filip.bedwars.setup:

@@ -44,6 +44,10 @@ public class GameJoinSignListener implements Listener {
 			return;
 		
 		Block block = event.getClickedBlock();
+		Player player = event.getPlayer();
+		
+		if (!player.hasPermission("filip.bedwars.play.sign"))
+			return;
 		
 		if (!(block.getState() instanceof Sign))
 			return;
@@ -53,7 +57,6 @@ public class GameJoinSignListener implements Listener {
 		if (joinSign == null)
 			return;
 		
-		Player player = event.getPlayer();
 		String mapName = joinSign.getMapName();
 		Arena arena = ArenaConfig.getInstance().getArena(mapName);
 		

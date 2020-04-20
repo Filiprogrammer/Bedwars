@@ -18,7 +18,7 @@ public class JoinSignConfig extends SingleConfig {
 	List<GameJoinSign> joinSigns = new ArrayList<GameJoinSign>();
 	
 	private JoinSignConfig() {
-		super("joinsignes.yml");
+		super("joinsigns.yml");
 		reloadConfig();
 	}
 
@@ -92,6 +92,7 @@ public class JoinSignConfig extends SingleConfig {
 			serializedLocation.put("y", joinSign.getLocation().getBlockY());
 			serializedLocation.put("z", joinSign.getLocation().getBlockZ());
 			serializedLocation.put("w", joinSign.getLocation().getWorld().getName());
+			serializedJoinSign.put("location", serializedLocation);
 			serializedJoinSigns.add(serializedJoinSign);
 		}
 		

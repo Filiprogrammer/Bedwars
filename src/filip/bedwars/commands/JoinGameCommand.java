@@ -40,7 +40,7 @@ public class JoinGameCommand implements ICommand {
 	}
 
 	public String getPermission() {
-		return "play";
+		return "play.command";
 	}
 
 	public String getName() {

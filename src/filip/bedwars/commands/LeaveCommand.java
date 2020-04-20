@@ -40,7 +40,7 @@ public class LeaveCommand implements ICommand {
 
 	@Override
 	public String getPermission() {
-		return "play";
+		return "play.command";
 	}
 
 	@Override
