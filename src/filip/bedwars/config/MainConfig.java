@@ -21,6 +21,7 @@ public class MainConfig extends SingleConfig {
 	private String itemShopName = "§2Item Shop";
 	private String teamShopName = "§1Team Shop";
 	private String baseSpawnPointName = "§dSpawn-Point";
+	private String[] joinSignLines = new String[4];
 	
 	protected MainConfig() {
 		super("config.yml");
@@ -63,6 +64,13 @@ public class MainConfig extends SingleConfig {
 		return baseSpawnPointName;
 	}
 	
+	public String getJoinSignLine(int line) {
+		if(line < 0 || line > joinSignLines.length - 1)
+			return null;
+		
+		return joinSignLines[line];
+	}
+	
 	public void setMainLobby(Location loc) {
 		mainLobby = loc;
 	}
@@ -82,6 +90,11 @@ public class MainConfig extends SingleConfig {
 		config.set("item-shop-name", itemShopName.replace('§', '&'));
 		config.set("team-shop-name", teamShopName.replace('§', '&'));
 		config.set("base-spawn-point-name", baseSpawnPointName.replace('§', '&'));
+		
+		config.set("join-sign-line-one", joinSignLines[0].replace('§', '&'));
+		config.set("join-sign-line-two", joinSignLines[1].replace('§', '&'));
+		config.set("join-sign-line-three", joinSignLines[2].replace('§', '&'));
+		config.set("join-sign-line-four", joinSignLines[3].replace('§', '&'));
 		
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
 		
@@ -127,6 +140,11 @@ public class MainConfig extends SingleConfig {
 		itemShopName = config.getString("item-shop-name", "&2Item Shop").replace('&', '§');
 		teamShopName = config.getString("team-shop-name", "&1Team Shop").replace('&', '§');
 		baseSpawnPointName = config.getString("base-spawn-point-name", "&dSpawn-Point").replace('&', '§');
+		
+		joinSignLines[0] = config.getString("join-sign-line-one", "&a[BedWars]").replace('&', '§');
+		joinSignLines[1] = config.getString("join-sign-line-two", "&d%arenaname%").replace('&', '§');
+		joinSignLines[2] = config.getString("join-sign-line-three", "").replace('&', '§');
+		joinSignLines[3] = config.getString("join-sign-line-four", "&b<Join Arena>").replace('&', '§');
 		
 		if (itemShopName.length() > 16) {
 			MessageSender.sendWarning("item-shop-name must not be longer than 16 characters. Check your config.yml!");

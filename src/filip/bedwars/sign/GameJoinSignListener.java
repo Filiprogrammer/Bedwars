@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import filip.bedwars.config.ArenaConfig;
 import filip.bedwars.config.JoinSignConfig;
+import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.GameManager;
 import filip.bedwars.game.arena.Arena;
@@ -31,8 +32,12 @@ public class GameJoinSignListener implements Listener {
 		
 		if (player.hasPermission("filip.bedwars.setup")) {
 			if (event.getLine(0).equalsIgnoreCase("[bedwars]")) {
-				event.setLine(0, "§1[BEDWARS]");
-				GameJoinSign joinSign = new GameJoinSign(event.getBlock().getLocation(), event.getLine(1));
+				String mapName = event.getLine(1);
+				event.setLine(0, MainConfig.getInstance().getJoinSignLine(0).replace("%arenaname%", mapName));
+				event.setLine(1, MainConfig.getInstance().getJoinSignLine(1).replace("%arenaname%", mapName));
+				event.setLine(2, MainConfig.getInstance().getJoinSignLine(2).replace("%arenaname%", mapName));
+				event.setLine(3, MainConfig.getInstance().getJoinSignLine(3).replace("%arenaname%", mapName));
+				GameJoinSign joinSign = new GameJoinSign(event.getBlock().getLocation(), mapName);
 				JoinSignConfig.getInstance().addJoinSign(joinSign);
 				JoinSignConfig.getInstance().saveConfig();
 			}
