@@ -25,15 +25,16 @@
 
 gamestates:
 - name: 'Start-Phase'
-  duration-seconds: 100
-  actions-start: []
-  actions-end: []
-- name: 'Spawner-Plus'
-  duration-seconds: 180
+  duration-seconds: 70
   countdown-message: 'spawner-will-be-faster'
   countdown-message-one-minute: 'spawner-will-be-faster-one'
   actions-start: []
-  actions-end:
+  actions-end: []
+- name: 'Spawner-Plus'
+  duration-seconds: 130
+  countdown-message: 'beds-gone-in'
+  countdown-message-one-minute: 'beds-gone-in-one'
+  actions-start:
   - action: PLAY_SOUND
     sound: 'success'
     include-spectators: true
@@ -45,56 +46,30 @@ gamestates:
     name: '&r&fIron'
     ticksPerSpawn-multiplier: 0.75
     alert: CHAT
-- name: 'Spawner-Ultra'
-  duration-seconds: 180
-  countdown-message: 'spawner-will-be-faster'
-  countdown-message-one-minute: 'spawner-will-be-faster-one'
-  actions-start: []
-  actions-end:
-  - action: PLAY_SOUND
-    sound: 'success'
-    include-spectators: true
-  - action: SPAWNER_CHANGE
-    name: '&eGold'
-    ticksPerSpawn-multiplier: 0.75
-    alert: CHAT
-  - action: SPAWNER_CHANGE
-    name: '&bDiamond'
-    ticksPerSpawn-multiplier: 0.85
-    alert: CHAT
-  - action: SPAWNER_CHANGE
-    name: '&2Emerald'
-    ticksPerSpawn-multiplier: 0.85
-    alert: CHAT
+  actions-end: []
 - name: 'Beds gone'
-  duration-seconds: 180
-  countdown-message: 'beds-gone-in'
-  countdown-message-one-minute: 'beds-gone-in-one'
-  actions-start: []
-  actions-end:
-  - action: DESTROY_BEDS
-- name: 'Dragon-Battle'
-  duration-seconds: 180
+  duration-seconds: 130
   countdown-message: 'dragons-will-spawn'
   countdown-message-one-minute: 'dragons-will-spawn-one'
-  actions-start: []
-  actions-end:
-  - action: SUMMON_DRAGONS
-- name: 'End-Battle'
-  duration-seconds: 180
+  actions-start:
+  - action: DESTROY_BEDS
+  actions-end: []
+- name: 'Dragon-Battle'
+  duration-seconds: 130
   countdown-message: 'end-battle-in'
   countdown-message-one-minute: 'end-battle-in-one'
-  actions-start: []
-  actions-end:
+  actions-start:
+  - action: SUMMON_DRAGONS
+  actions-end: []
+- name: 'Decrease Health'
+  duration-seconds: 130
+  countdown-message: 'game-ends-in'
+  countdown-message-one-minute: 'game-ends-in-one'
+  actions-start:
   - action: SEND_MESSAGE
     message: 'end-battle'
     include-spectators: true
   - action: SET_MAX_HEALTH
     max-health: 6
-- name: 'End of Game'
-  duration-seconds: 240
-  countdown-message: 'game-ends-in'
-  countdown-message-one-minute: 'game-ends-in-one'
-  actions-start: []
   actions-end: []
 #no action because after the last gamestate the game automatically ends

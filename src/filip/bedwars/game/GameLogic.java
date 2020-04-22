@@ -222,6 +222,7 @@ public class GameLogic implements Listener {
 					public void click(InventoryClickEvent event) {
 						HumanEntity player = event.getWhoClicked();
 						selectedItemShopCategory.put(player.getUniqueId(), ItemShopConfig.getInstance().getShop().handleClick(selectedItemShopCategory.getOrDefault(player.getUniqueId(), -1), event));
+						SoundPlayer.playSound("select", (Player)player);
 					}
 
 					@Override
@@ -313,16 +314,23 @@ public class GameLogic implements Listener {
 	
 	public void initiateNextGameState() {
 		if (gameStates.peek() == gameStates.getLast()) {
+			// Initiate game end state
 			initiateLastGameEndState();
+		} else if (gameState == gameStates.getLast()) {
+			// The Game is already over
 		} else {
+			// Initiate next game state
 			gameState = gameStates.remove();
 			gameState.initiate();
 		}
 	}
 	
 	public void initiateLastGameEndState() {
-		gameState = gameStates.getLast(); // Must not be .remove() because it would invalidate the game over checks
-		gameState.initiate();
+		// Check if the game is not already over
+		if (gameState != gameStates.getLast()) {
+			gameState = gameStates.getLast(); // Must not be .remove() because it would invalidate the game over checks
+			gameState.initiate();
+		}
 	}
 	
 	@EventHandler
