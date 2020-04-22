@@ -40,18 +40,23 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import com.destroystokyo.paper.Title;
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 
 import filip.bedwars.BedwarsPlugin;
+import filip.bedwars.config.GameStatesConfig;
 import filip.bedwars.config.ItemShopConfig;
 import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.config.TeamShopConfig;
+import filip.bedwars.game.action.Action;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.arena.Spawner;
+import filip.bedwars.game.state.GameState;
+import filip.bedwars.game.state.GameStateSetting;
 import filip.bedwars.inventory.ClickableInventory;
 import filip.bedwars.inventory.IClickable;
 import filip.bedwars.listener.player.IPacketListener;
@@ -85,101 +90,47 @@ public class GameLogic implements Listener {
 		this.arena = arena;
 		this.gameWorld = gameWorld;
 		
-		gameStates.add(new GameState("Phase 1", new Countdown(60 * 2) {
+		for (GameStateSetting gameStateSetting : GameStatesConfig.getInstance().getGameStateSettings())
+			gameStates.add(new GameState(gameStateSetting, game, this));
+		
+		Action gameEndStartAction = new Action() {
 			@Override
-			public void onTick() {
-				int secondsLeft = getSecondsLeft();
+			public void execute(@NotNull Game game, @NotNull GameLogic gameLogic) {
+				Team winnerTeam = game.isOver();
 				
-				if (secondsLeft != 0 && (secondsLeft % 60) == 0) {
+				if (winnerTeam == null) {
+					// No Team wins
 					for (Player p : gameWorld.getWorld().getPlayers())
-						MessageSender.sendMessage(p, "§7Beds will be destroyed in §3" + (secondsLeft / 60) + " minutes");
-				}
-			}
-			
-			@Override
-			public void onStart() {}
-			
-			@Override
-			public boolean onFinish() {
-				// Destroy all beds
-				List<Team> teamsSyncList = game.getTeams();
-				synchronized (teamsSyncList) {
-					for (Team team : teamsSyncList) {
-						team.destroyBed(gameWorld.getWorld());
+						MessageSender.sendMessage(p, "The game is over and noone wins");
+				} else {
+					for (Player p : gameWorld.getWorld().getPlayers()) {
+						String teamHasWonMsg = MessagesConfig.getInstance().getStringValue(p.getLocale(), "team-has-won").replace("%teamcolor%", TeamColorConverter.convertTeamColorToStringForMessages(winnerTeam.getBase().getTeamColor(), p.getLocale()));
+						MessageSender.sendMessage(p, teamHasWonMsg);
+						SoundPlayer.playSound("victory", p);
 						
-						for (UUID uuid : team.getMembers()) {
-							Player p = Bukkit.getPlayer(uuid);
-							Title title = new Title(MessagesConfig.getInstance().getStringValue(p.getLocale(), "your-bed-destroyed"), MessagesConfig.getInstance().getStringValue(p.getLocale(), "you-cant-respawn-anymore"));
-							p.sendTitle(title);
-						}
+						if(winnerTeam.containsMember(p.getUniqueId()))
+							p.sendTitle(MessagesConfig.getInstance().getStringValue(p.getLocale(), "victory"), teamHasWonMsg, 10, 70, 20);
 					}
 				}
-				
-				for (Player p : gameWorld.getWorld().getPlayers()) {
-					MessageSender.sendMessage(p, "§4All beds have been destroyed");
-					SoundPlayer.playSound("bed-destroyed", p);
-				}
-				
-				// Initiate Phase 2
-				gameState = gameStates.remove();
-				gameState.initiate();
-				return false;
 			}
-			
-			@Override
-			public void onCancel() {}
-		}));
+		};
 		
-		gameStates.add(new GameState("Phase 2", new Countdown(60 * 1) {
+		Action gameEndEndAction = new Action() {
 			@Override
-			public void onTick() {
-				int secondsLeft = getSecondsLeft();
-				
-				if (secondsLeft != 0 && (secondsLeft % 60) == 0) {
-					for (Player p : gameWorld.getWorld().getPlayers())
-						MessageSender.sendMessage(p, "§7Game will end in §3" + (secondsLeft / 60) + " minutes");
-				}
-			}
-			
-			@Override
-			public void onStart() {}
-			
-			@Override
-			public boolean onFinish() {
-				// Initiate Game End phase
-				gameState = gameStates.getLast(); // Must not be .remove() because it would invalidate the game over checks
-				gameState.initiate();
-				
-				// No Team wins
-				for (Player p : gameWorld.getWorld().getPlayers())
-					MessageSender.sendMessage(p, "The game is over and noone wins");
-				
-				return false;
-			}
-			
-			@Override
-			public void onCancel() {}
-		}));
-		
-		gameStates.add(new GameState("Game End", new Countdown(10) {
-			@Override
-			public void onTick() {}
-			
-			@Override
-			public void onStart() {}
-			
-			@Override
-			public boolean onFinish() {
+			public void execute(@NotNull Game game, @NotNull GameLogic gameLogic) {
 				game.endGame();
-				return false;
 			}
-			
-			@Override
-			public void onCancel() {}
-		}));
+		};
 		
-		gameState = gameStates.remove();
-		gameState.initiate();
+		GameStateSetting gameEndSetting = new GameStateSetting("Game End", 10, null, null, new ArrayList<Action>() {{
+			add(gameEndStartAction);
+		}}, new ArrayList<Action>() {{
+			add(gameEndEndAction);
+		}});
+		
+		gameStates.add(new GameState(gameEndSetting, game, this));
+		
+		initiateNextGameState();
 		
 		// Setup game ticker for spawners
 		gameTicker = new BukkitRunnable() {
@@ -358,6 +309,20 @@ public class GameLogic implements Listener {
 		HandlerList.unregisterAll(this);
 		
 		GameWorldManager.getInstance().removeGameWorld(gameWorld);
+	}
+	
+	public void initiateNextGameState() {
+		if (gameStates.peek() == gameStates.getLast()) {
+			initiateLastGameEndState();
+		} else {
+			gameState = gameStates.remove();
+			gameState.initiate();
+		}
+	}
+	
+	public void initiateLastGameEndState() {
+		gameState = gameStates.getLast(); // Must not be .remove() because it would invalidate the game over checks
+		gameState.initiate();
 	}
 	
 	@EventHandler
@@ -678,27 +643,15 @@ public class GameLogic implements Listener {
 		
 		if (winnerTeam != null)
 			// Game is over
-			runGameOver(winnerTeam);
+			runGameOver();
 	}
 	
-	private void runGameOver(Team winnerTeam) {
-		for (Player p : gameWorld.getWorld().getPlayers()) {
-			String teamHasWonMsg = MessagesConfig.getInstance().getStringValue(p.getLocale(), "team-has-won").replace("%teamcolor%", TeamColorConverter.convertTeamColorToStringForMessages(winnerTeam.getBase().getTeamColor(), p.getLocale()));
-			MessageSender.sendMessage(p, teamHasWonMsg);
-			SoundPlayer.playSound("victory", p);
-			
-			if(winnerTeam.containsMember(p.getUniqueId())) {
-				Title title = new Title(MessagesConfig.getInstance().getStringValue(p.getLocale(), "victory"), teamHasWonMsg);
-				p.sendTitle(title);
-			}
-		}
-		
+	private void runGameOver() {
 		// Make sure that the countdown of the current game state is cancelled
 		gameState.getCountdown().cancel();
 		
 		// Initiate game over phase
-		gameState = gameStates.getLast();
-		gameState.initiate();
+		initiateLastGameEndState();
 	}
 	
 	private void broadcastBedDestroyed(Player destroyer, Team team) {

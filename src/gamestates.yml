@@ -1,0 +1,100 @@
+# actions:
+#   DESTROY_BEDS: Destroy ALL beds
+#   PLACE_BEDS: "Respawn" ALL beds
+#   SUMMON_DRAGONS: Summon the dragons for each team
+#   KILL_DRAGONS: Kill every dragon
+#   PLAY_SOUND: Play a sound to either every player in the game world or only every game player
+#   sound: The sound read from the sounds.yml
+#   include-spectators: true/false if spectator should receive it too
+#   SEND_MESSAGE: Send a message to either every player in the game world or only every game player
+#   message: Message that is going to be read from every messages-language.yml and sent to every player
+#   include-spectators: true/false if spectator should receive it too
+#   SEND_TITLE: Send a title to either every player in the game world or only every game player
+#   title: '' Title as string
+#   subtitle: '' Subtitle as string (If you wish either only a title or only a subtitle be sure to use an empty string '')
+#   fade-in: 0 The time it needs to fade in
+#   stay: 0 The time it stays
+#   fade-out: 0 The time it needs to fade out
+#   include-spectators: true/false if spectator should receive it too
+#   SET_MAX_HEALTH: Set the max health for every ingame player
+#   health: The number of how many hearts everyone should have (1 is a half heart, so the default health is 20)
+#   SPAWNER_CHANGE: Change a spawners spawn-speed
+#   name: '' The spawners name, MUST be one of the inputted names in spawner.yml
+#   ticksPerSpawn-multiplier: 1.00 Input in percent (if you want it 10% faster its 0.90 because 1.00 is 100%)
+#   alert: How the ingame players are alerted about the new spawner-setting (Must be one of these: null, CHAT, ACTION_BAR, BOSS_BAR, TITLE, SUBTITLE)
+
+gamestates:
+- name: 'Start-Phase'
+  duration-seconds: 100
+  actions-start: []
+  actions-end: []
+- name: 'Spawner-Plus'
+  duration-seconds: 180
+  countdown-message: 'spawner-will-be-faster'
+  countdown-message-one-minute: 'spawner-will-be-faster-one'
+  actions-start: []
+  actions-end:
+  - action: PLAY_SOUND
+    sound: 'success'
+    include-spectators: true
+  - action: SPAWNER_CHANGE
+    name: '&6Bronze'
+    ticksPerSpawn-multiplier: 0.75
+    alert: CHAT
+  - action: SPAWNER_CHANGE
+    name: '&r&fIron'
+    ticksPerSpawn-multiplier: 0.75
+    alert: CHAT
+- name: 'Spawner-Ultra'
+  duration-seconds: 180
+  countdown-message: 'spawner-will-be-faster'
+  countdown-message-one-minute: 'spawner-will-be-faster-one'
+  actions-start: []
+  actions-end:
+  - action: PLAY_SOUND
+    sound: 'success'
+    include-spectators: true
+  - action: SPAWNER_CHANGE
+    name: '&eGold'
+    ticksPerSpawn-multiplier: 0.75
+    alert: CHAT
+  - action: SPAWNER_CHANGE
+    name: '&bDiamond'
+    ticksPerSpawn-multiplier: 0.85
+    alert: CHAT
+  - action: SPAWNER_CHANGE
+    name: '&2Emerald'
+    ticksPerSpawn-multiplier: 0.85
+    alert: CHAT
+- name: 'Beds gone'
+  duration-seconds: 180
+  countdown-message: 'beds-gone-in'
+  countdown-message-one-minute: 'beds-gone-in-one'
+  actions-start: []
+  actions-end:
+  - action: DESTROY_BEDS
+- name: 'Dragon-Battle'
+  duration-seconds: 180
+  countdown-message: 'dragons-will-spawn'
+  countdown-message-one-minute: 'dragons-will-spawn-one'
+  actions-start: []
+  actions-end:
+  - action: SUMMON_DRAGONS
+- name: 'End-Battle'
+  duration-seconds: 180
+  countdown-message: 'end-battle-in'
+  countdown-message-one-minute: 'end-battle-in-one'
+  actions-start: []
+  actions-end:
+  - action: SEND_MESSAGE
+    message: 'end-battle'
+    include-spectators: true
+  - action: SET_MAX_HEALTH
+    max-health: 6
+- name: 'End of Game'
+  duration-seconds: 240
+  countdown-message: 'game-ends-in'
+  countdown-message-one-minute: 'game-ends-in-one'
+  actions-start: []
+  actions-end: []
+#no action because after the last gamestate the game automatically ends
