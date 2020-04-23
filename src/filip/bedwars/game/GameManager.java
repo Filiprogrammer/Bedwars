@@ -51,7 +51,7 @@ public class GameManager {
 		
 		for (Game game : games) {
 			// Check if the game has the arena we are looking for
-			if (!game.getArena().equals(arena))
+			if (!game.getArena().getWorld().getName().equals(arena.getWorld().getName()))
 				continue;
 			
 			// Check if the game is not already running

@@ -38,7 +38,7 @@ public class Game implements Listener {
 	private boolean isStarting = false;
 	
 	public Game(@NotNull Arena arena) {
-		this.arena = arena;
+		this.arena = arena.clone();
 		this.lobby = new Lobby(MainConfig.getInstance().getGameLobby(), this);
 		
 		for (int i = 0; i < arena.getBases().size(); ++i) {

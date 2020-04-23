@@ -6,7 +6,7 @@ import java.util.List;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
-public class Arena {
+public class Arena implements Cloneable {
 	
 	private List<Spawner> spawner = new ArrayList<Spawner>();
 	private List<Base> bases = new ArrayList<Base>();
@@ -53,6 +53,19 @@ public class Arena {
 	
 	public int getPlayersPerTeam() {
 		return playersPerTeam;
+	}
+	
+	public Arena clone() {
+		List<Spawner> newSpawner = new ArrayList<>();
+		List<Base> newBases = new ArrayList<>();
+		
+		for (Spawner spawner : this.spawner)
+			newSpawner.add(spawner.clone());
+		
+		for (Base base : this.bases)
+			newBases.add(base.clone());
+		
+		return new Arena(mapName, minPlayersToStart, playersPerTeam, world, newSpawner, newBases);
 	}
 	
 }

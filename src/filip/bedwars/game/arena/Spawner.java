@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.inventory.ItemBuilder;
 
-public class Spawner {
+public class Spawner implements Cloneable {
 	private final Location location;
     private final int ticksPerSpawn;
     private final ItemStack itemStack;
@@ -52,5 +52,14 @@ public class Spawner {
      */
     private void spawnItem(World world) {
     	world.dropItemNaturally(location, itemStack);
+    }
+    
+    public Spawner clone() {
+    	String name = "";
+		
+		if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName())
+			name = itemStack.getItemMeta().getDisplayName();
+		
+		return new Spawner(getLocation(null), ticksPerSpawn, itemStack.getType(), name);
     }
 }

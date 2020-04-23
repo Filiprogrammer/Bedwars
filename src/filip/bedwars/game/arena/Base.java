@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.TeamColor;
 
-public class Base {
+public class Base implements Cloneable {
 	private final Location spawn, itemShop, teamShop, bedTop, bedBottom;
 	private final TeamColor teamColor;
 	
@@ -44,5 +44,9 @@ public class Base {
 	
 	public TeamColor getTeamColor() {
 		return teamColor;
+	}
+	
+	public Base clone() {
+		return new Base(getSpawn(null), getItemShop(null), getTeamShop(null), getBedTop(null), getBedBottom(null), teamColor);
 	}
 }
