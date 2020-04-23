@@ -9,13 +9,15 @@ import org.jetbrains.annotations.NotNull;
 import filip.bedwars.inventory.ItemBuilder;
 
 public class Spawner implements Cloneable {
+	private final String name;
 	private final Location location;
-    private final int ticksPerSpawn;
+    private int ticksPerSpawn;
     private final ItemStack itemStack;
     
     private int currentTick;
     
     public Spawner(@NotNull Location location, int ticksPerSpawn, @NotNull Material material, @NotNull String name) {
+    	this.name = name;
     	this.location = location;
     	this.ticksPerSpawn = ticksPerSpawn;
     	this.itemStack = new ItemBuilder()
@@ -36,6 +38,10 @@ public class Spawner implements Cloneable {
     	return itemStack;
     }
     
+    public String getItemName() {
+    	return name;
+    }
+    
     /**
      * Execute one tick and if ticksPerSpawn is reached spawn the item.
      */
@@ -47,6 +53,10 @@ public class Spawner implements Cloneable {
         }
     }
     
+    public void setTicksPerSpawn(int ticksPerSpawn) {
+    	this.ticksPerSpawn = ticksPerSpawn;
+    }
+    
     /**
      * Spawn the item at the location.
      */
@@ -55,11 +65,6 @@ public class Spawner implements Cloneable {
     }
     
     public Spawner clone() {
-    	String name = "";
-		
-		if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName())
-			name = itemStack.getItemMeta().getDisplayName();
-		
 		return new Spawner(getLocation(null), ticksPerSpawn, itemStack.getType(), name);
     }
 }

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.Game;
 import filip.bedwars.game.GameLogic;
+import filip.bedwars.game.arena.Spawner;
 import filip.bedwars.utils.MessageSender;
 
 public class ActionSpawnerChange extends Action {
@@ -25,24 +26,26 @@ public class ActionSpawnerChange extends Action {
 	
 	@Override
 	public void execute(@NotNull Game game, @NotNull GameLogic gameLogic) {
-		// TODO: change the spawner rates
+		for (Spawner spawner : game.getArena().getSpawner())
+			if (name.equals(spawner.getItemName()))
+				spawner.setTicksPerSpawn((int) (spawner.getTicksPerSpawn() * ticksPerSpawnMultiplier));
 		
 		for (Player p : gameLogic.getGameWorld().getWorld().getPlayers()) {
 			switch (alert) {
 			case CHAT:
-				MessageSender.sendMessage(p, name.replace('&', '§') + "§7-Spawner delays have been multiplied by " + ticksPerSpawnMultiplier);
+				MessageSender.sendMessage(p, name + "§7-Spawner delays have been multiplied by " + ticksPerSpawnMultiplier);
 				break;
 			case ACTION_BAR:
-				p.sendActionBar(name.replace('&', '§') + "§r-Spawner delays have been multiplied by " + ticksPerSpawnMultiplier);
+				p.sendActionBar(name + "§r-Spawner delays have been multiplied by " + ticksPerSpawnMultiplier);
 				break;
 			case BOSS_BAR:
 				// TODO: boss bar
 				break;
 			case TITLE:
-				p.sendTitle(name.replace('&', '§') + "§r-Spawner delays have been multiplied by " + ticksPerSpawnMultiplier, null, 10, 70, 20);
+				p.sendTitle(name + "§r-Spawner delays have been multiplied by " + ticksPerSpawnMultiplier, null, 10, 70, 20);
 				break;
 			case SUBTITLE:
-				p.sendTitle(null, name.replace('&', '§') + "§r-Spawner delays have been multiplied by " + ticksPerSpawnMultiplier, 10, 70, 20);
+				p.sendTitle(null, name + "§r-Spawner delays have been multiplied by " + ticksPerSpawnMultiplier, 10, 70, 20);
 				break;
 			}
 		}

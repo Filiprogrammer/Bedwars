@@ -70,6 +70,9 @@ public class ActionDeserializer {
 				return null;
 			}
 			
+			if (arg instanceof String)
+				arg = ((String) arg).replace('&', '§');
+			
 			initArgs[i] = arg;
 		}
 		

@@ -90,6 +90,11 @@ public class GameLogic implements Listener {
 		this.arena = arena;
 		this.gameWorld = gameWorld;
 		
+		// Destroy beds of empty teams
+		for (Team team : game.getTeams())
+			if (team.getMembers().size() == 0)
+				team.destroyBed(gameWorld.getWorld());
+		
 		for (GameStateSetting gameStateSetting : GameStatesConfig.getInstance().getGameStateSettings())
 			gameStates.add(new GameState(gameStateSetting, game, this));
 		
