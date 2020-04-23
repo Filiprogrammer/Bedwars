@@ -1,7 +1,6 @@
 package filip.bedwars.utils;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +13,7 @@ import filip.bedwars.game.action.ActionPlaySound;
 import filip.bedwars.game.action.ActionSendMessage;
 import filip.bedwars.game.action.ActionSendTitle;
 import filip.bedwars.game.action.ActionSetMaxHealth;
+import filip.bedwars.game.action.ActionSpawnerChange;
 import filip.bedwars.game.action.ActionSummonDragons;
 
 public class ActionDeserializer {
@@ -27,7 +27,7 @@ public class ActionDeserializer {
 		put("SEND_MESSAGE", ActionSendMessage.class);
 		put("SEND_TITLE", ActionSendTitle.class);
 		put("SET_MAX_HEALTH", ActionSetMaxHealth.class);
-		//put("SPAWNER_CHANGE", ActionSpawnerChange.class);
+		put("SPAWNER_CHANGE", ActionSpawnerChange.class);
 	}};
 	
 	public static Action deserializeAction(Map<String, Object> serializedAction) {
