@@ -61,12 +61,12 @@ public class ActionDeserializer {
 			Object arg = serializedAction.get(parameterNames[i]);
 			
 			if (arg == null) {
-				MessageSender.sendWarning("Missing parameter for action " + actionStr + ". Skipping it...");
+				MessageSender.sendWarning("Missing parameter " + parameterNames[i] + " for action " + actionStr + ". Skipping it...");
 				return null;
 			}
 			
 			if (!arg.getClass().isAssignableFrom(parameter.getType())) {
-				MessageSender.sendWarning("Invalid parameter for action " + actionStr + ". Skipping it...");
+				MessageSender.sendWarning("Invalid parameter " + parameterNames[i] + " for action " + actionStr + ". Skipping it...");
 				return null;
 			}
 			

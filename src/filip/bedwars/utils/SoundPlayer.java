@@ -34,7 +34,7 @@ public class SoundPlayer {
 	 * @return true if the sound was played successfully; false if the sound was not found
 	 */
 	public static boolean playSound(@NotNull String sound, @NotNull List<Player> players) {
-		return playSound(sound, (Player[]) players.toArray());
+		return playSound(sound, players.toArray(new Player[0]));
 	}
 	
 	/**
