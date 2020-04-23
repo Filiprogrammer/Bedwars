@@ -2,10 +2,12 @@ package filip.bedwars.game;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.lang.reflect.Field;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -61,6 +63,7 @@ import filip.bedwars.inventory.ClickableInventory;
 import filip.bedwars.inventory.IClickable;
 import filip.bedwars.listener.player.IPacketListener;
 import filip.bedwars.listener.player.UseEntityPacketListener;
+import filip.bedwars.utils.EnderDragonController;
 import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.PlayerUtils;
 import filip.bedwars.utils.SoundPlayer;
@@ -84,6 +87,7 @@ public class GameLogic implements Listener {
 	private List<IClickable> itemShopClickables = new ArrayList<IClickable>();
 	private Map<UUID, Integer> selectedItemShopCategory = new HashMap<UUID, Integer>();
 	private IPacketListener packetListener;
+	public final Set<EnderDragonController> enderDragonControllers = new HashSet<>();
 	
 	public GameLogic(Game game, Arena arena, GameWorld gameWorld) {
 		this.game = game;
@@ -287,12 +291,19 @@ public class GameLogic implements Listener {
 		
 		for (VillagerNPC teamShopNPC : teamShopNPCs)
 			teamShopNPC.respawn(player);
+		
+		for (EnderDragonController enderDragonController : enderDragonControllers)
+			enderDragonController.addViewer(player);
 	}
 	
 	public void leavePlayer(Player player) {
 		player.spigot().respawn();
 		player.teleport(MainConfig.getInstance().getMainLobby());
 		removePlayerListeners(player);
+		
+		for (EnderDragonController enderDragonController : enderDragonControllers)
+			enderDragonController.removeViewer(player);
+		
 		checkGameOver();
 	}
 	
@@ -308,6 +319,9 @@ public class GameLogic implements Listener {
 			for (UUID uuid : syncPlayersList)
 				leavePlayer(Bukkit.getPlayer(uuid));
 		}
+		
+		for (EnderDragonController enderDragonController : enderDragonControllers)
+			enderDragonController.stopTask();
 		
 		for (Player p : gameWorld.getWorld().getPlayers())
 			p.teleport(MainConfig.getInstance().getMainLobby());
@@ -504,6 +518,9 @@ public class GameLogic implements Listener {
 	public void onEntityExplode(EntityExplodeEvent event) {
 		// Check if the explosion is in the game world
 		if (event.getLocation().getWorld().getName().equals(getGameWorld().getWorld().getName())) {
+			if (event.getEntityType() == EntityType.ENDER_DRAGON)
+				return;
+			
 			List<Block> blockListCopy = new ArrayList<Block>();
 	        blockListCopy.addAll(event.blockList());
 	        
@@ -610,6 +627,9 @@ public class GameLogic implements Listener {
 			
 			for (VillagerNPC teamShopNPC : teamShopNPCs)
 				teamShopNPC.respawn(player);
+			
+			for (EnderDragonController enderDragonController : enderDragonControllers)
+				enderDragonController.respawn(player);
 		}
 	}
 	
