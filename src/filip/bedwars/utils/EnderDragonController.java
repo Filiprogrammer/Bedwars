@@ -2,6 +2,8 @@ package filip.bedwars.utils;
 
 import java.lang.reflect.Field;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -19,8 +21,10 @@ import net.minecraft.server.v1_14_R1.DragonControllerLanding;
 import net.minecraft.server.v1_14_R1.DragonControllerLandingFly;
 import net.minecraft.server.v1_14_R1.DragonControllerPhase;
 import net.minecraft.server.v1_14_R1.EntityEnderDragon;
+import net.minecraft.server.v1_14_R1.EntityLiving;
 import net.minecraft.server.v1_14_R1.EntityPlayer;
 import net.minecraft.server.v1_14_R1.EntityTypes;
+import net.minecraft.server.v1_14_R1.PacketPlayOutEntityDestroy;
 import net.minecraft.server.v1_14_R1.PacketPlayOutEntityTeleport;
 import net.minecraft.server.v1_14_R1.PacketPlayOutSpawnEntityLiving;
 import net.minecraft.server.v1_14_R1.PlayerConnection;
@@ -29,13 +33,17 @@ import net.minecraft.server.v1_14_R1.WorldServer;
 
 public class EnderDragonController {
 
-	private final Set<Entity> targetEntities;
+	private final List<Entity> targetEntities;
 	private final Set<Player> viewers;
 	private BukkitTask task;
 	private BukkitRunnable bukkitRunnable;
 	private EntityEnderDragon dragon;
 	
-	public EnderDragonController(Location loc, Set<Entity> targetEntities, Set<Player> viewers) {
+	private Entity currentTargetEntity;
+	private int dragonPhase;
+	private Random random = new Random();
+	
+	public EnderDragonController(Location loc, List<Entity> targetEntities, Set<Player> viewers) {
 		this.targetEntities = targetEntities;
 		this.viewers = viewers;
 		spawn(loc);
@@ -74,8 +82,32 @@ public class EnderDragonController {
 		bukkitRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
-				for (Entity targetEntity : targetEntities) {
-					dragonHoldingPattern(targetEntity.getLocation());
+				if (random.nextInt(200) == 0) {
+					// Choose a random target
+					currentTargetEntity = targetEntities.get(random.nextInt(targetEntities.size()));
+					
+					dragonPhase = random.nextInt(5);
+				}
+				
+				if (currentTargetEntity == null)
+					return;
+				
+				switch (dragonPhase) {
+				case 0:
+					dragonHoldingPattern(currentTargetEntity.getLocation());
+					break;
+				case 1:
+					if (currentTargetEntity instanceof EntityLiving)
+						dragonStrafePlayer((EntityLiving) currentTargetEntity);
+					break;
+				case 2:
+					dragonChargingPlayer(currentTargetEntity.getLocation());
+					break;
+				case 3:
+					dragonLandingApproach(currentTargetEntity.getLocation());
+					break;
+				case 4:
+					dragonLanding(currentTargetEntity.getLocation());
 					break;
 				}
 				
@@ -93,6 +125,15 @@ public class EnderDragonController {
 		for (Player p : viewers) {
 			EntityPlayer entityPlayer = ((CraftPlayer) p).getHandle();
 			PacketPlayOutSpawnEntityLiving packet = new PacketPlayOutSpawnEntityLiving(dragon);
+			PlayerConnection playerConnection = entityPlayer.playerConnection;
+			playerConnection.sendPacket(packet);
+		}
+	}
+	
+	public void despawn(Player... viewers) {
+		for (Player p : viewers) {
+			EntityPlayer entityPlayer = ((CraftPlayer) p).getHandle();
+			PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(dragon.getId());
 			PlayerConnection playerConnection = entityPlayer.playerConnection;
 			playerConnection.sendPacket(packet);
 		}
@@ -120,7 +161,7 @@ public class EnderDragonController {
 			Player p = iter.next();
 			
 			if (!p.getWorld().getName().equals(dragon.getWorld().getWorld().getName())) {
-				viewers.remove(p);
+				iter.remove();
 				continue;
 			}
 			
@@ -143,9 +184,9 @@ public class EnderDragonController {
 		}
 	}
 	
-	private void dragonStrafePlayer(EntityPlayer entityPlayer) {
+	private void dragonStrafePlayer(EntityLiving entityLiving) {
 		dragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.STRAFE_PLAYER);
-		dragon.getDragonControllerManager().b(DragonControllerPhase.STRAFE_PLAYER).a(entityPlayer);
+		dragon.getDragonControllerManager().b(DragonControllerPhase.STRAFE_PLAYER).a(entityLiving);
 	}
 	
 	private void dragonChargingPlayer(Location loc) {
