@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Bed;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -30,6 +31,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -37,6 +39,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -235,7 +238,6 @@ public class GameLogic implements Listener {
 					public void click(InventoryClickEvent event) {
 						HumanEntity player = event.getWhoClicked();
 						selectedItemShopCategory.put(player.getUniqueId(), ItemShopConfig.getInstance().getShop().handleClick(selectedItemShopCategory.getOrDefault(player.getUniqueId(), -1), event));
-						SoundPlayer.playSound("select", (Player)player);
 					}
 
 					@Override
@@ -327,6 +329,10 @@ public class GameLogic implements Listener {
 		return gameState;
 	}
 	
+	public GameState getNextGameState() {
+		return gameStates.peek();
+	}
+	
 	public void cleanup() {
 		gameTicker.cancel();
 		
@@ -413,13 +419,14 @@ public class GameLogic implements Listener {
 		Player damager = (Player) event.getDamager();
 		
 		if (game.containsPlayer(damager.getUniqueId())) {
-			if (event.getEntity().getType() != EntityType.PLAYER)
-				return;
-			
-			Player player = (Player) event.getEntity();
-			
-			if (game.getTeamOfPlayer(damager.getUniqueId()) == game.getTeamOfPlayer(player.getUniqueId()))
+			if (event.getEntity().getType() == EntityType.PLAYER) {
+				Player player = (Player) event.getEntity();
+				
+				if (game.getTeamOfPlayer(damager.getUniqueId()) == game.getTeamOfPlayer(player.getUniqueId()))
+					event.setCancelled(true);
+			} else if (event.getEntity().getType() == EntityType.ITEM_FRAME) {
 				event.setCancelled(true);
+			}
 		} else {
 			if (damager.getWorld().getName().equals(getGameWorld().getWorld().getName()))
 				event.setCancelled(true);
@@ -680,6 +687,23 @@ public class GameLogic implements Listener {
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
 		if (event.getFrom().getName().equals(gameWorld.getWorld().getName()))
 			scoreboardManager.reset(event.getPlayer());
+	}
+	
+	@EventHandler
+	public void onHangingBreak(HangingBreakEvent event) {
+		// Check if the hanging is in the game world
+		if (event.getEntity().getWorld().getName().equals(gameWorld.getWorld().getName()))
+			event.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+		Entity entity = event.getRightClicked();
+		
+		if (entity.getWorld().getName().equals(gameWorld.getWorld().getName())) {
+			if (entity.getType() == EntityType.ITEM_FRAME)
+				event.setCancelled(true);
+		}
 	}
 	
 	private void removePlayerListeners(Player player) {

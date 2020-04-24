@@ -29,6 +29,10 @@ public class ShopEntry {
 		return (item.getMaxStackSize() / item.getAmount()) * priceCount;
 	}
 	
+	public int getPriceCount(int buyItemAmount) {
+		return (buyItemAmount / item.getAmount()) * priceCount;
+	}
+	
 	public ItemStack getItem() {
 		return item;
 	}
@@ -84,6 +88,10 @@ public class ShopEntry {
 			return true;
 		
 		return false;
+	}
+	
+	public int getMaxBuyAmount(Player player) {
+		return (getPriceItemCount(player.getInventory()) / priceCount) * item.getAmount();
 	}
 
 }

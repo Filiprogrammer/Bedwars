@@ -34,7 +34,7 @@ public class ActionSummonDragons extends Action {
 			
 			// TODO: Clean this shit up
 			gameLogic.enderDragonControllers.add(
-					new EnderDragonController(team.getBase().getSpawn(gameLogic.getGameWorld().getWorld()),
+					new EnderDragonController(team.getBase().getSpawn(gameLogic.getGameWorld().getWorld()).clone().add(0, 50, 0),
 							targetEntities,
 							new HashSet<Player>(gameLogic.getGameWorld().getWorld().getPlayers()))
 			);

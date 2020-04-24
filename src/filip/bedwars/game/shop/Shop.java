@@ -79,12 +79,22 @@ public class Shop {
 		int itemAmount = 0;
 		
 		if (event.isShiftClick()) {
-			if (entry.canBuyFullStack(player)) {
-				removeItems(player.getInventory(), entry.getPriceMaterial(), entry.getPriceCountFullStack());
-				ItemStack itemStack = entry.getItem().clone();
-				itemAmount = entry.getItem().getAmount() * (entry.getPriceCountFullStack() / entry.getPriceCount());
-				itemStack.setAmount(itemAmount);
-				didNotFit = player.getInventory().addItem(itemStack);
+			int maxBuyAmount = entry.getMaxBuyAmount(player);
+			
+			if (maxBuyAmount > 0) {
+				if (maxBuyAmount < entry.getItem().getMaxStackSize()) {
+					removeItems(player.getInventory(), entry.getPriceMaterial(), entry.getPriceCount(maxBuyAmount));
+					ItemStack itemStack = entry.getItem().clone();
+					itemAmount = maxBuyAmount;
+					itemStack.setAmount(itemAmount);
+					didNotFit = player.getInventory().addItem(itemStack);
+				} else {
+					removeItems(player.getInventory(), entry.getPriceMaterial(), entry.getPriceCountFullStack());
+					ItemStack itemStack = entry.getItem().clone();
+					itemAmount = entry.getItem().getAmount() * (entry.getPriceCountFullStack() / entry.getPriceCount());
+					itemStack.setAmount(itemAmount);
+					didNotFit = player.getInventory().addItem(itemStack);
+				}
 			}
 		} else {
 			if (entry.canBuy(player)) {

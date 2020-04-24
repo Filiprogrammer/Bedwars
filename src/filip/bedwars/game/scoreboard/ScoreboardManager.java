@@ -11,6 +11,7 @@ import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.Game;
 import filip.bedwars.game.GameLogic;
 import filip.bedwars.game.Team;
+import filip.bedwars.game.state.GameState;
 import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.TeamColorConverter;
 
@@ -43,16 +44,22 @@ public class ScoreboardManager {
 		
 		int lineCount = 4 + game.getTeams().size();
 		
-		String scoreboardGamestate = MessagesConfig.getInstance().getStringValue(p.getLocale(), "scoreboard-state");
-		
-		if(scoreboardGamestate == null) {
-			scoreboardGamestate = "State: %gamestate%";
-			MessageSender.sendWarning("scoreboard-cur-state in messages.yml for language " + p.getLocale() + " was null! Setting a default value for it...");
-		}
-		
 		objective.getScore(" ").setScore(lineCount--);
-		objective.getScore(scoreboardGamestate.replace("%gamestate%", gameLogic.getGameState().getName())).setScore(lineCount--);
-		objective.getScore("§a" + gameLogic.getGameState().getCountdown().getSecondsLeft()).setScore(lineCount--);
+		
+		String nextGameStateName;
+		GameState nextGameState = gameLogic.getNextGameState();
+		
+		if (nextGameState == null)
+			nextGameStateName = "";
+		else
+			nextGameStateName = nextGameState.getName();
+		
+		objective.getScore(nextGameStateName).setScore(lineCount--);
+		objective.getScore("§a" +
+				(gameLogic.getGameState().getCountdown().getSecondsLeft() / 60) +
+				":" +
+				String.format("%02d", gameLogic.getGameState().getCountdown().getSecondsLeft() % 60))
+		.setScore(lineCount--);
 		objective.getScore("  ").setScore(lineCount--);
 		
 		for (Team team : game.getTeams()) {
