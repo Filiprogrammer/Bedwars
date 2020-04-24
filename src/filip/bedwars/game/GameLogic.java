@@ -35,6 +35,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -57,6 +58,7 @@ import filip.bedwars.game.action.Action;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.arena.Spawner;
+import filip.bedwars.game.scoreboard.ScoreboardManager;
 import filip.bedwars.game.state.GameState;
 import filip.bedwars.game.state.GameStateSetting;
 import filip.bedwars.inventory.ClickableInventory;
@@ -88,11 +90,13 @@ public class GameLogic implements Listener {
 	private Map<UUID, Integer> selectedItemShopCategory = new HashMap<UUID, Integer>();
 	private IPacketListener packetListener;
 	public final Set<EnderDragonController> enderDragonControllers = new HashSet<>();
+	public final ScoreboardManager scoreboardManager;
 	
 	public GameLogic(Game game, Arena arena, GameWorld gameWorld) {
 		this.game = game;
 		this.arena = arena;
 		this.gameWorld = gameWorld;
+		scoreboardManager = new ScoreboardManager(game, this);
 		
 		// Destroy beds of empty teams
 		for (Team team : game.getTeams())
@@ -268,6 +272,8 @@ public class GameLogic implements Listener {
 					BedwarsPlugin.getInstance().addPacketListener(player, teamShopNPCListener);
 			}
 		}
+		
+		scoreboardManager.update();
 	}
 	
 	private void teleportToSpawn(Player player) {
@@ -294,6 +300,8 @@ public class GameLogic implements Listener {
 		
 		for (EnderDragonController enderDragonController : enderDragonControllers)
 			enderDragonController.addViewer(player);
+		
+		scoreboardManager.update(player);
 	}
 	
 	public void leavePlayer(Player player) {
@@ -305,6 +313,8 @@ public class GameLogic implements Listener {
 			enderDragonController.removeViewer(player);
 			enderDragonController.removeTargetEntity(player);
 		}
+		
+		scoreboardManager.update();
 		
 		checkGameOver();
 	}
@@ -502,6 +512,7 @@ public class GameLogic implements Listener {
 							MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "you-cant-destroy-own-bed"));
 						} else {
 							team.destroyBed(gameWorld.getWorld());
+							scoreboardManager.update();
 							event.setCancelled(true);
 							broadcastBedDestroyed(player, team);
 						}
@@ -575,6 +586,11 @@ public class GameLogic implements Listener {
 				if (!team.hasBed()) {
 					removePlayerListeners(player);
 					team.removeMember(player.getUniqueId());
+					
+					if (team.getMembers().size() == 0)
+						team.destroyBed(gameWorld.getWorld());
+					
+					scoreboardManager.update();
 					isFinalKill = true;
 					
 					List<UUID> syncPlayersList = game.getPlayers();
@@ -654,6 +670,12 @@ public class GameLogic implements Listener {
 					player.teleport(game.getTeams().get(0).getBase().getSpawn(gameWorld.getWorld()));
 			}
 		}
+	}
+	
+	@EventHandler
+	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+		if (event.getFrom().getName().equals(gameWorld.getWorld().getName()))
+			scoreboardManager.reset(event.getPlayer());
 	}
 	
 	private void removePlayerListeners(Player player) {

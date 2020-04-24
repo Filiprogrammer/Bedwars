@@ -158,8 +158,12 @@ public class Game implements Listener {
 		if (players.remove(player.getUniqueId())) {
 			synchronized (teams) {
 				for (Team team : teams)
-					if (team.removeMember(player.getUniqueId()))
+					if (team.removeMember(player.getUniqueId())) {
+						if (team.getMembers().size() == 0 && isRunning())
+							team.destroyBed(gameLogic.getGameWorld().getWorld());
+						
 						break;
+					}
 			}
 			
 			if (isRunning())

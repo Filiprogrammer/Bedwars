@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -60,8 +62,19 @@ public class MessagesConfig extends MultipleConfig {
 			YamlConfiguration config = configs.get(langKey);
 			Set<String> keys = config.getKeys(false);
 			
-			for (String key : keys)
-				msgs.put(key, config.getString(key).replace('&', '§'));
+			for (String key : keys) {
+				String msg = config.getString(key).replace('&', '§');
+				String msgOut = msg;
+		        Matcher matcher = Pattern.compile("\\\\u\\d{1,4}").matcher(msg);
+				
+				while (matcher.find()) {
+				    String str = msg.substring(matcher.start(), matcher.end());
+				    char c = (char) Integer.parseInt(str.substring(2, str.length()), 16);
+				    msgOut = msgOut.replace(str, "" + c);
+				}
+				
+				msgs.put(key, msgOut);
+			}
 		}
 	}
 	

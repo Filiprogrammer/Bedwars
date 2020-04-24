@@ -21,6 +21,7 @@ public class ActionDestroyBeds extends Action {
 	public void execute(@NotNull Game game, @NotNull GameLogic gameLogic) {
 		for (Team team : game.getTeams()) {
 			team.destroyBed(gameLogic.getGameWorld().getWorld());
+			gameLogic.scoreboardManager.update();
 			
 			for (UUID uuid : team.getMembers()) {
 				Player p = Bukkit.getPlayer(uuid);
