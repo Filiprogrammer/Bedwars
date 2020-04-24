@@ -42,10 +42,12 @@ public class EnderDragonController {
 	private Entity currentTargetEntity;
 	private int dragonPhase;
 	private Random random = new Random();
+	private final Location spawnLoc;
 	
 	public EnderDragonController(Location loc, List<Entity> targetEntities, Set<Player> viewers) {
 		this.targetEntities = targetEntities;
 		this.viewers = viewers;
+		this.spawnLoc = loc;
 		spawn(loc);
 		runTask();
 	}
@@ -79,36 +81,45 @@ public class EnderDragonController {
 		if (isTaskRunning())
 			return;
 		
+		if (targetEntities.size() == 0)
+			currentTargetEntity = null;
+		else
+			currentTargetEntity = targetEntities.get(random.nextInt(targetEntities.size()));
+		
 		bukkitRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (random.nextInt(200) == 0) {
 					// Choose a random target
-					currentTargetEntity = targetEntities.get(random.nextInt(targetEntities.size()));
+					if (targetEntities.size() == 0)
+						currentTargetEntity = null;
+					else
+						currentTargetEntity = targetEntities.get(random.nextInt(targetEntities.size()));
 					
 					dragonPhase = random.nextInt(5);
 				}
 				
-				if (currentTargetEntity == null)
-					return;
-				
-				switch (dragonPhase) {
-				case 0:
-					dragonHoldingPattern(currentTargetEntity.getLocation());
-					break;
-				case 1:
-					if (currentTargetEntity instanceof EntityLiving)
-						dragonStrafePlayer((EntityLiving) currentTargetEntity);
-					break;
-				case 2:
-					dragonChargingPlayer(currentTargetEntity.getLocation());
-					break;
-				case 3:
-					dragonLandingApproach(currentTargetEntity.getLocation());
-					break;
-				case 4:
-					dragonLanding(currentTargetEntity.getLocation());
-					break;
+				if (currentTargetEntity == null) {
+					dragonHoldingPattern(spawnLoc);
+				} else {
+					switch (dragonPhase) {
+					case 0:
+						dragonHoldingPattern(currentTargetEntity.getLocation());
+						break;
+					case 1:
+						if (currentTargetEntity instanceof EntityLiving)
+							dragonStrafePlayer((EntityLiving) currentTargetEntity);
+						break;
+					case 2:
+						dragonChargingPlayer(currentTargetEntity.getLocation());
+						break;
+					case 3:
+						dragonLandingApproach(currentTargetEntity.getLocation());
+						break;
+					case 4:
+						dragonLanding(currentTargetEntity.getLocation());
+						break;
+					}
 				}
 				
 				dragon.tick();

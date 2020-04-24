@@ -301,8 +301,10 @@ public class GameLogic implements Listener {
 		player.teleport(MainConfig.getInstance().getMainLobby());
 		removePlayerListeners(player);
 		
-		for (EnderDragonController enderDragonController : enderDragonControllers)
+		for (EnderDragonController enderDragonController : enderDragonControllers) {
 			enderDragonController.removeViewer(player);
+			enderDragonController.removeTargetEntity(player);
+		}
 		
 		checkGameOver();
 	}
@@ -584,6 +586,10 @@ public class GameLogic implements Listener {
 					
 					Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), () -> {
 						player.spigot().respawn();
+						
+						for (EnderDragonController enderDragonController : enderDragonControllers)
+							enderDragonController.removeTargetEntity(player);
+						
 						joinSpectator(player);
 					}, 1L);
 				}
