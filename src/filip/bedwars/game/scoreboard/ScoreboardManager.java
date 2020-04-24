@@ -41,7 +41,7 @@ public class ScoreboardManager {
 		Objective objective = scoreboard.registerNewObjective("bw_scoreboard", "bbb", scoreboardTitle);
 		objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 		
-		int lineCount = 5 + game.getTeams().size();
+		int lineCount = 4 + game.getTeams().size();
 		
 		String scoreboardGamestate = MessagesConfig.getInstance().getStringValue(p.getLocale(), "scoreboard-state");
 		
@@ -51,18 +51,9 @@ public class ScoreboardManager {
 		}
 		
 		objective.getScore(" ").setScore(lineCount--);
-		objective.getScore(scoreboardGamestate.replace("%gamestate%", "keine")).setScore(lineCount--);
-		objective.getScore("0:00").setScore(lineCount--);
+		objective.getScore(scoreboardGamestate.replace("%gamestate%", gameLogic.getGameState().getName())).setScore(lineCount--);
+		objective.getScore("§a" + gameLogic.getGameState().getCountdown().getSecondsLeft()).setScore(lineCount--);
 		objective.getScore("  ").setScore(lineCount--);
-		
-		String scoreboardTeams = MessagesConfig.getInstance().getStringValue(p.getLocale(), "scoreboard-teams");
-		
-		if(scoreboardTeams == null) {
-			scoreboardTeams = "Teams:";
-			MessageSender.sendWarning("scoreboard-teams in messages.yml for language " + p.getLocale() + " was null! Setting a default value for it...");
-		}
-		
-		objective.getScore(scoreboardTeams).setScore(lineCount--);
 		
 		for (Team team : game.getTeams()) {
 			int teamMemberCount = team.getMembers().size();

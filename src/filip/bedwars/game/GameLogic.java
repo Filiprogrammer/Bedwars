@@ -323,6 +323,10 @@ public class GameLogic implements Listener {
 		return gameWorld;
 	}
 	
+	public GameState getGameState() {
+		return gameState;
+	}
+	
 	public void cleanup() {
 		gameTicker.cancel();
 		

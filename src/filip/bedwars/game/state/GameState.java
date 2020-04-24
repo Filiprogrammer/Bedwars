@@ -39,6 +39,8 @@ public class GameState {
 							MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), countdownMsgKey).replace("%minutes%", "" + (getSecondsLeft() / 60)));
 					}
 				}
+				
+				gameLogic.scoreboardManager.update();
 			}
 			
 			@Override
