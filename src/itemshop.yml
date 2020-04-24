@@ -3,21 +3,21 @@ categories:
   material: WHITE_WOOL
   shopentries:
   - priceMaterial: BRICK
-    priceCount: 2
+    priceCount: 3
     item:
       ==: org.bukkit.inventory.ItemStack
       v: 1976
       type: WHITE_WOOL
       amount: 4
   - priceMaterial: IRON_INGOT
-    priceCount: 1
+    priceCount: 4
     item:
       ==: org.bukkit.inventory.ItemStack
       v: 1976
       type: END_STONE
       amount: 4
   - priceMaterial: IRON_INGOT
-    priceCount: 2
+    priceCount: 4
     item:
       ==: org.bukkit.inventory.ItemStack
       v: 1976
@@ -28,7 +28,7 @@ categories:
     item:
       ==: org.bukkit.inventory.ItemStack
       v: 1976
-      type: WHITE_STAINED_GLASS
+      type: GLASS
       amount: 2
 - name: '&aWeapons'
   material: GOLDEN_SWORD
@@ -44,7 +44,7 @@ categories:
         meta-type: UNSPECIFIC
         enchants:
           KNOCKBACK: 2
-        display-name: 'Â§bKnockback Stick'
+        display-name: '§bKnockback Stick'
   - priceMaterial: IRON_INGOT
     priceCount: 3
     item:
@@ -56,7 +56,7 @@ categories:
         meta-type: UNSPECIFIC
         enchants:
           DAMAGE_ALL: 1
-        display-name: 'Â§aLvl.1 Sword'
+        display-name: '§aLvl.1 Sword'
         Unbreakable: true
   - priceMaterial: IRON_INGOT
     priceCount: 6
@@ -69,7 +69,7 @@ categories:
         meta-type: UNSPECIFIC
         enchants:
           DAMAGE_ALL: 3
-        display-name: 'Â§aLvl.2 Sword'
+        display-name: '§aLvl.2 Sword'
         Unbreakable: true
   - priceMaterial: IRON_INGOT
     priceCount: 12
@@ -82,7 +82,7 @@ categories:
         meta-type: UNSPECIFIC
         enchants:
           DAMAGE_ALL: 4
-        display-name: 'Â§aLvl.3 Sword'
+        display-name: '§aLvl.3 Sword'
         Unbreakable: true
   - priceMaterial: GOLD_INGOT
     priceCount: 10
@@ -95,10 +95,10 @@ categories:
         meta-type: UNSPECIFIC
         enchants:
           DAMAGE_ALL: 3
-        display-name: 'Â§aLvl.4 Sword'
+        display-name: '§aLvl.4 Sword'
         Unbreakable: true
   - priceMaterial: EMERALD
-    priceCount: 12
+    priceCount: 11
     item:
       ==: org.bukkit.inventory.ItemStack
       v: 1976
@@ -109,13 +109,13 @@ categories:
         enchants:
           DAMAGE_ALL: 2
           FIRE_ASPECT: 1
-        display-name: 'Â§aLvl.5 Sword'
+        display-name: '§aLvl.5 Sword'
         Unbreakable: true
 - name: '&aBows'
   material: BOW
   shopentries:
   - priceMaterial: GOLD_INGOT
-    priceCount: 12
+    priceCount: 8
     item:
       ==: org.bukkit.inventory.ItemStack
       v: 1976
@@ -125,10 +125,10 @@ categories:
         meta-type: UNSPECIFIC
         enchants:
           ARROW_DAMAGE: 1
-        display-name: 'Â§aLvl.1 Bow'
-      damage: 374
+        display-name: '§aLvl.1 Bow'
+        Damage: 374
   - priceMaterial: GOLD_INGOT
-    priceCount: 25
+    priceCount: 16
     item:
       ==: org.bukkit.inventory.ItemStack
       v: 1976
@@ -138,10 +138,10 @@ categories:
         meta-type: UNSPECIFIC
         enchants:
           ARROW_DAMAGE: 3
-        display-name: 'Â§aLvl.2 Bow'
-      damage: 359
+        display-name: '§aLvl.2 Bow'
+        Damage: 359
   - priceMaterial: EMERALD
-    priceCount: 14
+    priceCount: 10
     item:
       ==: org.bukkit.inventory.ItemStack
       v: 1976
@@ -152,10 +152,10 @@ categories:
         enchants:
           ARROW_DAMAGE: 3
           ARROW_FIRE: 1
-        display-name: 'Â§aLvl.3 Bow'
-      damage: 344
+        display-name: '§aLvl.3 Bow'
+        Damage: 344
   - priceMaterial: EMERALD
-    priceCount: 32
+    priceCount: 24
     item:
       ==: org.bukkit.inventory.ItemStack
       v: 1976
@@ -167,15 +167,54 @@ categories:
           ARROW_DAMAGE: 4
           ARROW_FIRE: 2
           ARROW_KNOCKBACK: 1
-        display-name: 'Â§aLvl.4 Bow'
-      damage: 339
+        display-name: '§aLvl.4 Bow'
+        Damage: 339
   - priceMaterial: GOLD_INGOT
-    priceCount: 2
+    priceCount: 1
     item:
       ==: org.bukkit.inventory.ItemStack
       v: 1976
       type: ARROW
       amount: 2
+- name: '&aArmor'
+  material: CHAINMAIL_CHESTPLATE
+  shopentries:
+  - priceMaterial: IRON_INGOT
+    priceCount: 5
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      v: 1976
+      type: LEATHER_CHESTPLATE
+      meta:
+        ==: ItemMeta
+        meta-type: UNSPECIFIC
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 1
+        display-name: '§aLvl.1 Armor'
+  - priceMaterial: GOLD_INGOT
+    priceCount: 8
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      v: 1976
+      type: IRON_CHESTPLATE
+      meta:
+        ==: ItemMeta
+        meta-type: UNSPECIFIC
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 2
+        display-name: '§aLvl.2 Armor'
+  - priceMaterial: EMERALD
+    priceCount: 7
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      v: 1976
+      type: DIAMOND_CHESTPLATE
+      meta:
+        ==: ItemMeta
+        meta-type: UNSPECIFIC
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 2
+        display-name: '§aLvl.3 Armor'
 - name: '&aTools'
   material: IRON_PICKAXE
   shopentries:
@@ -191,7 +230,7 @@ categories:
         meta-type: UNSPECIFIC
         enchants:
           DIG_SPEED: 1
-        display-name: 'Â§aLvl.1 Pickaxe'
+        display-name: '§aLvl.1 Pickaxe'
         Unbreakable: true
   - priceMaterial: IRON_INGOT
     priceCount: 10
@@ -205,7 +244,7 @@ categories:
         meta-type: UNSPECIFIC
         enchants:
           DIG_SPEED: 2
-        display-name: 'Â§aLvl.2 Pickaxe'
+        display-name: '§aLvl.2 Pickaxe'
         Unbreakable: true
   - priceMaterial: GOLD_INGOT
     priceCount: 10
@@ -219,24 +258,24 @@ categories:
         meta-type: UNSPECIFIC
         enchants:
           DIG_SPEED: 2
-        display-name: 'Â§aLvl.3 Pickaxe'
+        display-name: '§aLvl.3 Pickaxe'
         Unbreakable: true
-  - priceMaterial: IRON_INGOT
-    priceCount: 12
+  - priceMaterial: GOLD_INGOT
+    priceCount: 8
     item:
       ==: org.bukkit.inventory.ItemStack
       v: 1976
-      type: STONE_AXE
+      type: IRON_AXE
       amount: 1
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
         enchants:
-          DIG_SPEED: 2
-        display-name: 'Â§aLvl.1 Axe'
+          DIG_SPEED: 1
+        display-name: '§aLvl.1 Axe'
         Unbreakable: true
-  - priceMaterial: IRON_INGOT
-    priceCount: 12
+  - priceMaterial: GOLD_INGOT
+    priceCount: 3
     item:
       ==: org.bukkit.inventory.ItemStack
       v: 1976
@@ -245,7 +284,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: 'Â§aLvl.1 Shears'
+        display-name: '§aLvl.1 Shears'
         Unbreakable: true
 - name: '&aSpecials'
   material: FIREWORK_ROCKET
@@ -260,19 +299,29 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: 'Â§4TÂ§fNÂ§4T'
-  - priceMaterial: DIAMOND
-    priceCount: 10
+        display-name: '§4T§fN§4T'
+  - priceMaterial: EMERALD
+    priceCount: 4
     item:
       ==: org.bukkit.inventory.ItemStack
       v: 1976
-      type: WHITE_STAINED_GLASS
-      amount: 4
-      damage: 384
+      type: ENDER_PEARL
+      amount: 1
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
+        display-name: '§2Enderpearl'
+  - priceMaterial: EMERALD
+    priceCount: 30
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      v: 1976
+      type: ELYTRA
+      amount: 1
+      meta:
+        ==: ItemMeta
+        meta-type: UNSPECIFIC
+        Damage: 416
         enchants:
-          PROTECTION_ENVIRONMENTAL: 4
-        display-name: 'Geiler Brustpanzer zum testen'
-        Unbreakable: true
+          PROTECTION_PROJECTILE: 2
+        display-name: '§6ELYTRA'

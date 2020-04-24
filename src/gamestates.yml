@@ -25,13 +25,30 @@
 
 gamestates:
 - name: 'Start-Phase'
-  duration-seconds: 70
+  duration-seconds: 125
   countdown-message: 'spawner-will-be-faster'
   countdown-message-one-minute: 'spawner-will-be-faster-one'
   actions-start: []
   actions-end: []
-- name: 'Spawner-Plus'
-  duration-seconds: 130
+- name: 'Spawner+'
+  duration-seconds: 180
+  countdown-message: 'spawner-will-be-faster'
+  countdown-message-one-minute: 'spawner-will-be-faster-one'
+  actions-start:
+  - action: PLAY_SOUND
+    sound: 'success'
+    include-spectators: true
+  - action: SPAWNER_CHANGE
+    name: '&6Bronze'
+    ticksPerSpawn-multiplier: 0.9
+    alert: CHAT
+  - action: SPAWNER_CHANGE
+    name: '&r&fIron'
+    ticksPerSpawn-multiplier: 0.9
+    alert: CHAT
+  actions-end: []
+- name: 'Ultra-Spawner'
+  duration-seconds: 220
   countdown-message: 'beds-gone-in'
   countdown-message-one-minute: 'beds-gone-in-one'
   actions-start:
@@ -39,30 +56,30 @@ gamestates:
     sound: 'success'
     include-spectators: true
   - action: SPAWNER_CHANGE
-    name: '&6Bronze'
-    ticksPerSpawn-multiplier: 0.75
+    name: '&eGold'
+    ticksPerSpawn-multiplier: 0.85
     alert: CHAT
   - action: SPAWNER_CHANGE
-    name: '&r&fIron'
-    ticksPerSpawn-multiplier: 0.75
+    name: '&2Emerald'
+    ticksPerSpawn-multiplier: 0.85
     alert: CHAT
   actions-end: []
 - name: 'Beds gone'
-  duration-seconds: 130
+  duration-seconds: 160
   countdown-message: 'dragons-will-spawn'
   countdown-message-one-minute: 'dragons-will-spawn-one'
   actions-start:
   - action: DESTROY_BEDS
   actions-end: []
 - name: 'Dragon-Battle'
-  duration-seconds: 130
+  duration-seconds: 160
   countdown-message: 'end-battle-in'
   countdown-message-one-minute: 'end-battle-in-one'
   actions-start:
   - action: SUMMON_DRAGONS
   actions-end: []
 - name: 'Decrease Health'
-  duration-seconds: 130
+  duration-seconds: 240
   countdown-message: 'game-ends-in'
   countdown-message-one-minute: 'game-ends-in-one'
   actions-start:
@@ -72,4 +89,4 @@ gamestates:
   - action: SET_MAX_HEALTH
     max-health: 6
   actions-end: []
-#no action because after the last gamestate the game automatically ends
+# no action because the game ends automatically after the last gamestate

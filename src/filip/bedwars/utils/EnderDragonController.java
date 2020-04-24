@@ -1,8 +1,10 @@
 package filip.bedwars.utils;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -34,7 +36,7 @@ import net.minecraft.server.v1_14_R1.WorldServer;
 public class EnderDragonController {
 
 	private final List<Entity> targetEntities;
-	private final Set<Player> viewers;
+	private final Map<Player, Boolean> viewers = new HashMap<>();
 	private BukkitTask task;
 	private BukkitRunnable bukkitRunnable;
 	private EntityEnderDragon dragon;
@@ -46,7 +48,10 @@ public class EnderDragonController {
 	
 	public EnderDragonController(Location loc, List<Entity> targetEntities, Set<Player> viewers) {
 		this.targetEntities = targetEntities;
-		this.viewers = viewers;
+		
+		for (Player viewer : viewers)
+			this.viewers.put(viewer, true);
+		
 		this.spawnLoc = loc;
 		spawn(loc);
 		runTask();
@@ -61,11 +66,14 @@ public class EnderDragonController {
 	}
 	
 	public void addViewer(Player viewer) {
-		viewers.add(viewer);
+		viewers.put(viewer, true);
 		respawn(viewer);
 	}
 	
 	public boolean removeViewer(Player viewer) {
+		if (spawnLoc.getWorld().getName().equals(viewer.getWorld().getName()))
+			despawn(viewer);
+		
 		return viewers.remove(viewer);
 	}
 	
@@ -162,11 +170,11 @@ public class EnderDragonController {
 		dragon = new EntityEnderDragon(EntityTypes.ENDER_DRAGON, worldServer);
 		dragon.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
 		
-		respawn(viewers.toArray(new Player[0]));
+		respawn(viewers.keySet().toArray(new Player[0]));
 	}
 	
 	private void updateLocation() {
-		Iterator<Player> iter = viewers.iterator();
+		Iterator<Player> iter = viewers.keySet().iterator();
 		
 		while (iter.hasNext()) {
 			Player p = iter.next();
@@ -174,6 +182,20 @@ public class EnderDragonController {
 			if (!p.getWorld().getName().equals(dragon.getWorld().getWorld().getName())) {
 				iter.remove();
 				continue;
+			}
+			
+			double dist = p.getLocation().distance(new Location(dragon.getWorld().getWorld(), dragon.locX, dragon.locY, dragon.locZ));
+			
+			if (viewers.get(p)) {
+				if (dist > p.getClientViewDistance() * 16) {
+					despawn(p);
+					viewers.put(p, false);
+				}
+			} else {
+				if (dist < p.getClientViewDistance() * 16) {
+					respawn(p);
+					viewers.put(p, true);
+				}
 			}
 			
 			EntityPlayer entityPlayer = ((CraftPlayer) p).getHandle();
