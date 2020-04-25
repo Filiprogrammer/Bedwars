@@ -57,6 +57,8 @@ public class Game implements Listener {
 		if (players.size() < arena.getMinPlayersToStart())
 			return false; // Not enough players
 		
+		lobby.cleanup();
+		
 		// Assign players who didn't choose a team to a team automatically.
 		assignLonelyPlayersToTeamsAutomatically();
 		

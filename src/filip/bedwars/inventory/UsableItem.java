@@ -26,7 +26,7 @@ public abstract class UsableItem implements IUsable {
 
 	@Override
 	public boolean matches(ItemStack itemStack, Player player) {
-		return this.itemStack.getItemMeta().getDisplayName().equals(itemStack.getItemMeta().getDisplayName());
+		return this.itemStack.getItemMeta().getDisplayName().equals(itemStack.getItemMeta().getDisplayName()) && (this.player == player);
 	}
 
 }
