@@ -56,6 +56,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.destroystokyo.paper.Title;
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
+import com.mojang.authlib.GameProfile;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.config.GameStatesConfig;
@@ -84,6 +85,8 @@ import filip.bedwars.utils.TeamColorConverter;
 import filip.bedwars.utils.VillagerNPC;
 import filip.bedwars.world.GameWorld;
 import filip.bedwars.world.GameWorldManager;
+import net.minecraft.server.v1_14_R1.PacketPlayOutPlayerInfo.EnumPlayerInfoAction;
+import net.minecraft.server.v1_14_R1.PacketPlayOutPlayerInfo.PlayerInfoData;
 
 public class GameLogic implements Listener {
 
@@ -172,20 +175,48 @@ public class GameLogic implements Listener {
 		
 		packetListener = new IPacketListener() {
 			public boolean writePacket(Object packet, Player player) {
-				if (packet.getClass().getSimpleName().equals("PacketPlayOutNamedEntitySpawn")) {
-					List<UUID> syncPlayersList = game.getPlayers();
-					synchronized (syncPlayersList) {
-						for (UUID uuid : syncPlayersList) {
-							Player p = Bukkit.getPlayer(uuid);
-							try {
-								Field aField = packet.getClass().getDeclaredField("a");
-								aField.setAccessible(true);
-								if (p.getEntityId() == aField.getInt(packet))
-									return true;
-							} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-								e.printStackTrace();
-							}
+				if (packet.getClass().getSimpleName().equals("PacketPlayOutNamedEntitySpawn")
+				 || packet.getClass().getSimpleName().equals("PacketPlayOutEntityMetadata")
+				 || packet.getClass().getSimpleName().equals("PacketPlayOutUpdateAttributes")
+				 || packet.getClass().getSimpleName().equals("PacketPlayOutEntityEquipment")
+				 || packet.getClass().getSimpleName().equals("PacketPlayOutEntityHeadRotation")) {
+					int a = -1;
+					try {
+						Field aField = packet.getClass().getDeclaredField("a");
+						aField.setAccessible(true);
+						a = aField.getInt(packet);
+					} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+						e.printStackTrace();
+					}
+					
+					for (Player p : gameWorld.getWorld().getPlayers())
+						if (p.getEntityId() == a && !game.getPlayers().contains(p.getUniqueId()))
+							return false;
+					
+					return true;
+				}
+				
+				if (packet.getClass().getSimpleName().equals("PacketPlayOutPlayerInfo")) {
+					try {
+						Field aField = packet.getClass().getDeclaredField("a");
+						aField.setAccessible(true);
+						EnumPlayerInfoAction a = (EnumPlayerInfoAction) aField.get(packet);
+						
+						if (a == EnumPlayerInfoAction.REMOVE_PLAYER)
+							return true;
+						
+						Field bField = packet.getClass().getDeclaredField("b");
+						bField.setAccessible(true);
+						List<PlayerInfoData> b = (List<PlayerInfoData>) bField.get(packet);
+						
+						for (PlayerInfoData playerInfoData : b) {
+							GameProfile gameProfile = playerInfoData.a();
+							
+							if (game.getPlayers().contains(gameProfile.getId()))
+								return true;
 						}
+					} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+						e.printStackTrace();
 					}
 					
 					return false;
@@ -649,6 +680,9 @@ public class GameLogic implements Listener {
 					}
 					
 					checkGameOver();
+					
+					for (UUID uuid : game.getPlayers())
+						PlayerUtils.hidePlayer(player, Bukkit.getPlayer(uuid));
 					
 					Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), () -> {
 						player.spigot().respawn();

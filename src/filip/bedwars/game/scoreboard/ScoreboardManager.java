@@ -1,5 +1,7 @@
 package filip.bedwars.game.scoreboard;
 
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -63,6 +65,12 @@ public class ScoreboardManager {
 		objective.getScore("  ").setScore(lineCount--);
 		
 		for (Team team : game.getTeams()) {
+			org.bukkit.scoreboard.Team scoreboardTeam = scoreboard.registerNewTeam("" + team.getId());
+			scoreboardTeam.setPrefix(TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale()) + " §7|§r ");
+			
+			for (UUID uuid : team.getMembers())
+				scoreboardTeam.addEntry(Bukkit.getPlayer(uuid).getName());
+			
 			int teamMemberCount = team.getMembers().size();
 			String msgKey = null;
 			
@@ -71,10 +79,15 @@ public class ScoreboardManager {
 			else
 				msgKey = "scoreboard-team-has-no-bed";
 			
+			String youStr = "";
+			
+			if (team.containsMember(p.getUniqueId()))
+				youStr = " " + MessagesConfig.getInstance().getStringValue(p.getLocale(), "scoreboard-you");
+			
 			objective.getScore(
 					MessagesConfig.getInstance().getStringValue(p.getLocale(), msgKey)
 							.replace("%team%", TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale()))
-							.replace("%membercount%", "" + teamMemberCount))
+							.replace("%membercount%", "" + teamMemberCount) + youStr)
 			.setScore(lineCount--);
 		}
 		
@@ -82,7 +95,7 @@ public class ScoreboardManager {
 	}
 	
 	public void reset(Player p) {
-		p.getScoreboard().clearSlot(DisplaySlot.SIDEBAR);
+		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 	}
 	
 }
