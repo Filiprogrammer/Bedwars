@@ -131,6 +131,8 @@ public class Lobby {
 			if (!game.getPlayers().contains(p.getUniqueId())) {
 				PlayerUtils.hidePlayerEntity(p, player);
 				PlayerUtils.hidePlayerEntity(player, p);
+				PlayerUtils.hidePlayer(p, player);
+				PlayerUtils.hidePlayer(player, p);
 			}
 		}
 		

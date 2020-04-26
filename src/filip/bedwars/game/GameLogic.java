@@ -48,6 +48,8 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -795,6 +797,12 @@ public class GameLogic implements Listener {
 	public void onPrepareAnvil(PrepareAnvilEvent event) {
 		if (event.getView().getPlayer().getWorld().getName().equals(gameWorld.getWorld().getName()))
 			event.setResult(null);
+	}
+	
+	@EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+		if (event.getPlayer().getWorld().getName().equals(gameWorld.getWorld().getName()) && event.getCause().equals(TeleportCause.SPECTATE))
+			event.setCancelled(true);
 	}
 	
 	private void removePlayerListeners(Player player) {
