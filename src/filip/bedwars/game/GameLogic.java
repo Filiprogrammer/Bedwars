@@ -8,6 +8,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -15,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.Entity;
@@ -26,6 +28,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -36,6 +39,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -44,6 +49,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -56,11 +62,13 @@ import filip.bedwars.config.GameStatesConfig;
 import filip.bedwars.config.ItemShopConfig;
 import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
+import filip.bedwars.config.SpawnerConfig;
 import filip.bedwars.config.TeamShopConfig;
 import filip.bedwars.game.action.Action;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.arena.Spawner;
+import filip.bedwars.game.arena.SpawnerType;
 import filip.bedwars.game.scoreboard.ScoreboardManager;
 import filip.bedwars.game.state.GameState;
 import filip.bedwars.game.state.GameStateSetting;
@@ -202,6 +210,11 @@ public class GameLogic implements Listener {
 				BedwarsPlugin.getInstance().addPacketListener(player, packetListener);
 				// Teleport player to the spawnpoint of their base
 				teleportToSpawn(player);
+				
+				if (!MainConfig.getInstance().getAttackCooldown())
+					// Disable attack cooldown
+					player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(20);
+				
 				// Notify the player that the game has started.
 				MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "game-started"));
 				SoundPlayer.playSound("game-started", player);
@@ -568,6 +581,28 @@ public class GameLogic implements Listener {
 			event.setDeathMessage(null);
 			Team team = game.getTeamOfPlayer(player.getUniqueId());
 			
+			if (MainConfig.getInstance().getDropOnlySpawnerResourcesOnDeath()) {
+				// Only drop spawner resources
+				Iterator<ItemStack> iter = event.getDrops().iterator();
+				
+				while (iter.hasNext()) {
+					ItemStack itemStack = iter.next();
+					boolean removeItem = true;
+					
+					for (SpawnerType spawnerType : SpawnerConfig.getInstance().getSpawnerTypes()) {
+						if (itemStack.getType() == spawnerType.getMaterial() && itemStack.hasItemMeta()) {
+							ItemMeta itemMeta = itemStack.getItemMeta();
+							
+							if (itemMeta.hasDisplayName() && itemMeta.getDisplayName().equals(spawnerType.getName()))
+								removeItem = false;
+						}
+					}
+					
+					if (removeItem)
+						iter.remove();
+				}
+			}
+			
 			if (team != null) {
 				EntityDamageEvent entityDamageEvent = player.getLastDamageCause();
 				
@@ -576,12 +611,16 @@ public class GameLogic implements Listener {
 						Player killer = player.getKiller();
 						
 						if (killer != null) {
-							for (ItemStack itemStack : player.getInventory().getContents()) {
+							Iterator<ItemStack> iter = event.getDrops().iterator();
+							
+							while (iter.hasNext()) {
+								ItemStack itemStack = iter.next();
+								
 								if (itemStack == null)
 									continue;
 								
 								if (!event.getItemsToKeep().contains(itemStack)) {
-									event.getDrops().remove(itemStack);
+									iter.remove();
 									HashMap<Integer, ItemStack> didNotFit = killer.getInventory().addItem(itemStack);
 									
 									for (ItemStack is : didNotFit.values())
@@ -704,6 +743,24 @@ public class GameLogic implements Listener {
 			if (entity.getType() == EntityType.ITEM_FRAME)
 				event.setCancelled(true);
 		}
+	}
+	
+	@EventHandler
+	public void onPrepareItemCraft(PrepareItemCraftEvent event) {
+		if (event.getView().getPlayer().getWorld().getName().equals(gameWorld.getWorld().getName()))
+			event.getInventory().setResult(null);
+	}
+	
+	@EventHandler
+	public void onEnchantItem(EnchantItemEvent event) {
+		if (event.getEnchanter().getWorld().getName().equals(gameWorld.getWorld().getName()))
+			event.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onPrepareAnvil(PrepareAnvilEvent event) {
+		if (event.getView().getPlayer().getWorld().getName().equals(gameWorld.getWorld().getName()))
+			event.setResult(null);
 	}
 	
 	private void removePlayerListeners(Player player) {

@@ -165,25 +165,31 @@ public class Lobby {
 					return;
 				
 				UUID puuid = p.getUniqueId();
-				Team previousTeam = game.getTeamOfPlayer(puuid);
-				
-				if (previousTeam != null)
-					previousTeam.removeMember(puuid);
-				
 				Team newTeam = game.getTeams().get(slot);
-				newTeam.addMember(puuid);
-				event.getView().close();
-				MessageSender.sendMessage(p,
-						MessagesConfig.getInstance().getStringValue(p.getLocale(), "team-changed")
-						.replace("%teamcolor%", TeamColorConverter.convertTeamColorToStringForMessages(newTeam.getBase().getTeamColor(), p.getLocale())));
 				
-				for (ItemStack itemStack : inventory.getContents()) {
-					if (itemStack != null)
-						itemStack.removeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL);
+				if (newTeam.getMembers().size() < game.getArena().getPlayersPerTeam()) {
+					Team previousTeam = game.getTeamOfPlayer(puuid);
+					
+					if (previousTeam != null)
+						previousTeam.removeMember(puuid);
+					
+					newTeam.addMember(puuid);
+					event.getView().close();
+					MessageSender.sendMessage(p,
+							MessagesConfig.getInstance().getStringValue(p.getLocale(), "team-changed")
+							.replace("%teamcolor%", TeamColorConverter.convertTeamColorToStringForMessages(newTeam.getBase().getTeamColor(), p.getLocale())));
+					
+					for (ItemStack itemStack : inventory.getContents()) {
+						if (itemStack != null)
+							itemStack.removeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL);
+					}
+					
+					event.getCurrentItem().addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+					updateTeamSelectorLores();
+				} else {
+					MessageSender.sendMessage(p, "The team is full");
+					SoundPlayer.playSound("error", p);
 				}
-				
-				event.getCurrentItem().addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
-				updateTeamSelectorLores();
 			}
 		};
 		

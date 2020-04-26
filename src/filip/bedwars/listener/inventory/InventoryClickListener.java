@@ -17,16 +17,21 @@ public class InventoryClickListener implements Listener {
 	}
 	
 	@EventHandler
-    private void onClick(InventoryClickEvent event) {
+	private void onClick(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 
-        if (event.getClickedInventory() != null) {
-            IClickable clickable = BedwarsPlugin.getInstance().getClickable(event.getClickedInventory(), player);
-            if (clickable != null) {
-                clickable.click(event);
-                event.setCancelled(true);
-            }
-        }
+		if (event.getClickedInventory() != null) {
+			IClickable clickable = BedwarsPlugin.getInstance().getClickable(event.getView().getTopInventory(), player);
+
+			if (clickable != null) {
+				if (clickable.matches(event.getClickedInventory(), player)) {
+					clickable.click(event);
+					event.setCancelled(true);
+				} else if (event.isShiftClick()) {
+					event.setCancelled(true);
+				}
+			}
+	    }
 	}
 	
 	@EventHandler

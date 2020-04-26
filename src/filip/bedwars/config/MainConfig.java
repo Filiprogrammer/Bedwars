@@ -22,6 +22,8 @@ public class MainConfig extends SingleConfig {
 	private String teamShopName = "§1Team Shop";
 	private String baseSpawnPointName = "§dSpawn-Point";
 	private String[] joinSignLines = new String[4];
+	private boolean dropOnlySpawnerResourcesOnDeath = true;
+	private boolean attackCooldown = false;
 	
 	protected MainConfig() {
 		super("config.yml");
@@ -71,6 +73,14 @@ public class MainConfig extends SingleConfig {
 		return joinSignLines[line];
 	}
 	
+	public boolean getDropOnlySpawnerResourcesOnDeath() {
+		return dropOnlySpawnerResourcesOnDeath;
+	}
+	
+	public boolean getAttackCooldown() {
+		return attackCooldown;
+	}
+	
 	public void setMainLobby(Location loc) {
 		mainLobby = loc;
 	}
@@ -86,15 +96,16 @@ public class MainConfig extends SingleConfig {
 		config.set("language", language);
 		config.set("game-lobby-countdown", gameLobbyCountdown);
 		config.set("game-world-prefix", gameWorldPrefix);
-		config.set("hunger", hunger);
 		config.set("item-shop-name", itemShopName.replace('§', '&'));
 		config.set("team-shop-name", teamShopName.replace('§', '&'));
 		config.set("base-spawn-point-name", baseSpawnPointName.replace('§', '&'));
-		
 		config.set("join-sign-line-one", joinSignLines[0].replace('§', '&'));
 		config.set("join-sign-line-two", joinSignLines[1].replace('§', '&'));
 		config.set("join-sign-line-three", joinSignLines[2].replace('§', '&'));
 		config.set("join-sign-line-four", joinSignLines[3].replace('§', '&'));
+		config.set("hunger", hunger);
+		config.set("drop-only-spawner-resources-on-death", dropOnlySpawnerResourcesOnDeath);
+		config.set("attack-cooldown", attackCooldown);
 		
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
 		
@@ -136,15 +147,16 @@ public class MainConfig extends SingleConfig {
 		language = config.getString("language", "en_us");
 		gameLobbyCountdown = config.getInt("game-lobby-countdown", 60);
 		gameWorldPrefix = config.getString("game-world-prefix", "bw_game_").replace("/", "").replace("\\", "");
-		hunger = config.getBoolean("hunger", false);
 		itemShopName = config.getString("item-shop-name", "&2Item Shop").replace('&', '§');
 		teamShopName = config.getString("team-shop-name", "&1Team Shop").replace('&', '§');
 		baseSpawnPointName = config.getString("base-spawn-point-name", "&dSpawn-Point").replace('&', '§');
-		
 		joinSignLines[0] = config.getString("join-sign-line-one", "&a[BedWars]").replace('&', '§');
 		joinSignLines[1] = config.getString("join-sign-line-two", "&d%arenaname%").replace('&', '§');
 		joinSignLines[2] = config.getString("join-sign-line-three", "").replace('&', '§');
 		joinSignLines[3] = config.getString("join-sign-line-four", "&b<Join Arena>").replace('&', '§');
+		hunger = config.getBoolean("hunger", false);
+		dropOnlySpawnerResourcesOnDeath = config.getBoolean("drop-only-spawner-resources-on-death", true);
+		hunger = config.getBoolean("attack-cooldown", false);
 		
 		if (itemShopName.length() > 16) {
 			MessageSender.sendWarning("item-shop-name must not be longer than 16 characters. Check your config.yml!");

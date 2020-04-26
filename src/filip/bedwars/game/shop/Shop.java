@@ -70,7 +70,12 @@ public class Shop {
 			return shopCategoryIndex;
 		
 		ShopCategory category = categories[shopCategoryIndex];
-		ShopEntry entry = category.getShopEntry(event.getSlot() - 18);
+		ShopEntry entry;
+		
+		if (event.getSlot() >= 27)
+			entry = category.getShopEntry(event.getSlot() - 27);
+		else
+			entry = category.getShopEntry(event.getSlot() - 18);
 		
 		if (entry == null)
 			return shopCategoryIndex;
