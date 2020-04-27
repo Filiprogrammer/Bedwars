@@ -363,6 +363,7 @@ public class GameLogic implements Listener {
 		}
 		
 		scoreboardManager.update();
+		scoreboardManager.reset(player);
 		
 		checkGameOver();
 	}

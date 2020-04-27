@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
@@ -185,14 +186,15 @@ public class EnderDragonController {
 			}
 			
 			double dist = p.getLocation().distance(new Location(dragon.getWorld().getWorld(), dragon.locX, dragon.locY, dragon.locZ));
+			int viewDistance = Math.min(Bukkit.getServer().getViewDistance(), p.getClientViewDistance());
 			
 			if (viewers.get(p)) {
-				if (dist > p.getClientViewDistance() * 16) {
+				if (dist > viewDistance * 16) {
 					despawn(p);
 					viewers.put(p, false);
 				}
 			} else {
-				if (dist < p.getClientViewDistance() * 16) {
+				if (dist < viewDistance * 16) {
 					respawn(p);
 					viewers.put(p, true);
 				}
