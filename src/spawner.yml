@@ -1,10 +1,10 @@
 spawner:
 - name: '&6Bronze'
   material: BRICK
-  defaultTicksPerSpawn: 30
-- name: '&r&fIron'
+  defaultTicksPerSpawn: 20
+- name: '&rIron'
   material: IRON_INGOT
-  defaultTicksPerSpawn: 120
+  defaultTicksPerSpawn: 140
 - name: '&eGold'
   material: GOLD_INGOT
   defaultTicksPerSpawn: 560
@@ -13,4 +13,4 @@ spawner:
   defaultTicksPerSpawn: 400
 - name: '&2Emerald'
   material: EMERALD
-  defaultTicksPerSpawn: 760
+  defaultTicksPerSpawn: 700

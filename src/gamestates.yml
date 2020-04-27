@@ -25,13 +25,13 @@
 
 gamestates:
 - name: 'Start-Phase'
-  duration-seconds: 125
+  duration-seconds: 190
   countdown-message: 'spawner-will-be-faster'
   countdown-message-one-minute: 'spawner-will-be-faster-one'
   actions-start: []
   actions-end: []
 - name: 'Spawner+'
-  duration-seconds: 180
+  duration-seconds: 280
   countdown-message: 'spawner-will-be-faster'
   countdown-message-one-minute: 'spawner-will-be-faster-one'
   actions-start:
@@ -40,15 +40,15 @@ gamestates:
     include-spectators: true
   - action: SPAWNER_CHANGE
     name: '&6Bronze'
-    ticksPerSpawn-multiplier: 0.9
+    ticksPerSpawn-multiplier: 0.85
     alert: CHAT
   - action: SPAWNER_CHANGE
-    name: '&r&fIron'
+    name: '&rIron'
     ticksPerSpawn-multiplier: 0.9
     alert: CHAT
   actions-end: []
 - name: 'Ultra-Spawner'
-  duration-seconds: 220
+  duration-seconds: 300
   countdown-message: 'beds-gone-in'
   countdown-message-one-minute: 'beds-gone-in-one'
   actions-start:
@@ -57,29 +57,29 @@ gamestates:
     include-spectators: true
   - action: SPAWNER_CHANGE
     name: '&eGold'
-    ticksPerSpawn-multiplier: 0.85
+    ticksPerSpawn-multiplier: 0.8
     alert: CHAT
   - action: SPAWNER_CHANGE
     name: '&2Emerald'
-    ticksPerSpawn-multiplier: 0.85
+    ticksPerSpawn-multiplier: 0.8
     alert: CHAT
   actions-end: []
 - name: 'Beds gone'
-  duration-seconds: 160
+  duration-seconds: 300
   countdown-message: 'dragons-will-spawn'
   countdown-message-one-minute: 'dragons-will-spawn-one'
   actions-start:
   - action: DESTROY_BEDS
   actions-end: []
 - name: 'Dragon-Battle'
-  duration-seconds: 160
+  duration-seconds: 220
   countdown-message: 'end-battle-in'
   countdown-message-one-minute: 'end-battle-in-one'
   actions-start:
   - action: SUMMON_DRAGONS
   actions-end: []
 - name: 'Decrease Health'
-  duration-seconds: 240
+  duration-seconds: 300
   countdown-message: 'game-ends-in'
   countdown-message-one-minute: 'game-ends-in-one'
   actions-start:
