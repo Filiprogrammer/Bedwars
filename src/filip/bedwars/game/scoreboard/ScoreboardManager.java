@@ -49,7 +49,12 @@ public class ScoreboardManager {
 		objective.getScore(" ").setScore(lineCount--);
 		
 		String nextGameStateName;
-		GameState nextGameState = gameLogic.getNextGameState();
+		GameState nextGameState;
+		
+		if (gameLogic.getLastGameEndGameState() == gameLogic.getGameState())
+			nextGameState = gameLogic.getGameState();
+		else
+			nextGameState = gameLogic.getNextGameState();
 		
 		if (nextGameState == null)
 			nextGameStateName = "";

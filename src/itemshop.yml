@@ -51,7 +51,7 @@ categories:
         meta-type: UNSPECIFIC
         enchants:
           KNOCKBACK: 1
-        display-name: '§bLvl.1 Knockback Stick'
+        display-name: 'Â§bLvl.1 Knockback Stick'
   - priceMaterial: IRON_INGOT
     priceCount: 5
     item:
@@ -63,7 +63,7 @@ categories:
         meta-type: UNSPECIFIC
         enchants:
           KNOCKBACK: 2
-        display-name: '§bLvl.2 Knockback Stick'
+        display-name: 'Â§bLvl.2 Knockback Stick'
   - priceMaterial: IRON_INGOT
     priceCount: 2
     item:
@@ -73,7 +73,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§aLvl.1 Sword'
+        display-name: 'Â§aLvl.1 Sword'
         Unbreakable: true
   - priceMaterial: IRON_INGOT
     priceCount: 4
@@ -84,7 +84,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§aLvl.2 Sword'
+        display-name: 'Â§aLvl.2 Sword'
         Unbreakable: true
   - priceMaterial: IRON_INGOT
     priceCount: 6
@@ -95,7 +95,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§aLvl.3 Sword'
+        display-name: 'Â§aLvl.3 Sword'
         Unbreakable: true
   - priceMaterial: GOLD_INGOT
     priceCount: 3
@@ -106,7 +106,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§aLvl.4 Sword'
+        display-name: 'Â§aLvl.4 Sword'
         Unbreakable: true
   - priceMaterial: EMERALD
     priceCount: 4
@@ -120,7 +120,7 @@ categories:
         enchants:
           DAMAGE_ALL: 1
           FIRE_ASPECT: 1
-        display-name: '§aLvl.5 Sword'
+        display-name: 'Â§aLvl.5 Sword'
         Unbreakable: true
 - name: '&aBows'
   material: BOW
@@ -136,7 +136,7 @@ categories:
         meta-type: UNSPECIFIC
         enchants:
           ARROW_DAMAGE: 1
-        display-name: '§aLvl.1 Bow'
+        display-name: 'Â§aLvl.1 Bow'
         Damage: 374
   - priceMaterial: GOLD_INGOT
     priceCount: 16
@@ -149,7 +149,7 @@ categories:
         meta-type: UNSPECIFIC
         enchants:
           ARROW_DAMAGE: 3
-        display-name: '§aLvl.2 Bow'
+        display-name: 'Â§aLvl.2 Bow'
         Damage: 359
   - priceMaterial: EMERALD
     priceCount: 6
@@ -163,7 +163,7 @@ categories:
         enchants:
           ARROW_DAMAGE: 3
           ARROW_FIRE: 1
-        display-name: '§aLvl.3 Bow'
+        display-name: 'Â§aLvl.3 Bow'
         Damage: 344
   - priceMaterial: EMERALD
     priceCount: 8
@@ -178,7 +178,7 @@ categories:
           ARROW_DAMAGE: 4
           ARROW_FIRE: 2
           ARROW_KNOCKBACK: 1
-        display-name: '§aLvl.4 Bow'
+        display-name: 'Â§aLvl.4 Bow'
         Damage: 339
   - priceMaterial: GOLD_INGOT
     priceCount: 1
@@ -199,7 +199,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§aLvl.1 Armor'
+        display-name: 'Â§aLvl.1 Armor'
         Unbreakable: true
   - priceMaterial: IRON_INGOT
     priceCount: 7
@@ -210,7 +210,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§aLvl.2 Armor'
+        display-name: 'Â§aLvl.2 Armor'
         Unbreakable: true
   - priceMaterial: GOLD_INGOT
     priceCount: 4
@@ -221,7 +221,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§aLvl.3 Armor'
+        display-name: 'Â§aLvl.3 Armor'
         Unbreakable: true
   - priceMaterial: EMERALD
     priceCount: 2
@@ -232,7 +232,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§aLvl.4 Armor'
+        display-name: 'Â§aLvl.4 Armor'
         Unbreakable: true
 - name: '&aTools'
   material: IRON_PICKAXE
@@ -247,7 +247,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§aLvl.1 Pickaxe'
+        display-name: 'Â§aLvl.1 Pickaxe'
         Unbreakable: true
   - priceMaterial: IRON_INGOT
     priceCount: 4
@@ -259,7 +259,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§aLvl.2 Pickaxe'
+        display-name: 'Â§aLvl.2 Pickaxe'
         Unbreakable: true
   - priceMaterial: IRON_INGOT
     priceCount: 8
@@ -271,7 +271,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§aLvl.3 Pickaxe'
+        display-name: 'Â§aLvl.3 Pickaxe'
         Unbreakable: true
   - priceMaterial: GOLD_INGOT
     priceCount: 5
@@ -283,7 +283,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§aLvl.4 Pickaxe'
+        display-name: 'Â§aLvl.4 Pickaxe'
         Unbreakable: true
   - priceMaterial: GOLD_INGOT
     priceCount: 10
@@ -295,7 +295,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§aLvl.5 Pickaxe'
+        display-name: 'Â§aLvl.5 Pickaxe'
         Unbreakable: true
   - priceMaterial: GOLD_INGOT
     priceCount: 8
@@ -307,7 +307,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§aLvl.1 Axe'
+        display-name: 'Â§aLvl.1 Axe'
         Unbreakable: true
   - priceMaterial: GOLD_INGOT
     priceCount: 3
@@ -319,7 +319,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§aLvl.1 Shears'
+        display-name: 'Â§aLvl.1 Shears'
         Unbreakable: true
 - name: '&aSpecials'
   material: FIREWORK_ROCKET
@@ -334,7 +334,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§4T§fN§4T'
+        display-name: 'Â§4TÂ§fNÂ§4T'
   - priceMaterial: EMERALD
     priceCount: 6
     item:
@@ -345,7 +345,7 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§2Enderpearl'
+        display-name: 'Â§2Enderpearl'
   - priceMaterial: EMERALD
     priceCount: 16
     item:
@@ -357,7 +357,7 @@ categories:
         ==: ItemMeta
         meta-type: UNSPECIFIC
         Damage: 416
-        display-name: '§6ELYTRA'
+        display-name: 'Â§6ELYTRA'
   - priceMaterial: GOLD_INGOT
     priceCount: 4
     item:
@@ -375,4 +375,4 @@ categories:
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§cBoom Boom Ball'
+        display-name: 'Â§cBoom Boom Ball'

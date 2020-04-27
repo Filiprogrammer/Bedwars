@@ -379,6 +379,10 @@ public class GameLogic implements Listener {
 		return gameStates.peek();
 	}
 	
+	public GameState getLastGameEndGameState() {
+		return gameStates.peekLast();
+	}
+	
 	public void cleanup() {
 		gameTicker.cancel();
 		
@@ -427,6 +431,16 @@ public class GameLogic implements Listener {
 		// Check if the player is a spectator
 		if (!game.containsPlayer(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
 			event.setCancelled(true);
+		
+		if (event.getClickedBlock() != null && !event.getClickedBlock().hasMetadata("bedwars_placed")) {
+			if (event.getAction() == org.bukkit.event.block.Action.PHYSICAL) {
+				if (event.getClickedBlock().getType() == Material.FARMLAND)
+					event.setCancelled(true);
+			} else if (event.getAction() == org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK) {
+				if (event.getClickedBlock().getType() == Material.FLOWER_POT || event.getClickedBlock().getType().toString().startsWith("POTTED_"))
+					event.setCancelled(true);
+			}
+		}
 	}
 	
 	@EventHandler
@@ -529,6 +543,14 @@ public class GameLogic implements Listener {
 			loc.getWorld().spawnEntity(loc.clone().add(0.5, 0, 0.5), EntityType.PRIMED_TNT);
 			block.setType(Material.AIR);
 			return;
+		}
+		
+		for (Base base : game.getArena().getBases()) {
+			if (base.getSpawn(gameWorld.getWorld()).distance(block.getLocation()) <= 2) {
+				event.setCancelled(true);
+				MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "you-cant-place-blocks-near-spawn"));
+				return;
+			}
 		}
 		
 		block.setMetadata("bedwars_placed", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
@@ -640,7 +662,7 @@ public class GameLogic implements Listener {
 				EntityDamageEvent entityDamageEvent = player.getLastDamageCause();
 				
 				if (entityDamageEvent != null) {
-					if (entityDamageEvent.getCause() == DamageCause.PROJECTILE) {
+					if (entityDamageEvent.getCause() == DamageCause.PROJECTILE || entityDamageEvent.getCause() == DamageCause.VOID) {
 						Player killer = player.getKiller();
 						
 						if (killer != null) {
