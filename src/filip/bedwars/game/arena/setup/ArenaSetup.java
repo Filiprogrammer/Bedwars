@@ -64,6 +64,7 @@ public class ArenaSetup implements Listener {
 	private ItemStack teamShopItem;
 	private ItemStack spawnItem;
 	private ItemStack bedItem;
+	private ItemStack spectatorSpawnItem;
 	private ItemStack createBaseItem;
 	private ItemStack cancelSetupItem;
 	private ItemStack finishSetupItem;
@@ -308,6 +309,22 @@ public class ArenaSetup implements Listener {
 			}
 		});
 		
+		usables.add(new UsableItem(spectatorSpawnItem, setuper) {
+			@Override
+			public void use(@NotNull PlayerInteractEvent event) {
+				Player player = event.getPlayer();
+				
+				// Check if the player who initiated the event is the setuper of the arena
+				if (player != setuper)
+					return;
+				
+				if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+					arenaBuilder.setSpectatorSpawn(player.getLocation());
+					MessageSender.sendMessage(player, "Spectator Spawn has been set at your current location");
+				}
+			}
+		});
+		
 		// Do the following when an item with the custom name is right clicked:
 		// Set the team color of the base by checking the wool color the player is holding.
 		// Build a base with base builder.
@@ -455,6 +472,7 @@ public class ArenaSetup implements Listener {
 		teamShopItem = new ItemBuilder().setName(MainConfig.getInstance().getTeamShopName()).setMaterial(Material.DIAMOND_BLOCK).build();
 		spawnItem = new ItemBuilder().setName(MainConfig.getInstance().getBaseSpawnPointName()).setMaterial(Material.BEACON).build();
 		bedItem = new ItemBuilder().setName("§rBed").setMaterial(Material.WHITE_BED).build();
+		spectatorSpawnItem = new ItemBuilder().setName("§rSpectator Spawn").setMaterial(Material.ENDER_PEARL).build();
 		createBaseItem = new ItemBuilder().setName("§rCreate Base").setMaterial(Material.WHITE_WOOL).build();
 		cancelSetupItem = new ItemBuilder().setName("§r§cCancel Setup").setMaterial(Material.BARRIER).build();
 		finishSetupItem = new ItemBuilder().setName("§r§aFinish Setup").setMaterial(Material.GREEN_DYE).build();
@@ -466,9 +484,10 @@ public class ArenaSetup implements Listener {
 		setuper.getInventory().setItem(2, teamShopItem);
 		setuper.getInventory().setItem(3, spawnItem);
 		setuper.getInventory().setItem(4, bedItem);
-		setuper.getInventory().setItem(5, createBaseItem);
-		setuper.getInventory().setItem(6, cancelSetupItem);
-		setuper.getInventory().setItem(7, finishSetupItem);
+		setuper.getInventory().setItem(5, spectatorSpawnItem);
+		setuper.getInventory().setItem(6, createBaseItem);
+		setuper.getInventory().setItem(7, cancelSetupItem);
+		setuper.getInventory().setItem(8, finishSetupItem);
 	}
 	
 	private void cleanup() {
@@ -496,6 +515,7 @@ public class ArenaSetup implements Listener {
 		setuperInv.remove(teamShopItem);
 		setuperInv.remove(spawnItem);
 		setuperInv.remove(bedItem);
+		setuperInv.remove(spectatorSpawnItem);
 		setuperInv.remove(createBaseItem);
 		setuperInv.remove(cancelSetupItem);
 		setuperInv.remove(finishSetupItem);
@@ -596,6 +616,7 @@ public class ArenaSetup implements Listener {
 			 || itemDisplayNameMatches(itemStack, teamShopItem)
 			 || itemDisplayNameMatches(itemStack, spawnItem)
 			 || itemDisplayNameMatches(itemStack, bedItem)
+			 || itemDisplayNameMatches(itemStack, spectatorSpawnItem)
 			 || itemDisplayNameMatches(itemStack, createBaseItem)
 			 || itemDisplayNameMatches(itemStack, cancelSetupItem)
 			 || itemDisplayNameMatches(itemStack, finishSetupItem)) {

@@ -3,6 +3,7 @@ package filip.bedwars.game.arena.setup;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,6 +19,7 @@ public class ArenaBuilder {
 	private World world;
 	private int minPlayersToStart;
 	private int playersPerTeam;
+	private Location spectatorSpawn;
 	
 	public ArenaBuilder addBase(@NotNull Base base) {
 		bases.add(base);
@@ -54,6 +56,11 @@ public class ArenaBuilder {
 		return this;
 	}
 	
+	public ArenaBuilder setSpectatorSpawn(Location location) {
+		this.spectatorSpawn = location;
+		return this;
+	}
+	
 	public boolean hasBase(@NotNull Base base) {
 		return bases.contains(base);
 	}
@@ -75,7 +82,7 @@ public class ArenaBuilder {
 	}
 	
 	public Arena build() {
-		return new Arena(mapName, minPlayersToStart, playersPerTeam, world, spawner, bases);
+		return new Arena(mapName, minPlayersToStart, playersPerTeam, world, spawner, bases, spectatorSpawn);
 	}
 
 }

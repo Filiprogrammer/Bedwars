@@ -334,8 +334,7 @@ public class GameLogic implements Listener {
 	}
 	
 	public void joinSpectator(Player player) {
-		// TODO: Add spectator spawn point
-		player.teleport(arena.getBase(0).getSpawn(gameWorld.getWorld()));
+		player.teleport(getSpectatorSpawn());
 		PlayerUtils.playerReset(player);
 		player.setGameMode(GameMode.SPECTATOR);
 		MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "joined-game-as-spectator"));
@@ -740,8 +739,7 @@ public class GameLogic implements Listener {
 			Team team = game.getTeamOfPlayer(player.getUniqueId());
 			
 			if (team == null)
-				// TODO: use spectator specific respawn location
-				event.setRespawnLocation(game.getTeams().get(0).getBase().getSpawn(gameWorld.getWorld()));
+				event.setRespawnLocation(getSpectatorSpawn());
 			else
 				event.setRespawnLocation(team.getBase().getSpawn(gameWorld.getWorld()));
 		}
@@ -775,8 +773,7 @@ public class GameLogic implements Listener {
 				if (game.containsPlayer(player.getUniqueId()))
 					PlayerUtils.damagePlayer(player, "OUT_OF_WORLD", 999);
 				else
-					// TODO: use spectator specific respawn location
-					player.teleport(game.getTeams().get(0).getBase().getSpawn(gameWorld.getWorld()));
+					player.teleport(getSpectatorSpawn());
 			}
 		}
 	}
@@ -881,6 +878,15 @@ public class GameLogic implements Listener {
 				p.sendTitle(title);
 			}
 		}
+	}
+	
+	private Location getSpectatorSpawn() {
+		Location spectatorSpawn = arena.getSpectatorSpawn(gameWorld.getWorld());
+		
+		if (spectatorSpawn == null)
+			return game.getTeams().get(0).getBase().getSpawn(gameWorld.getWorld());
+		
+		return spectatorSpawn;
 	}
 	
 }

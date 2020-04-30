@@ -21,6 +21,18 @@ public class ArenaSerializer {
 		ret.put("playersPerTeam", arena.getPlayersPerTeam());
 		ret.put("world", arena.getWorld().getName());
 		
+		Location spectatorSpawn = arena.getSpectatorSpawn(null);
+		
+		if (spectatorSpawn != null) {
+			ret.put("spectatorSpawn", new HashMap<String, Double>() {{
+				put("x", spectatorSpawn.getX());
+				put("y", spectatorSpawn.getY());
+				put("z", spectatorSpawn.getZ());
+				put("yaw", (double) spectatorSpawn.getYaw());
+				put("pitch", (double) spectatorSpawn.getPitch());
+			}});
+		}
+		
 		List<Map<String, Object>> spawnerList = new ArrayList<Map<String, Object>>();
 		
 		for (Spawner spawner : arena.getSpawner()) {

@@ -25,6 +25,17 @@ public class ArenaDeserializer {
 		arenaBuilder.setPlayersPerTeam((int) mapOfElements.get("playersPerTeam"));
 		arenaBuilder.setWorld(Bukkit.getWorld((String) mapOfElements.get("world")));
 		
+		Map<String, Double> serializedSpectatorSpawn = (Map<String, Double>) mapOfElements.get("spectatorSpawn");
+		
+		if (serializedSpectatorSpawn != null) {
+			double x = serializedSpectatorSpawn.get("x");
+			double y = serializedSpectatorSpawn.get("y");
+			double z = serializedSpectatorSpawn.get("z");
+			float yaw = serializedSpectatorSpawn.get("yaw").floatValue();
+			float pitch = serializedSpectatorSpawn.get("pitch").floatValue();
+			arenaBuilder.setSpectatorSpawn(new Location(null, x, y, z, yaw, pitch));
+		}
+		
 		List<Map<String, Object>> spawnerList = (List<Map<String, Object>>) mapOfElements.get("spawner");
 		
 		for (Map<String, Object> serializedSpawner : spawnerList) {
