@@ -192,7 +192,7 @@ public class GameLogic implements Listener {
 					}
 					
 					for (Player p : gameWorld.getWorld().getPlayers())
-						if (p.getEntityId() == a && !game.getPlayers().contains(p.getUniqueId()))
+						if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
 							return false;
 					
 					return true;
@@ -214,7 +214,7 @@ public class GameLogic implements Listener {
 						for (PlayerInfoData playerInfoData : b) {
 							GameProfile gameProfile = playerInfoData.a();
 							
-							if (game.getPlayers().contains(gameProfile.getId()))
+							if (game.containsPlayer(gameProfile.getId()))
 								return true;
 						}
 					} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
@@ -230,19 +230,19 @@ public class GameLogic implements Listener {
 		
 		BedwarsPlugin.getInstance().getServer().getPluginManager().registerEvents(this, BedwarsPlugin.getInstance());
 		
-		List<UUID> syncPlayersList = game.getPlayers();
+		List<GamePlayer> syncPlayersList = game.getPlayers();
 		Player[] players;
+		int i = 0;
 		synchronized (syncPlayersList) {
 			players = new Player[syncPlayersList.size()];
-			int i = 0;
 			
-			for (UUID uuid : syncPlayersList) {
-				Player player = Bukkit.getPlayer(uuid);
+			for (GamePlayer gamePlayer : syncPlayersList) {
+				Player player = gamePlayer.getPlayer();
 				players[i] = player;
 				// Add a packet listener
 				BedwarsPlugin.getInstance().addPacketListener(player, packetListener);
 				// Teleport player to the spawnpoint of their base
-				teleportToSpawn(player);
+				teleportToSpawn(gamePlayer);
 				
 				if (!MainConfig.getInstance().getAttackCooldown())
 					// Disable attack cooldown
@@ -324,11 +324,12 @@ public class GameLogic implements Listener {
 		scoreboardManager.update();
 	}
 	
-	private void teleportToSpawn(Player player) {
-		if (player == null)
+	private void teleportToSpawn(GamePlayer gamePlayer) {
+		if (gamePlayer == null)
 			return;
 		
-		Location spawnLoc = game.getTeamOfPlayer(player.getUniqueId()).getBase().getSpawn(gameWorld.getWorld());
+		Location spawnLoc = gamePlayer.getTeam().getBase().getSpawn(gameWorld.getWorld());
+		Player player = gamePlayer.getPlayer();
 		player.teleport(spawnLoc);
 		PlayerUtils.playerReset(player);
 	}
@@ -386,10 +387,10 @@ public class GameLogic implements Listener {
 	public void cleanup() {
 		gameTicker.cancel();
 		
-		List<UUID> syncPlayersList = game.getPlayers();
+		List<GamePlayer> syncPlayersList = game.getPlayers();
 		synchronized (syncPlayersList) {
-			for (UUID uuid : syncPlayersList)
-				leavePlayer(Bukkit.getPlayer(uuid));
+			for (GamePlayer gamePlayer : syncPlayersList)
+				leavePlayer(gamePlayer.getPlayer());
 		}
 		
 		for (EnderDragonController enderDragonController : enderDragonControllers)
@@ -480,9 +481,10 @@ public class GameLogic implements Listener {
 		
 		if (game.containsPlayer(damager.getUniqueId())) {
 			if (event.getEntity().getType() == EntityType.PLAYER) {
-				Player player = (Player) event.getEntity();
+				GamePlayer damagerGamePlayer = game.getGamePlayer(damager.getUniqueId());
+				GamePlayer gamePlayer = game.getGamePlayer(event.getEntity().getUniqueId());
 				
-				if (game.getTeamOfPlayer(damager.getUniqueId()) == game.getTeamOfPlayer(player.getUniqueId()))
+				if (damagerGamePlayer.getTeam() == gamePlayer.getTeam())
 					event.setCancelled(true);
 			} else if (event.getEntity().getType() == EntityType.ITEM_FRAME) {
 				event.setCancelled(true);
@@ -634,7 +636,12 @@ public class GameLogic implements Listener {
 		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
 			String deathMsg = event.getDeathMessage();
 			event.setDeathMessage(null);
-			Team team = game.getTeamOfPlayer(player.getUniqueId());
+			GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
+			
+			if (gamePlayer == null)
+				return;
+			
+			Team team = gamePlayer.getTeam();
 			
 			if (MainConfig.getInstance().getDropOnlySpawnerResourcesOnDeath()) {
 				// Only drop spawner resources
@@ -690,7 +697,7 @@ public class GameLogic implements Listener {
 				
 				if (!team.hasBed()) {
 					removePlayerListeners(player);
-					team.removeMember(player.getUniqueId());
+					team.removeMember(gamePlayer);
 					
 					if (team.getMembers().size() == 0)
 						team.destroyBed(gameWorld.getWorld());
@@ -698,15 +705,15 @@ public class GameLogic implements Listener {
 					scoreboardManager.update();
 					isFinalKill = true;
 					
-					List<UUID> syncPlayersList = game.getPlayers();
+					List<GamePlayer> syncPlayersList = game.getPlayers();
 					synchronized (syncPlayersList) {
-						syncPlayersList.remove(player.getUniqueId());
+						syncPlayersList.remove(gamePlayer);
 					}
 					
 					checkGameOver();
 					
-					for (UUID uuid : game.getPlayers())
-						PlayerUtils.hidePlayer(player, Bukkit.getPlayer(uuid));
+					for (GamePlayer gp : game.getPlayers())
+						PlayerUtils.hidePlayer(player, gp.getPlayer());
 					
 					Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), () -> {
 						player.spigot().respawn();

@@ -3,9 +3,9 @@ package filip.bedwars.game;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -33,7 +33,7 @@ public class Game implements Listener {
 	private Lobby lobby;
 	private Arena arena;
 	private GameLogic gameLogic;
-	private List<UUID> players = Collections.synchronizedList(new ArrayList<UUID>());
+	private List<GamePlayer> players = Collections.synchronizedList(new ArrayList<GamePlayer>());
 	private List<Team> teams = Collections.synchronizedList(new ArrayList<Team>());
 	private boolean isStarting = false;
 	
@@ -43,7 +43,7 @@ public class Game implements Listener {
 		
 		for (int i = 0; i < arena.getBases().size(); ++i) {
 			Base base = arena.getBase(i);
-			teams.add(new Team(i, base, new ArrayList<UUID>()));
+			teams.add(new Team(i, base));
 		}
 		
 		BedwarsPlugin.getInstance().getServer().getPluginManager().registerEvents(this, BedwarsPlugin.getInstance());
@@ -92,8 +92,8 @@ public class Game implements Listener {
 	 * Cleans everything up after a game
 	 */
 	public void endGame() {
-		for (UUID uuid : new ArrayList<UUID>(players))
-			leavePlayer(Bukkit.getPlayer(uuid));
+		for (GamePlayer gamePlayer : new ArrayList<GamePlayer>(players))
+			leavePlayer(gamePlayer.getPlayer());
 		
 		HandlerList.unregisterAll(this);
 		
@@ -125,7 +125,7 @@ public class Game implements Listener {
 	// TODO: Add reconnect function
 	
 	public void joinPlayer(Player player) {
-		if (players.contains(player.getUniqueId())) {
+		if (containsPlayer(player.getUniqueId())) {
 			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "already-in-this-game"));
 			SoundPlayer.playSound("error", player);
 			return; // Player is already in this game 
@@ -136,11 +136,13 @@ public class Game implements Listener {
 			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "joined-game-as-spectator"));
 			SoundPlayer.playSound("success", player);
 		} else {
-			players.add(player.getUniqueId());
+			players.add(new GamePlayer(player.getUniqueId(), this));
 			lobby.joinPlayer(player);
 			
-			for(UUID uuid : players)
-				MessageSender.sendMessageUUID(uuid, MessagesConfig.getInstance().getStringValue(Bukkit.getPlayer(uuid).getLocale(), "player-joined").replace("%player%", player.getName()));
+			for(GamePlayer gp : players) {
+				Player p = gp.getPlayer();
+				MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "player-joined").replace("%player%", player.getName()));
+			}
 			
 			SoundPlayer.playSound("success", player);
 		}
@@ -157,10 +159,17 @@ public class Game implements Listener {
 	 * @return
 	 */
 	public boolean leavePlayer(Player player) {
-		if (players.remove(player.getUniqueId())) {
+		Optional<GamePlayer> gamePlayerOptional = players.stream().filter(gp -> gp.uuid.equals(player.getUniqueId())).findFirst().map(gp -> {
+			players.remove(gp);
+			return gp;
+		});
+		
+		if (gamePlayerOptional.isPresent()) {
+			GamePlayer gamePlayer = gamePlayerOptional.get();
+			
 			synchronized (teams) {
 				for (Team team : teams)
-					if (team.removeMember(player.getUniqueId())) {
+					if (team.removeMember(gamePlayer)) {
 						if (team.getMembers().size() == 0 && isRunning())
 							team.destroyBed(gameLogic.getGameWorld().getWorld());
 						
@@ -173,8 +182,10 @@ public class Game implements Listener {
 			else
 				lobby.leavePlayer(player);
 			
-			for(UUID uuid : players) 
-				MessageSender.sendMessageUUID(uuid, MessagesConfig.getInstance().getStringValue(Bukkit.getPlayer(uuid).getLocale(), "player-left").replace("%player%", player.getName()));
+			for(GamePlayer gp : players) {
+				Player p = gp.getPlayer();
+				MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "player-left").replace("%player%", player.getName()));
+			}
 			
 			return true;
 		} else {
@@ -195,32 +206,32 @@ public class Game implements Listener {
 		return teams;
 	}
 	
-	public List<UUID> getPlayers() {
+	public List<GamePlayer> getPlayers() {
 		return players;
 	}
 	
 	public boolean containsPlayer(UUID uuid) {
 		synchronized (players) {
-			return players.contains(uuid);
+			return players.stream().anyMatch(gp -> gp.uuid.equals(uuid));
 		}
 	}
 	
-	private boolean playerHasTeam(UUID uuid) {
-		synchronized (teams) {
-			for (Team team : teams)
-				if (team.containsMember(uuid))
-					return true;
+	public GamePlayer getGamePlayer(UUID uuid) {
+		synchronized (players) {
+			Optional<GamePlayer> optionalGamePlayer = players.stream().filter(gp -> gp.uuid.equals(uuid)).findFirst();
+			
+			if (optionalGamePlayer.isPresent())
+				return optionalGamePlayer.get();
+			
+			return null;
 		}
-		
-		return false;
 	}
 	
 	public Team getTeamOfPlayer(UUID uuid) {
-		synchronized (teams) {
-			for (Team team : teams)
-				if (team.containsMember(uuid))
-					return team;
-		}
+		GamePlayer gamePlayer = getGamePlayer(uuid);
+		
+		if (gamePlayer != null)
+			return gamePlayer.getTeam();
 		
 		return null;
 	}
@@ -245,12 +256,12 @@ public class Game implements Listener {
 	
 	private void assignLonelyPlayersToTeamsAutomatically() {
 		synchronized (players) {
-			for (UUID uuid : players) {
-				if (!playerHasTeam(uuid)) {
+			for (GamePlayer gamePlayer : players) {
+				if (gamePlayer.getTeam() == null) {
 					Team team = getSmallestTeam();
-					team.addMember(uuid);
+					team.addMember(gamePlayer);
 					
-					Player p = Bukkit.getPlayer(uuid);
+					Player p = gamePlayer.getPlayer();
 					String colorStr = TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale());
 					MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "team-changed").replace("%teamcolor%", colorStr));
 				}
@@ -262,19 +273,15 @@ public class Game implements Listener {
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		
-		synchronized (players) {
-			if (!players.contains(player.getUniqueId()))
-				return;
-		}
-		
-		leavePlayer(player);
+		if (containsPlayer(player.getUniqueId()))
+			leavePlayer(player);
 	}
 	
 	@EventHandler
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
 		Player player = event.getPlayer();
 		
-		if (players.contains(player.getUniqueId())) {
+		if (containsPlayer(player.getUniqueId())) {
 			if (isStarting)
 				return;
 			
@@ -296,7 +303,7 @@ public class Game implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		
-		if (players.contains(player.getUniqueId())) {
+		if (containsPlayer(player.getUniqueId())) {
 			if (isStarting) {
 				event.setCancelled(true);
 				return;

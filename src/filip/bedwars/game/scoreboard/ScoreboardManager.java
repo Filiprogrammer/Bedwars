@@ -1,7 +1,5 @@
 package filip.bedwars.game.scoreboard;
 
-import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -12,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.Game;
 import filip.bedwars.game.GameLogic;
+import filip.bedwars.game.GamePlayer;
 import filip.bedwars.game.Team;
 import filip.bedwars.game.state.GameState;
 import filip.bedwars.utils.MessageSender;
@@ -73,8 +72,8 @@ public class ScoreboardManager {
 			org.bukkit.scoreboard.Team scoreboardTeam = scoreboard.registerNewTeam("" + team.getId());
 			scoreboardTeam.setPrefix(TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale()) + " §7|§r ");
 			
-			for (UUID uuid : team.getMembers())
-				scoreboardTeam.addEntry(Bukkit.getPlayer(uuid).getName());
+			for (GamePlayer gp : team.getMembers())
+				scoreboardTeam.addEntry(gp.getPlayer().getName());
 			
 			int teamMemberCount = team.getMembers().size();
 			String msgKey = null;

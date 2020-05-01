@@ -1,14 +1,12 @@
 package filip.bedwars.game.action;
 
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.Game;
 import filip.bedwars.game.GameLogic;
+import filip.bedwars.game.GamePlayer;
 import filip.bedwars.utils.MessageSender;
 
 public class ActionSendMessage extends Action {
@@ -27,8 +25,8 @@ public class ActionSendMessage extends Action {
 			for (Player p : gameLogic.getGameWorld().getWorld().getPlayers())
 				MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), message));
 		} else {
-			for (UUID uuid : game.getPlayers()) {
-				Player p = Bukkit.getPlayer(uuid);
+			for (GamePlayer gamePlayer : game.getPlayers()) {
+				Player p = gamePlayer.getPlayer();
 				
 				if (p != null)
 					MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), message));

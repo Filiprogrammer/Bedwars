@@ -21,6 +21,7 @@ import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.Countdown;
 import filip.bedwars.game.Game;
+import filip.bedwars.game.GamePlayer;
 import filip.bedwars.game.Team;
 import filip.bedwars.game.TeamColor;
 import filip.bedwars.inventory.ClickableInventory;
@@ -51,8 +52,8 @@ public class Lobby {
 			public void onTick() {
 				if (game.getPlayers().size() < game.getArena().getMinPlayersToStart()) {
 					// Not enough players, countdown should be cancelled
-					for (UUID uuid : game.getPlayers()) {
-						Player player = Bukkit.getPlayer(uuid);
+					for (GamePlayer gamePlayer : game.getPlayers()) {
+						Player player = gamePlayer.getPlayer();
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "countdown-not-enough-player"));
 						SoundPlayer.playSound("error", player);
 					}
@@ -67,14 +68,14 @@ public class Lobby {
 					return;
 				
 				if (secondsLeft == 1) {
-					for (UUID uuid : game.getPlayers()) {
-						Player player = Bukkit.getPlayer(uuid);
+					for (GamePlayer gamePlayer : game.getPlayers()) {
+						Player player = gamePlayer.getPlayer();
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "game-starts-in-one-second"));
 						SoundPlayer.playSound("countdown-tick", player);
 					}
 				} else if ((secondsLeft % 10) == 0 || secondsLeft <= 5) {
-					for (UUID uuid : game.getPlayers()) {
-						Player player = Bukkit.getPlayer(uuid);
+					for (GamePlayer gamePlayer : game.getPlayers()) {
+						Player player = gamePlayer.getPlayer();
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "game-starts-in").replace("%seconds%", "" + secondsLeft));
 						SoundPlayer.playSound("countdown-tick", player);
 					}
@@ -83,8 +84,9 @@ public class Lobby {
 			
 			@Override
 			public void onStart() {
-				for(UUID uuid : game.getPlayers()) {
-					MessageSender.sendMessageUUID(uuid, MessagesConfig.getInstance().getStringValue(Bukkit.getPlayer(uuid).getLocale(), "countdown-started"));
+				for(GamePlayer gamePlayer : game.getPlayers()) {
+					Player player = gamePlayer.getPlayer();
+					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "countdown-started"));
 				}
 			}
 			
@@ -92,8 +94,8 @@ public class Lobby {
 			public boolean onFinish() {
 				if (game.getPlayers().size() < game.getArena().getMinPlayersToStart()) {
 					// Not enough players, countdown should be cancelled
-					for (UUID uuid : game.getPlayers()) {
-						Player player = Bukkit.getPlayer(uuid);
+					for (GamePlayer gamePlayer : game.getPlayers()) {
+						Player player = gamePlayer.getPlayer();
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "countdown-not-enough-player"));
 						SoundPlayer.playSound("cancel", player);
 					}
@@ -108,8 +110,8 @@ public class Lobby {
 			
 			@Override
 			public void onCancel() {
-				for(UUID uuid : game.getPlayers())
-					MessageSender.sendMessageUUID(uuid, "The countdown was cancelled");
+				for(GamePlayer gamePlayer : game.getPlayers())
+					MessageSender.sendMessage(gamePlayer.getPlayer(), "The countdown was cancelled");
 			}
 		};
 	}
@@ -128,7 +130,7 @@ public class Lobby {
 		
 		// Make sure only players of the same game see each other
 		for (Player p : spawnPoint.getWorld().getPlayers()) {
-			if (!game.getPlayers().contains(p.getUniqueId())) {
+			if (!game.containsPlayer(p.getUniqueId())) {
 				PlayerUtils.hidePlayerEntity(p, player);
 				PlayerUtils.hidePlayerEntity(player, p);
 				PlayerUtils.hidePlayer(p, player);
@@ -170,12 +172,13 @@ public class Lobby {
 				Team newTeam = game.getTeams().get(slot);
 				
 				if (newTeam.getMembers().size() < game.getArena().getPlayersPerTeam()) {
-					Team previousTeam = game.getTeamOfPlayer(puuid);
+					GamePlayer gamePlayer = game.getGamePlayer(puuid);
+					Team previousTeam = gamePlayer.getTeam();
 					
 					if (previousTeam != null)
-						previousTeam.removeMember(puuid);
+						previousTeam.removeMember(gamePlayer);
 					
-					newTeam.addMember(puuid);
+					newTeam.addMember(gamePlayer);
 					event.getView().close();
 					MessageSender.sendMessage(p,
 							MessagesConfig.getInstance().getStringValue(p.getLocale(), "team-changed")
@@ -258,11 +261,10 @@ public class Lobby {
 			ItemStack[] contents = clickable.getInventory().getContents();
 			
 			for (int i = 0; i < game.getTeams().size(); ++i) {
-				List<UUID> memberUUIDs = game.getTeams().get(i).getMembers();
 				List<String> lore = new ArrayList<>();
 				
-				for (UUID uuid : memberUUIDs)
-					lore.add(Bukkit.getPlayer(uuid).getName());
+				for (GamePlayer gp : game.getTeams().get(i).getMembers())
+					lore.add(gp.getPlayer().getName());
 				
 				contents[i].setLore(lore);
 			}

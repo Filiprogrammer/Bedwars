@@ -3,15 +3,14 @@ package filip.bedwars.game.action;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.Game;
 import filip.bedwars.game.GameLogic;
+import filip.bedwars.game.GamePlayer;
 import filip.bedwars.game.Team;
 import filip.bedwars.utils.EnderDragonController;
 
@@ -27,8 +26,8 @@ public class ActionSummonDragons extends Action {
 			
 			for (Team t : game.getTeams()) {
 				if (t.getId() != team.getId()) {
-					for (UUID uuid : t.getMembers())
-						targetEntities.add(Bukkit.getPlayer(uuid));
+					for (GamePlayer gamePlayer : t.getMembers())
+						targetEntities.add(gamePlayer.getPlayer());
 				}
 			}
 			

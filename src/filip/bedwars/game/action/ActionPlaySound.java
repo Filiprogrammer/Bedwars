@@ -1,5 +1,7 @@
 package filip.bedwars.game.action;
 
+import java.util.stream.Collectors;
+
 import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.Game;
@@ -21,7 +23,7 @@ public class ActionPlaySound extends Action {
 		if (includeSpectators)
 			SoundPlayer.playSound(sound, gameLogic.getGameWorld().getWorld().getPlayers());
 		else
-			SoundPlayer.playSoundUUID(sound, game.getPlayers());
+			SoundPlayer.playSoundUUID(sound, game.getPlayers().stream().map(gp -> gp.uuid).collect(Collectors.toList()));
 	}
 
 	public static String[] getArgumentNames() {

@@ -46,7 +46,7 @@ public class GameManager {
 		
 		for (Game game : games)
 			for (Player player : players)
-				if (game.getPlayers().contains(player.getUniqueId()))
+				if (game.containsPlayer(player.getUniqueId()))
 					return null; // One of the players is already in a game
 		
 		for (Game game : games) {
@@ -82,7 +82,7 @@ public class GameManager {
 	
 	public Game getGameOfPlayer(Player player) {
 		for (Game game : games)
-			if (game.getPlayers().contains(player.getUniqueId()))
+			if (game.containsPlayer(player.getUniqueId()))
 				return game;
 		
 		return null;
