@@ -1,20 +1,14 @@
 package filip.bedwars.game.shop;
 
-import java.util.HashMap;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import filip.bedwars.config.MessagesConfig;
+import filip.bedwars.game.GamePlayer;
 import filip.bedwars.inventory.ItemBuilder;
-import filip.bedwars.utils.MessageSender;
-import filip.bedwars.utils.SoundPlayer;
 
 public class Shop {
 	
@@ -52,7 +46,7 @@ public class Shop {
     	return inventories[categoryIndex];
     }
     
-	public int handleClick(int shopCategoryIndex, InventoryClickEvent event) {
+	public int handleClick(int shopCategoryIndex, InventoryClickEvent event, GamePlayer gamePlayer) {
 		if (!(event.getWhoClicked() instanceof Player))
 			return shopCategoryIndex;
 		
@@ -77,59 +71,8 @@ public class Shop {
 		else
 			entry = category.getShopEntry(event.getSlot() - 18);
 		
-		if (entry == null)
-			return shopCategoryIndex;
-		
-		HashMap<Integer, ItemStack> didNotFit = null;
-		int itemAmount = 0;
-		
-		if (event.isShiftClick()) {
-			int maxBuyAmount = entry.getMaxBuyAmount(player);
-			
-			if (maxBuyAmount > 0) {
-				if (maxBuyAmount < entry.getItem().getMaxStackSize()) {
-					removeItems(player.getInventory(), entry.getPriceMaterial(), entry.getPriceCount(maxBuyAmount));
-					ItemStack itemStack = entry.getItem().clone();
-					itemAmount = maxBuyAmount;
-					itemStack.setAmount(itemAmount);
-					didNotFit = player.getInventory().addItem(itemStack);
-				} else {
-					removeItems(player.getInventory(), entry.getPriceMaterial(), entry.getPriceCountFullStack());
-					ItemStack itemStack = entry.getItem().clone();
-					itemAmount = entry.getItem().getAmount() * (entry.getPriceCountFullStack() / entry.getPriceCount());
-					itemStack.setAmount(itemAmount);
-					didNotFit = player.getInventory().addItem(itemStack);
-				}
-			}
-		} else {
-			if (entry.canBuy(player)) {
-				removeItems(player.getInventory(), entry.getPriceMaterial(), entry.getPriceCount());
-				itemAmount = entry.getItem().getAmount();
-		    	didNotFit = player.getInventory().addItem(entry.getItem());
-			}
-		}
-		
-		if (didNotFit == null) {
-			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "cant-afford-item"));
-			SoundPlayer.playSound("cant-afford-item", player);
-		} else {
-			for (ItemStack is : didNotFit.values())
-	    		player.getWorld().dropItemNaturally(player.getLocation(), is).setVelocity(player.getLocation().getDirection().multiply(0.5));
-			
-			String itemName = entry.getItem().getType().toString();
-			
-			if (entry.getItem().hasItemMeta()) {
-				ItemMeta itemMeta = entry.getItem().getItemMeta();
-				if (itemMeta.hasDisplayName())
-					itemName = itemMeta.getDisplayName();
-			}
-			
-			MessageSender.sendMessage(player, 
-				MessagesConfig.getInstance().getStringValue(player.getLocale(), "bought-item")
-					.replace("%amount%", "" + itemAmount)
-					.replace("%item%", itemName));
-			SoundPlayer.playSound("buy-item", player);
-		}
+		if (entry != null)
+			entry.buy(gamePlayer, event.isShiftClick());
 		
 		return shopCategoryIndex;
 	}
@@ -151,8 +94,8 @@ public class Shop {
     	for (int i = 0; i < category.getShopEntriesCount(); ++i) {
     		ShopEntry shopEntry = category.getShopEntry(i);
     		
-    		ItemStack buyItem = shopEntry.getItem();
-    		thisCategoryInv.setItem(9 * 2 + i, buyItem);
+    		ItemStack displayItem = shopEntry.getDisplayItem();
+    		thisCategoryInv.setItem(9 * 2 + i, displayItem);
     		
     		ItemStack priceItem = new ItemBuilder()
     				.setMaterial(shopEntry.getPriceMaterial())
@@ -180,34 +123,6 @@ public class Shop {
             
             inv.setItem(i + 9, ItemBuilder.NULL);
     	}
-    }
-    
-    private void removeItems(Inventory inventory, Material type, int amount) {
-        if (amount <= 0)
-        	return;
-        
-        int size = inventory.getSize();
-        
-        for (int slot = 0; slot < size; ++slot) {
-            ItemStack is = inventory.getItem(slot);
-            
-            if (is == null)
-            	continue;
-            
-            if (type == is.getType()) {
-                int newAmount = is.getAmount() - amount;
-                if (newAmount > 0) {
-                    is.setAmount(newAmount);
-                    break;
-                } else {
-                    inventory.clear(slot);
-                    amount = -newAmount;
-                    
-                    if (amount == 0)
-                    	break;
-                }
-            }
-        }
     }
 
 }

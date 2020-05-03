@@ -278,20 +278,8 @@ public class GameLogic implements Listener {
 			
 			itemShopNPCListeners.add(itemShopNPCListener);
 			
-			for (Player player : players) {
-				itemShopClickables.add(new ClickableInventory(ItemShopConfig.getInstance().getShop().getCategoryListInventory(), player) {
-					@Override
-					public void click(InventoryClickEvent event) {
-						HumanEntity player = event.getWhoClicked();
-						selectedItemShopCategory.put(player.getUniqueId(), ItemShopConfig.getInstance().getShop().handleClick(selectedItemShopCategory.getOrDefault(player.getUniqueId(), -1), event));
-					}
-
-					@Override
-					public void drag(InventoryDragEvent event) {}
-				});
-				
-				BedwarsPlugin.getInstance().addPacketListener(player, itemShopNPCListener);
-			}
+			for (GamePlayer gamePlayer : syncPlayersList)
+				BedwarsPlugin.getInstance().addPacketListener(gamePlayer.getPlayer(), itemShopNPCListener);
 			
 			// Setup team shop NPC, if it is not null
 			if (base.getTeamShop(gameWorld.getWorld()) != null) {
@@ -319,6 +307,19 @@ public class GameLogic implements Listener {
 				for (Player player : players)
 					BedwarsPlugin.getInstance().addPacketListener(player, teamShopNPCListener);
 			}
+		}
+		
+		for (GamePlayer gamePlayer : syncPlayersList) {
+			itemShopClickables.add(new ClickableInventory(ItemShopConfig.getInstance().getShop().getCategoryListInventory(), gamePlayer.getPlayer()) {
+				@Override
+				public void click(InventoryClickEvent event) {
+					HumanEntity player = event.getWhoClicked();
+					selectedItemShopCategory.put(player.getUniqueId(), ItemShopConfig.getInstance().getShop().handleClick(selectedItemShopCategory.getOrDefault(player.getUniqueId(), -1), event, gamePlayer));
+				}
+
+				@Override
+				public void drag(InventoryDragEvent event) {}
+			});
 		}
 		
 		scoreboardManager.update();

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.ConfigurationSection;
 
 import filip.bedwars.utils.MessageSender;
@@ -24,6 +25,8 @@ public class MainConfig extends SingleConfig {
 	private String[] joinSignLines = new String[4];
 	private boolean dropOnlySpawnerResourcesOnDeath = true;
 	private boolean attackCooldown = false;
+	private boolean lobbyBossbar = true;
+	private BarColor lobbyBossbarColor = BarColor.YELLOW;
 	
 	protected MainConfig() {
 		super("config.yml");
@@ -81,6 +84,14 @@ public class MainConfig extends SingleConfig {
 		return attackCooldown;
 	}
 	
+	public boolean getLobbyBossBar() {
+		return lobbyBossbar;
+	}
+	
+	public BarColor getLobbyBossBarColor() {
+		return lobbyBossbarColor;
+	}
+	
 	public void setMainLobby(Location loc) {
 		mainLobby = loc;
 	}
@@ -103,6 +114,8 @@ public class MainConfig extends SingleConfig {
 		config.set("join-sign-line-two", joinSignLines[1].replace('§', '&'));
 		config.set("join-sign-line-three", joinSignLines[2].replace('§', '&'));
 		config.set("join-sign-line-four", joinSignLines[3].replace('§', '&'));
+		config.set("lobby-bossbar", lobbyBossbar);
+		config.set("lobby-bossbar-color", lobbyBossbarColor.toString());
 		config.set("hunger", hunger);
 		config.set("drop-only-spawner-resources-on-death", dropOnlySpawnerResourcesOnDeath);
 		config.set("attack-cooldown", attackCooldown);
@@ -154,6 +167,14 @@ public class MainConfig extends SingleConfig {
 		joinSignLines[1] = config.getString("join-sign-line-two", "&d%arenaname%").replace('&', '§');
 		joinSignLines[2] = config.getString("join-sign-line-three", "").replace('&', '§');
 		joinSignLines[3] = config.getString("join-sign-line-four", "&b<Join Arena>").replace('&', '§');
+		lobbyBossbar = config.getBoolean("lobby-bossbar", true);
+		
+		try {
+			lobbyBossbarColor = BarColor.valueOf(config.getString("lobby-bossbar-color", "YELLOW"));
+		} catch (IllegalArgumentException e) {
+			MessageSender.sendWarning("lobby-bossbar-color has an invalid value.");
+		}
+		
 		hunger = config.getBoolean("hunger", false);
 		dropOnlySpawnerResourcesOnDeath = config.getBoolean("drop-only-spawner-resources-on-death", true);
 		hunger = config.getBoolean("attack-cooldown", false);

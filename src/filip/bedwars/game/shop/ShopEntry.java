@@ -5,16 +5,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class ShopEntry {
+import filip.bedwars.game.GamePlayer;
+
+public abstract class ShopEntry {
 	
-	private Material priceMaterial;
-	private int priceCount;
-	private ItemStack item;
+	protected final Material priceMaterial;
+	protected final int priceCount;
 	
-	public ShopEntry(Material priceMaterial, int priceCount, ItemStack item) {
+	public ShopEntry(Material priceMaterial, int priceCount) {
 		this.priceMaterial = priceMaterial;
 		this.priceCount = priceCount;
-		this.item = item;
 	}
 	
 	public Material getPriceMaterial() {
@@ -25,24 +25,16 @@ public class ShopEntry {
 		return priceCount;
 	}
 	
-	public int getPriceCountFullStack() {
-		return (item.getMaxStackSize() / item.getAmount()) * priceCount;
-	}
+	public abstract ItemStack getDisplayItem();
 	
-	public int getPriceCount(int buyItemAmount) {
-		return (buyItemAmount / item.getAmount()) * priceCount;
-	}
-	
-	public ItemStack getItem() {
-		return item;
-	}
+	public abstract void buy(GamePlayer gamePlayer, boolean fullStack);
 	
 	/**
 	 * Get the amount of priceMaterial in the players inventory. (for example how much gold they have)
 	 * @param inv the inventory that should be checked
 	 * @return amount of items
 	 */
-	private int getPriceItemCount(Inventory inv) {
+	protected int getPriceItemCount(Inventory inv) {
 		int amount = 0;
 		
 		for (int i = 0; i < 36; ++i) {
@@ -66,32 +58,12 @@ public class ShopEntry {
 	 */
 	public boolean canBuy(Player player) {
 		Inventory inv = player.getInventory();
-		
 		int amount = getPriceItemCount(inv);
 		
 		if(amount >= priceCount)
 			return true;
 		
 		return false;
-	}
-	
-	/**
-	 * Check if the player can afford a full stack of the item.
-	 * @param player player that should be checked
-	 * @return true if they can afford it, false if not
-	 */
-	public boolean canBuyFullStack(Player player) {
-		int amount = getPriceItemCount(player.getInventory());
-		int value = item.getMaxStackSize() / item.getAmount();
-		
-		if(amount >= (priceCount * value))
-			return true;
-		
-		return false;
-	}
-	
-	public int getMaxBuyAmount(Player player) {
-		return (getPriceItemCount(player.getInventory()) / priceCount) * item.getAmount();
 	}
 
 }

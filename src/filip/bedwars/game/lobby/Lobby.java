@@ -1,13 +1,17 @@
 package filip.bedwars.game.lobby;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -41,6 +45,8 @@ public class Lobby {
 	private Game game;
 	private List<IClickable> clickables = new ArrayList<>();
 	private List<IUsable> usables = new ArrayList<>();
+	private Map<UUID, BossBar> bossbars = new HashMap<>();
+	private boolean showBossbar = MainConfig.getInstance().getLobbyBossBar();
 	
 	public Lobby(Location spawnPoint, Game game) {
 		this.spawnPoint = spawnPoint;
@@ -80,6 +86,18 @@ public class Lobby {
 						SoundPlayer.playSound("countdown-tick", player);
 					}
 				}
+				
+				if (showBossbar) {
+					for (UUID uuid : bossbars.keySet()) {
+						BossBar bossbar = bossbars.get(uuid);
+						bossbar.setProgress((double) secondsLeft / getTotalSeconds());
+						
+						if (secondsLeft == 1)
+							bossbar.setTitle(MessagesConfig.getInstance().getStringValue(Bukkit.getPlayer(uuid).getLocale(), "game-starts-in-one-second"));
+						else
+							bossbar.setTitle(MessagesConfig.getInstance().getStringValue(Bukkit.getPlayer(uuid).getLocale(), "game-starts-in").replace("%seconds%", "" + secondsLeft));
+					}
+				}
 			}
 			
 			@Override
@@ -112,6 +130,13 @@ public class Lobby {
 			public void onCancel() {
 				for(GamePlayer gamePlayer : game.getPlayers())
 					MessageSender.sendMessage(gamePlayer.getPlayer(), "The countdown was cancelled");
+				
+				if (showBossbar) {
+					for (BossBar bossbar : bossbars.values()) {
+						bossbar.setProgress(1);
+						bossbar.setTitle(null);
+					}
+				}
 			}
 		};
 	}
@@ -127,6 +152,12 @@ public class Lobby {
 	public void joinPlayer(Player player) {
 		player.teleport(spawnPoint);
 		PlayerUtils.playerReset(player);
+		
+		if (showBossbar) {
+			BossBar bossbar = Bukkit.createBossBar(null, MainConfig.getInstance().getLobbyBossBarColor(), BarStyle.SOLID);
+			bossbar.addPlayer(player);
+			bossbars.put(player.getUniqueId(), bossbar);
+		}
 		
 		// Make sure only players of the same game see each other
 		for (Player p : spawnPoint.getWorld().getPlayers()) {
@@ -244,6 +275,9 @@ public class Lobby {
 			}
 		}
 		
+		if (showBossbar)
+			bossbars.get(player.getUniqueId()).removeAll();
+		
 		updateTeamSelectorLores();
 		player.teleport(MainConfig.getInstance().getMainLobby());
 	}
@@ -254,6 +288,11 @@ public class Lobby {
 		
 		for (IUsable usable : usables)
 			BedwarsPlugin.getInstance().removeUsable(usable);
+		
+		if (showBossbar) {
+			for (BossBar bossbar : bossbars.values())
+				bossbar.removeAll();
+		}
 	}
 	
 	public void updateTeamSelectorLores() {

@@ -5,9 +5,7 @@ categories:
   - priceMaterial: BRICK
     priceCount: 2
     item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: WHITE_WOOL
+      custom-item: COLORED_WOOL
       amount: 4
   - priceMaterial: IRON_INGOT
     priceCount: 4
@@ -26,9 +24,7 @@ categories:
   - priceMaterial: IRON_INGOT
     priceCount: 1
     item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: GLASS
+      custom-item: COLORED_GLASS
       amount: 2
   - priceMaterial: BRICK
     priceCount: 10
@@ -37,7 +33,7 @@ categories:
       v: 1976
       type: COBWEB
       amount: 2
-- name: '&aWeapons'
+- name: '&aMelee Weapons'
   material: GOLDEN_SWORD
   shopentries:
   - priceMaterial: BRICK
@@ -187,14 +183,57 @@ categories:
       v: 1976
       type: ARROW
       amount: 2
+  - priceMaterial: GOLD_INGOT
+    priceCount: 1
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      v: 1976
+      type: TIPPED_ARROW
+      amount: 1
+      meta:
+        ==: ItemMeta
+        meta-type: POTION
+        potion-type: minecraft:slowness
+  - priceMaterial: GOLD_INGOT
+    priceCount: 1
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      v: 1976
+      type: TIPPED_ARROW
+      amount: 1
+      meta:
+        ==: ItemMeta
+        meta-type: POTION
+        potion-type: minecraft:strong_slowness
+  - priceMaterial: GOLD_INGOT
+    priceCount: 2
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      v: 1976
+      type: TIPPED_ARROW
+      amount: 1
+      meta:
+        ==: ItemMeta
+        meta-type: POTION
+        potion-type: minecraft:long_weakness
+  - priceMaterial: GOLD_INGOT
+    priceCount: 2
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      v: 1976
+      type: TIPPED_ARROW
+      amount: 2
+      meta:
+        ==: ItemMeta
+        meta-type: POTION
+        potion-type: minecraft:poison
 - name: '&aArmor'
   material: CHAINMAIL_CHESTPLATE
   shopentries:
   - priceMaterial: IRON_INGOT
     priceCount: 3
     item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
+      custom-item: ARMOR
       type: LEATHER_CHESTPLATE
       meta:
         ==: ItemMeta
@@ -204,8 +243,7 @@ categories:
   - priceMaterial: IRON_INGOT
     priceCount: 7
     item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
+      custom-item: ARMOR
       type: CHAINMAIL_CHESTPLATE
       meta:
         ==: ItemMeta
@@ -215,8 +253,7 @@ categories:
   - priceMaterial: GOLD_INGOT
     priceCount: 4
     item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
+      custom-item: ARMOR
       type: IRON_CHESTPLATE
       meta:
         ==: ItemMeta
@@ -226,13 +263,43 @@ categories:
   - priceMaterial: EMERALD
     priceCount: 2
     item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
+      custom-item: ARMOR
       type: DIAMOND_CHESTPLATE
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
         display-name: '§aLvl.4 Armor'
+        Unbreakable: true
+  - priceMaterial: EMERALD
+    priceCount: 2
+    item:
+      custom-item: ARMOR
+      type: IRON_BOOTS
+      meta:
+        ==: ItemMeta
+        meta-type: UNSPECIFIC
+        enchants:
+          PROTECTION_FALL: 4
+        display-name: '§aFeather Falling Boots'
+        Unbreakable: true
+  - priceMaterial: EMERALD
+    priceCount: 2
+    item:
+      custom-item: ARMOR
+      type: IRON_BOOTS
+      meta:
+        ==: ItemMeta
+        meta-type: UNSPECIFIC
+        attribute-modifiers:
+          GENERIC_KNOCKBACK_RESISTANCE:
+          - ==: org.bukkit.attribute.AttributeModifier
+            amount: 0.5
+            name: generic.knockbackResistance
+            uuid: 00000000-0000-0063-0000-00000750c358
+            operation: 0
+        ItemFlags:
+        - HIDE_ATTRIBUTES
+        display-name: '§aMagnet Boots'
         Unbreakable: true
 - name: '&aTools'
   material: IRON_PICKAXE
@@ -321,6 +388,65 @@ categories:
         meta-type: UNSPECIFIC
         display-name: '§aLvl.1 Shears'
         Unbreakable: true
+- name: '&dPotions'
+  material: POTION
+  shopentries:
+  - priceMaterial: GOLD_INGOT
+    priceCount: 2
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      v: 1976
+      type: POTION
+      meta:
+        ==: ItemMeta
+        meta-type: POTION
+        potion-type: minecraft:swiftness
+  - priceMaterial: GOLD_INGOT
+    priceCount: 2
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      v: 1976
+      type: POTION
+      meta:
+        ==: ItemMeta
+        meta-type: POTION
+        potion-type: minecraft:strong_swiftness
+  - priceMaterial: GOLD_INGOT
+    priceCount: 3
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      v: 1976
+      type: POTION
+      meta:
+        ==: ItemMeta
+        meta-type: POTION
+        potion-type: minecraft:strong_leaping
+  - priceMaterial: EMERALD
+    priceCount: 3
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      v: 1976
+      type: POTION
+      meta:
+        ==: ItemMeta
+        meta-type: POTION
+        potion-type: minecraft:slow_falling
+  - priceMaterial: EMERALD
+    priceCount: 3
+    item:
+      ==: org.bukkit.inventory.ItemStack
+      v: 1976
+      type: POTION
+      meta:
+        ==: ItemMeta
+        meta-type: POTION
+        display-name: '§rInvisibility Potion'
+        potion-type: minecraft:water
+        custom-effects:
+        - ==: PotionEffect
+          effect: 14
+          duration: 1200
+          amplifier: 0
 - name: '&aSpecials'
   material: FIREWORK_ROCKET
   shopentries:
@@ -349,14 +475,13 @@ categories:
   - priceMaterial: EMERALD
     priceCount: 16
     item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
+      custom-item: ARMOR
       type: ELYTRA
       amount: 1
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        Damage: 416
+        Damage: 400
         display-name: '§6ELYTRA'
   - priceMaterial: GOLD_INGOT
     priceCount: 4

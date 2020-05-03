@@ -1,6 +1,7 @@
 package filip.bedwars.utils;
 
 import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.TeamColor;
@@ -25,6 +26,14 @@ public class TeamColorConverter {
 		}
 		
 		return ret;
+	}
+	
+	public static Material convertTeamColorToWoolMaterial(@NotNull TeamColor teamColor) {
+		return Material.valueOf(teamColor.toString() + "_WOOL");
+	}
+	
+	public static Material convertTeamColorToStainedGlassMaterial(@NotNull TeamColor teamColor) {
+		return Material.valueOf(teamColor.toString() + "_STAINED_GLASS");
 	}
 	
 	public static String convertTeamColorToStringForMessages(TeamColor teamColor, String locale) {
