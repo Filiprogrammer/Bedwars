@@ -1,11 +1,10 @@
 package filip.bedwars.game.shop;
 
-import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.GamePlayer;
@@ -15,19 +14,22 @@ import filip.bedwars.utils.SoundPlayer;
 
 public class ItemShopEntry extends ShopEntry {
 
-	protected final ItemStack item;
+	private final List<ItemShopReward> rewards;
+	private final ItemStack displayItem;
 	
-	public ItemShopEntry(Material priceMaterial, int priceCount, ItemStack item) {
+	public ItemShopEntry(Material priceMaterial, int priceCount, List<ItemShopReward> rewards, ItemStack displayItem) {
 		super(priceMaterial, priceCount);
-		this.item = item;
+		this.rewards = rewards;
+		this.displayItem = displayItem;
 	}
 	
 	public int getPriceCountFullStack() {
-		return (item.getMaxStackSize() / item.getAmount()) * priceCount;
-	}
-	
-	public int getPriceCount(int buyItemAmount) {
-		return (buyItemAmount / item.getAmount()) * priceCount;
+		if (rewards.size() == 1) {
+			ItemShopReward reward = rewards.get(0);
+			return reward.getMaxAmountAtOnce() * priceCount;
+		}
+		
+		return priceCount;
 	}
 	
 	/**
@@ -36,75 +38,44 @@ public class ItemShopEntry extends ShopEntry {
 	 * @return true if they can afford it, false if not
 	 */
 	public boolean canBuyFullStack(Player player) {
-		int amount = getPriceItemCount(player.getInventory());
-		int value = item.getMaxStackSize() / item.getAmount();
-		
-		if(amount >= (priceCount * value))
+		if (getPriceItemCount(player.getInventory()) >= getPriceCountFullStack())
 			return true;
 		
 		return false;
 	}
-	
-	public int getMaxBuyAmount(Player player) {
-		return (getPriceItemCount(player.getInventory()) / priceCount) * item.getAmount();
-	}
 
 	@Override
 	public ItemStack getDisplayItem() {
-		return item;
+		if (displayItem != null)
+			return displayItem;
+		
+		if (rewards.size() > 0)
+			return rewards.get(0).getDisplayItem();
+		
+		return null;
 	}
 
 	@Override
 	public void buy(GamePlayer gamePlayer, boolean fullStack) {
 		Player player = gamePlayer.getPlayer();
-		HashMap<Integer, ItemStack> didNotFit = null;
-		int itemAmount = 0;
 		
-		if (fullStack) {
-			int maxBuyAmount = getMaxBuyAmount(player);
+		if (canBuy(player)) {
+			int buyAmount = 1;
 			
-			if (maxBuyAmount > 0) {
-				ItemStack itemStack = item.clone();
-				
-				if (maxBuyAmount < item.getMaxStackSize()) {
-					InventoryUtils.removeItems(player.getInventory(), priceMaterial, getPriceCount(maxBuyAmount));
-					itemAmount = maxBuyAmount;
-				} else {
-					InventoryUtils.removeItems(player.getInventory(), priceMaterial, getPriceCountFullStack());
-					itemAmount = item.getAmount() * (getPriceCountFullStack() / priceCount);
-				}
-				
-				itemStack.setAmount(itemAmount);
-				didNotFit = player.getInventory().addItem(itemStack);
+			if (fullStack && rewards.size() == 1) {
+				ItemShopReward reward = rewards.get(0);
+				buyAmount = Math.min(getMaxBuyAmount(player), reward.getMaxAmountAtOnce());
 			}
+			
+			InventoryUtils.removeItems(player.getInventory(), priceMaterial, buyAmount * priceCount);
+			
+			for (ItemShopReward reward : rewards)
+				reward.reward(gamePlayer, buyAmount);
+			
+			SoundPlayer.playSound("buy-item", player);
 		} else {
-			if (canBuy(player)) {
-				InventoryUtils.removeItems(player.getInventory(), priceMaterial, priceCount);
-				itemAmount = item.getAmount();
-		    	didNotFit = player.getInventory().addItem(item);
-			}
-		}
-		
-		if (didNotFit == null) {
 			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "cant-afford-item"));
 			SoundPlayer.playSound("cant-afford-item", player);
-		} else {
-			for (ItemStack is : didNotFit.values())
-	    		player.getWorld().dropItemNaturally(player.getLocation(), is).setVelocity(player.getLocation().getDirection().multiply(0.5));
-			
-			String itemName = item.getType().toString();
-			
-			if (item.hasItemMeta()) {
-				ItemMeta itemMeta = item.getItemMeta();
-				if (itemMeta.hasDisplayName())
-					itemName = itemMeta.getDisplayName();
-			}
-			
-			MessageSender.sendMessage(player, 
-				MessagesConfig.getInstance().getStringValue(player.getLocale(), "bought-item")
-					.replace("%amount%", "" + itemAmount)
-					.replace("%item%", itemName));
-			SoundPlayer.playSound("buy-item", player);
 		}
 	}
 	

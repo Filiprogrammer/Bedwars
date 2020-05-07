@@ -65,5 +65,9 @@ public abstract class ShopEntry {
 		
 		return false;
 	}
+	
+	public int getMaxBuyAmount(Player player) {
+		return getPriceItemCount(player.getInventory()) / priceCount;
+	}
 
 }

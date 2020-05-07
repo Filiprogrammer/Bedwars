@@ -45,9 +45,12 @@ public class GameManager {
 		}
 		
 		for (Game game : games)
-			for (Player player : players)
-				if (game.containsPlayer(player.getUniqueId()))
+			for (Player player : players) {
+				if (game.containsPlayer(player.getUniqueId())) {
+					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "already-in-a-game"));
 					return null; // One of the players is already in a game
+				}
+			}
 		
 		for (Game game : games) {
 			// Check if the game has the arena we are looking for

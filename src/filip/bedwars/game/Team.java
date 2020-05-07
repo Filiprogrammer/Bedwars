@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.arena.Base;
@@ -15,6 +17,7 @@ public class Team {
     private final Base base;
     private final List<GamePlayer> members = new ArrayList<GamePlayer>();
     private boolean hasBed = true;
+    private Inventory teamChestInventory = Bukkit.createInventory(null, 3 * 9, "Team Chest");
     
     public Team(int id, @NotNull Base base) {
         this.id = id;
@@ -49,14 +52,18 @@ public class Team {
     	return members;
     }
     
+    public Inventory getTeamChestInventory() {
+    	return teamChestInventory;
+    }
+    
     public boolean hasBed() {
     	return hasBed;
     }
     
     public void destroyBed(World world) {
     	hasBed = false;
-    	base.getBedBottom(world).getBlock().setType(Material.AIR);
-    	base.getBedTop(world).getBlock().setType(Material.AIR);
+    	base.getBedBottom(world).getBlock().setType(Material.AIR, false);
+    	base.getBedTop(world).getBlock().setType(Material.AIR, false);
     }
     
 }

@@ -39,6 +39,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -825,6 +826,42 @@ public class GameLogic implements Listener {
 	public void onPrepareAnvil(PrepareAnvilEvent event) {
 		if (event.getView().getPlayer().getWorld().getName().equals(gameWorld.getWorld().getName()))
 			event.setResult(null);
+	}
+	
+	@EventHandler
+	public void onInventoryOpen(InventoryOpenEvent event) {
+		HumanEntity humanEntity = event.getPlayer();
+		
+		if (humanEntity.getWorld().getName().equals(gameWorld.getWorld().getName())) {
+			switch (event.getInventory().getType()) {
+			case ANVIL:
+			case BEACON:
+			case BLAST_FURNACE:
+			case BREWING:
+			case CARTOGRAPHY:
+			case DISPENSER:
+			case DROPPER:
+			case ENCHANTING:
+			case FURNACE:
+			case GRINDSTONE:
+			case HOPPER:
+			case LECTERN:
+			case LOOM:
+			case MERCHANT:
+			case SMOKER:
+			case STONECUTTER:
+			case WORKBENCH:
+				event.setCancelled(true);
+				break;
+			case ENDER_CHEST:
+				event.setCancelled(true);
+				Team team = game.getTeamOfPlayer(humanEntity.getUniqueId());
+				
+				if (team != null)
+					humanEntity.openInventory(team.getTeamChestInventory());
+			default:
+			}
+		}
 	}
 	
 	@EventHandler

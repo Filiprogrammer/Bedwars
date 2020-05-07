@@ -8,10 +8,11 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import filip.bedwars.game.shop.ArmorItemShopEntry;
-import filip.bedwars.game.shop.ColoredGlassItemShopEntry;
-import filip.bedwars.game.shop.ColoredWoolItemShopEntry;
+import filip.bedwars.game.shop.ArmorItemShopReward;
+import filip.bedwars.game.shop.ColoredGlassItemShopReward;
+import filip.bedwars.game.shop.ColoredWoolItemShopReward;
 import filip.bedwars.game.shop.ItemShopEntry;
+import filip.bedwars.game.shop.ItemShopReward;
 import filip.bedwars.game.shop.ShopCategory;
 import filip.bedwars.game.shop.ShopEntry;
 
@@ -40,53 +41,94 @@ public class ShopCategoryDeserializer {
 		for (Map<String, Object> serializedShopEntry : shopEntriesList) {
 			Material priceMaterial = Material.valueOf((String) serializedShopEntry.get("priceMaterial"));
 			int priceCount = (int) serializedShopEntry.get("priceCount");
-			Object item = serializedShopEntry.get("item");
+			Object serializedRewards = serializedShopEntry.get("rewards");
+			List<ItemShopReward> rewards = new ArrayList<>();
 			
-			if (item instanceof ItemStack) {
-				shopEntries.add(new ItemShopEntry(priceMaterial, priceCount, (ItemStack) item));
-			} else if (item instanceof Map) {
-				Map<String, Object> customItemMap = (Map<String, Object>) item;
-				Object customItemNameObject = customItemMap.get("custom-item");
-				
-				if (customItemNameObject != null && customItemNameObject instanceof String) {
-					String customItemName = (String) customItemNameObject;
-					int customItemAmount = 1;
-					Material customItemType = Material.STONE;
-					ItemMeta customItemMeta = null;
-					
-					Object customItemAmountObject = customItemMap.get("amount");
-					
-					if (customItemAmountObject != null && customItemAmountObject instanceof Integer)
-						customItemAmount = (int) customItemAmountObject;
-					
-					Object customItemTypeObject = customItemMap.get("type");
-					
-					if (customItemTypeObject != null && customItemTypeObject instanceof String)
-						customItemType = Material.valueOf((String) customItemTypeObject);
-					
-					Object customItemMetaObject = customItemMap.get("meta");
-					
-					if (customItemMetaObject != null && customItemMetaObject instanceof ItemMeta)
-						customItemMeta = (ItemMeta) customItemMetaObject;
-					
-					switch (customItemName) {
-					case "COLORED_WOOL":
-						shopEntries.add(new ColoredWoolItemShopEntry(priceMaterial, priceCount, customItemAmount));
-						break;
-					case "COLORED_GLASS":
-						shopEntries.add(new ColoredGlassItemShopEntry(priceMaterial, priceCount, customItemAmount));
-						break;
-					case "ARMOR":
-						ItemStack customItem = new ItemStack(customItemType, customItemAmount);
-						customItem.setItemMeta(customItemMeta);
-						shopEntries.add(new ArmorItemShopEntry(priceMaterial, priceCount, customItem));
-						break;
+			if (serializedRewards instanceof List) {
+				for (Object serializedReward : (List<Object>) serializedRewards) {
+					if (serializedReward instanceof Map) {
+						Map<String, Object> itemMap = (Map<String, Object>) serializedReward;
+						int itemAmount = 1;
+						Material itemType = Material.STONE;
+						ItemMeta itemMeta = null;
+						
+						Object itemAmountObject = itemMap.get("amount");
+						
+						if (itemAmountObject != null && itemAmountObject instanceof Integer)
+							itemAmount = (int) itemAmountObject;
+						
+						Object itemTypeObject = itemMap.get("type");
+						
+						if (itemTypeObject != null && itemTypeObject instanceof String)
+							itemType = Material.valueOf((String) itemTypeObject);
+						
+						Object itemMetaObject = itemMap.get("meta");
+						
+						if (itemMetaObject != null && itemMetaObject instanceof ItemMeta)
+							itemMeta = (ItemMeta) itemMetaObject;
+						
+						Object customItemNameObject = itemMap.get("custom-item");
+						
+						if (customItemNameObject != null && customItemNameObject instanceof String) {
+							String customItemName = (String) customItemNameObject;
+							
+							switch (customItemName) {
+							case "COLORED_WOOL":
+								rewards.add(new ColoredWoolItemShopReward(itemAmount));
+								break;
+							case "COLORED_GLASS":
+								rewards.add(new ColoredGlassItemShopReward(itemAmount));
+								break;
+							case "ARMOR":
+								ItemStack customItem = new ItemStack(itemType, itemAmount);
+								customItem.setItemMeta(itemMeta);
+								rewards.add(new ArmorItemShopReward(customItem));
+								break;
+							}
+						} else {
+							ItemStack itemStack = new ItemStack(itemType, itemAmount);
+							itemStack.setItemMeta(itemMeta);
+							rewards.add(new ItemShopReward(itemStack));
+						}
+					} else {
+						MessageSender.sendWarning("An item in the shop category §6\"" + categoryName + "\" §eis not valid");
+						return null;
 					}
 				}
 			} else {
 				MessageSender.sendWarning("An item in the shop category §6\"" + categoryName + "\" §eis not valid");
 				return null;
 			}
+			
+			Object serializedDisplayItem = serializedShopEntry.get("display-item");
+			ItemStack displayItem = null;
+			
+			if (serializedDisplayItem != null && serializedDisplayItem instanceof Map) {
+				Map<String, Object> displayItemMap = (Map<String, Object>) serializedDisplayItem;
+				int itemAmount = 1;
+				Material itemType = Material.STONE;
+				ItemMeta itemMeta = null;
+				
+				Object itemAmountObject = displayItemMap.get("amount");
+				
+				if (itemAmountObject != null && itemAmountObject instanceof Integer)
+					itemAmount = (int) itemAmountObject;
+				
+				Object itemTypeObject = displayItemMap.get("type");
+				
+				if (itemTypeObject != null && itemTypeObject instanceof String)
+					itemType = Material.valueOf((String) itemTypeObject);
+				
+				Object itemMetaObject = displayItemMap.get("meta");
+				
+				if (itemMetaObject != null && itemMetaObject instanceof ItemMeta)
+					itemMeta = (ItemMeta) itemMetaObject;
+				
+				displayItem = new ItemStack(itemType, itemAmount);
+				displayItem.setItemMeta(itemMeta);
+			}
+			
+			shopEntries.add(new ItemShopEntry(priceMaterial, priceCount, rewards, displayItem));
 		}
 		
 		return new ShopCategory(categoryName, categoryMaterial, shopEntries);

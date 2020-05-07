@@ -4,500 +4,551 @@ categories:
   shopentries:
   - priceMaterial: BRICK
     priceCount: 2
-    item:
-      custom-item: COLORED_WOOL
-      amount: 4
+    rewards:
+      - custom-item: COLORED_WOOL
+        amount: 4
   - priceMaterial: IRON_INGOT
     priceCount: 4
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: END_STONE
-      amount: 4
+    rewards:
+      - type: END_STONE
+        amount: 4
   - priceMaterial: IRON_INGOT
     priceCount: 4
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: OAK_PLANKS
-      amount: 4
+    rewards:
+      - type: OAK_PLANKS
+        amount: 4
   - priceMaterial: IRON_INGOT
     priceCount: 1
-    item:
-      custom-item: COLORED_GLASS
-      amount: 2
+    rewards:
+      - custom-item: COLORED_GLASS
+        amount: 2
   - priceMaterial: BRICK
     priceCount: 10
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: COBWEB
-      amount: 2
+    rewards:
+      - type: COBWEB
+        amount: 2
 - name: '&aMelee Weapons'
   material: GOLDEN_SWORD
   shopentries:
   - priceMaterial: BRICK
     priceCount: 8
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: STICK
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        enchants:
-          KNOCKBACK: 1
-        display-name: '§bLvl.1 Knockback Stick'
+    rewards:
+      - type: STICK
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          enchants:
+            KNOCKBACK: 1
+          display-name: '§bLvl.1 Knockback Stick'
   - priceMaterial: IRON_INGOT
     priceCount: 5
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: STICK
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        enchants:
-          KNOCKBACK: 2
-        display-name: '§bLvl.2 Knockback Stick'
+    rewards:
+      - type: STICK
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          enchants:
+            KNOCKBACK: 2
+          display-name: '§bLvl.2 Knockback Stick'
   - priceMaterial: IRON_INGOT
     priceCount: 2
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: GOLDEN_SWORD
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§aLvl.1 Sword'
-        Unbreakable: true
+    rewards:
+      - type: GOLDEN_SWORD
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.1 Sword'
+          Unbreakable: true
   - priceMaterial: IRON_INGOT
     priceCount: 4
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: STONE_SWORD
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§aLvl.2 Sword'
-        Unbreakable: true
+    rewards:
+      - type: STONE_SWORD
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.2 Sword'
+          Unbreakable: true
   - priceMaterial: IRON_INGOT
     priceCount: 6
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: IRON_SWORD
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§aLvl.3 Sword'
-        Unbreakable: true
+    rewards:
+      - type: IRON_SWORD
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.3 Sword'
+          Unbreakable: true
   - priceMaterial: GOLD_INGOT
     priceCount: 3
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: DIAMOND_SWORD
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§aLvl.4 Sword'
-        Unbreakable: true
+    rewards:
+      - type: DIAMOND_SWORD
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.4 Sword'
+          Unbreakable: true
   - priceMaterial: EMERALD
     priceCount: 4
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: DIAMOND_SWORD
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        enchants:
-          DAMAGE_ALL: 1
-          FIRE_ASPECT: 1
-        display-name: '§aLvl.5 Sword'
-        Unbreakable: true
+    rewards:
+      - type: DIAMOND_SWORD
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          enchants:
+            DAMAGE_ALL: 1
+            FIRE_ASPECT: 1
+          display-name: '§aLvl.5 Sword'
+          Unbreakable: true
 - name: '&aBows'
   material: BOW
   shopentries:
   - priceMaterial: GOLD_INGOT
     priceCount: 8
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: BOW
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        enchants:
-          ARROW_DAMAGE: 1
-        display-name: '§aLvl.1 Bow'
-        Damage: 374
+    rewards:
+      - type: BOW
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          enchants:
+            ARROW_DAMAGE: 1
+          display-name: '§aLvl.1 Bow'
+          Damage: 374
   - priceMaterial: GOLD_INGOT
     priceCount: 16
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: BOW
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        enchants:
-          ARROW_DAMAGE: 3
-        display-name: '§aLvl.2 Bow'
-        Damage: 359
+    rewards:
+      - type: BOW
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          enchants:
+            ARROW_DAMAGE: 3
+          display-name: '§aLvl.2 Bow'
+          Damage: 359
   - priceMaterial: EMERALD
     priceCount: 6
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: BOW
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        enchants:
-          ARROW_DAMAGE: 3
-          ARROW_FIRE: 1
-        display-name: '§aLvl.3 Bow'
-        Damage: 344
+    rewards:
+      - type: BOW
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          enchants:
+            ARROW_DAMAGE: 3
+            ARROW_FIRE: 1
+          display-name: '§aLvl.3 Bow'
+          Damage: 344
   - priceMaterial: EMERALD
     priceCount: 8
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: BOW
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        enchants:
-          ARROW_DAMAGE: 4
-          ARROW_FIRE: 2
-          ARROW_KNOCKBACK: 1
-        display-name: '§aLvl.4 Bow'
-        Damage: 339
+    rewards:
+      - type: BOW
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          enchants:
+            ARROW_DAMAGE: 4
+            ARROW_FIRE: 2
+            ARROW_KNOCKBACK: 1
+          display-name: '§aLvl.4 Bow'
+          Damage: 339
   - priceMaterial: GOLD_INGOT
     priceCount: 1
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: ARROW
-      amount: 2
+    rewards:
+      - type: ARROW
+        amount: 2
   - priceMaterial: GOLD_INGOT
     priceCount: 1
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: TIPPED_ARROW
-      amount: 1
-      meta:
-        ==: ItemMeta
-        meta-type: POTION
-        potion-type: minecraft:slowness
+    rewards:
+      - type: TIPPED_ARROW
+        amount: 1
+        meta:
+          ==: ItemMeta
+          meta-type: POTION
+          potion-type: minecraft:slowness
   - priceMaterial: GOLD_INGOT
     priceCount: 1
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: TIPPED_ARROW
-      amount: 1
-      meta:
-        ==: ItemMeta
-        meta-type: POTION
-        potion-type: minecraft:strong_slowness
+    rewards:
+      - type: TIPPED_ARROW
+        amount: 1
+        meta:
+          ==: ItemMeta
+          meta-type: POTION
+          potion-type: minecraft:strong_slowness
   - priceMaterial: GOLD_INGOT
     priceCount: 2
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: TIPPED_ARROW
-      amount: 1
-      meta:
-        ==: ItemMeta
-        meta-type: POTION
-        potion-type: minecraft:long_weakness
+    rewards:
+      - type: TIPPED_ARROW
+        amount: 1
+        meta:
+          ==: ItemMeta
+          meta-type: POTION
+          potion-type: minecraft:long_weakness
   - priceMaterial: GOLD_INGOT
     priceCount: 2
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: TIPPED_ARROW
-      amount: 2
-      meta:
-        ==: ItemMeta
-        meta-type: POTION
-        potion-type: minecraft:poison
-- name: '&aArmor'
+    rewards:
+      - type: TIPPED_ARROW
+        amount: 2
+        meta:
+          ==: ItemMeta
+          meta-type: POTION
+          potion-type: minecraft:poison
+- name: '&aDefense'
   material: CHAINMAIL_CHESTPLATE
   shopentries:
   - priceMaterial: IRON_INGOT
     priceCount: 3
-    item:
-      custom-item: ARMOR
-      type: LEATHER_CHESTPLATE
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§aLvl.1 Armor'
-        Unbreakable: true
+    rewards:
+      - custom-item: ARMOR
+        type: LEATHER_CHESTPLATE
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.1 Armor'
+          Unbreakable: true
+      - custom-item: ARMOR
+        type: LEATHER_LEGGINGS
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.1 Armor'
+          Unbreakable: true
+      - custom-item: ARMOR
+        type: LEATHER_BOOTS
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.1 Armor'
+          Unbreakable: true
+      - custom-item: ARMOR
+        type: LEATHER_HELMET
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.1 Armor'
+          Unbreakable: true
   - priceMaterial: IRON_INGOT
     priceCount: 7
-    item:
-      custom-item: ARMOR
-      type: CHAINMAIL_CHESTPLATE
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§aLvl.2 Armor'
-        Unbreakable: true
+    rewards:
+      - custom-item: ARMOR
+        type: CHAINMAIL_CHESTPLATE
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.2 Armor'
+          Unbreakable: true
+      - custom-item: ARMOR
+        type: CHAINMAIL_LEGGINGS
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.2 Armor'
+          Unbreakable: true
+      - custom-item: ARMOR
+        type: CHAINMAIL_BOOTS
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.2 Armor'
+          Unbreakable: true
+      - custom-item: ARMOR
+        type: CHAINMAIL_HELMET
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.2 Armor'
+          Unbreakable: true
   - priceMaterial: GOLD_INGOT
     priceCount: 4
-    item:
-      custom-item: ARMOR
-      type: IRON_CHESTPLATE
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§aLvl.3 Armor'
-        Unbreakable: true
+    rewards:
+      - custom-item: ARMOR
+        type: IRON_CHESTPLATE
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.3 Armor'
+          Unbreakable: true
+      - custom-item: ARMOR
+        type: IRON_LEGGINGS
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.3 Armor'
+          Unbreakable: true
+      - custom-item: ARMOR
+        type: IRON_BOOTS
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.3 Armor'
+          Unbreakable: true
+      - custom-item: ARMOR
+        type: IRON_HELMET
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.3 Armor'
+          Unbreakable: true
   - priceMaterial: EMERALD
     priceCount: 2
-    item:
-      custom-item: ARMOR
-      type: DIAMOND_CHESTPLATE
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§aLvl.4 Armor'
-        Unbreakable: true
+    rewards:
+      - custom-item: ARMOR
+        type: DIAMOND_CHESTPLATE
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.4 Armor'
+          Unbreakable: true
+      - custom-item: ARMOR
+        type: DIAMOND_LEGGINGS
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.4 Armor'
+          Unbreakable: true
+      - custom-item: ARMOR
+        type: DIAMOND_BOOTS
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.4 Armor'
+          Unbreakable: true
+      - custom-item: ARMOR
+        type: DIAMOND_HELMET
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.4 Armor'
+          Unbreakable: true
   - priceMaterial: EMERALD
     priceCount: 2
-    item:
-      custom-item: ARMOR
-      type: IRON_BOOTS
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        enchants:
-          PROTECTION_FALL: 4
-        display-name: '§aFeather Falling Boots'
-        Unbreakable: true
+    rewards:
+      - custom-item: ARMOR
+        type: IRON_BOOTS
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          enchants:
+            PROTECTION_FALL: 4
+          display-name: '§aFeather Falling Boots'
+          Unbreakable: true
   - priceMaterial: EMERALD
     priceCount: 2
-    item:
-      custom-item: ARMOR
-      type: IRON_BOOTS
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        attribute-modifiers:
-          GENERIC_KNOCKBACK_RESISTANCE:
-          - ==: org.bukkit.attribute.AttributeModifier
-            amount: 0.5
-            name: generic.knockbackResistance
-            uuid: 00000000-0000-0063-0000-00000750c358
-            operation: 0
-        ItemFlags:
-        - HIDE_ATTRIBUTES
-        display-name: '§aMagnet Boots'
-        Unbreakable: true
+    rewards:
+      - custom-item: ARMOR
+        type: IRON_BOOTS
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          attribute-modifiers:
+            GENERIC_KNOCKBACK_RESISTANCE:
+            - ==: org.bukkit.attribute.AttributeModifier
+              amount: 0.5
+              name: generic.knockbackResistance
+              uuid: 00000000-0000-0063-0000-00000750c358
+              operation: 0
+          ItemFlags:
+          - HIDE_ATTRIBUTES
+          display-name: '§aMagnet Boots'
+          Unbreakable: true
+  - priceMaterial: IRON_INGOT
+    priceCount: 8
+    rewards:
+      - type: SHIELD
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          Unbreakable: true
 - name: '&aTools'
   material: IRON_PICKAXE
   shopentries:
   - priceMaterial: BRICK
     priceCount: 10
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: WOODEN_PICKAXE
-      amount: 1
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§aLvl.1 Pickaxe'
-        Unbreakable: true
+    rewards:
+      - type: WOODEN_PICKAXE
+        amount: 1
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.1 Pickaxe'
+          Unbreakable: true
   - priceMaterial: IRON_INGOT
     priceCount: 4
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: STONE_PICKAXE
-      amount: 1
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§aLvl.2 Pickaxe'
-        Unbreakable: true
+    rewards:
+      - type: STONE_PICKAXE
+        amount: 1
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.2 Pickaxe'
+          Unbreakable: true
   - priceMaterial: IRON_INGOT
     priceCount: 8
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: IRON_PICKAXE
-      amount: 1
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§aLvl.3 Pickaxe'
-        Unbreakable: true
+    rewards:
+      - type: IRON_PICKAXE
+        amount: 1
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.3 Pickaxe'
+          Unbreakable: true
   - priceMaterial: GOLD_INGOT
     priceCount: 5
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: DIAMOND_PICKAXE
-      amount: 1
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§aLvl.4 Pickaxe'
-        Unbreakable: true
+    rewards:
+      - type: DIAMOND_PICKAXE
+        amount: 1
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.4 Pickaxe'
+          Unbreakable: true
   - priceMaterial: GOLD_INGOT
     priceCount: 10
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: GOLDEN_PICKAXE
-      amount: 1
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§aLvl.5 Pickaxe'
-        Unbreakable: true
+    rewards:
+      - type: GOLDEN_PICKAXE
+        amount: 1
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.5 Pickaxe'
+          Unbreakable: true
   - priceMaterial: GOLD_INGOT
     priceCount: 8
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: STONE_AXE
-      amount: 1
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§aLvl.1 Axe'
-        Unbreakable: true
+    rewards:
+      - type: STONE_AXE
+        amount: 1
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.1 Axe'
+          Unbreakable: true
   - priceMaterial: GOLD_INGOT
     priceCount: 3
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: SHEARS
-      amount: 1
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§aLvl.1 Shears'
-        Unbreakable: true
+    rewards:
+      - type: SHEARS
+        amount: 1
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§aLvl.1 Shears'
+          Unbreakable: true
 - name: '&dPotions'
   material: POTION
   shopentries:
   - priceMaterial: GOLD_INGOT
     priceCount: 2
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: POTION
-      meta:
-        ==: ItemMeta
-        meta-type: POTION
-        potion-type: minecraft:swiftness
+    rewards:
+      - type: POTION
+        meta:
+          ==: ItemMeta
+          meta-type: POTION
+          potion-type: minecraft:swiftness
   - priceMaterial: GOLD_INGOT
     priceCount: 2
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: POTION
-      meta:
-        ==: ItemMeta
-        meta-type: POTION
-        potion-type: minecraft:strong_swiftness
+    rewards:
+      - type: POTION
+        meta:
+          ==: ItemMeta
+          meta-type: POTION
+          potion-type: minecraft:strong_swiftness
   - priceMaterial: GOLD_INGOT
     priceCount: 3
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: POTION
-      meta:
-        ==: ItemMeta
-        meta-type: POTION
-        potion-type: minecraft:strong_leaping
+    rewards:
+      - type: POTION
+        meta:
+          ==: ItemMeta
+          meta-type: POTION
+          potion-type: minecraft:strong_leaping
   - priceMaterial: EMERALD
     priceCount: 3
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: POTION
-      meta:
-        ==: ItemMeta
-        meta-type: POTION
-        potion-type: minecraft:slow_falling
+    rewards:
+      - type: POTION
+        meta:
+          ==: ItemMeta
+          meta-type: POTION
+          potion-type: minecraft:slow_falling
   - priceMaterial: EMERALD
     priceCount: 3
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: POTION
-      meta:
-        ==: ItemMeta
-        meta-type: POTION
-        display-name: '§rInvisibility Potion'
-        potion-type: minecraft:water
-        custom-effects:
-        - ==: PotionEffect
-          effect: 14
-          duration: 1200
-          amplifier: 0
+    rewards:
+      - type: POTION
+        meta:
+          ==: ItemMeta
+          meta-type: POTION
+          display-name: '§rInvisibility Potion'
+          potion-type: minecraft:water
+          custom-effects:
+          - ==: PotionEffect
+            effect: 14
+            duration: 1200
+            amplifier: 0
 - name: '&aSpecials'
   material: FIREWORK_ROCKET
   shopentries:
   - priceMaterial: GOLD_INGOT
     priceCount: 4
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: TNT
-      amount: 1
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§4T§fN§4T'
+    rewards:
+      - type: TNT
+        amount: 1
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§4T§fN§4T'
   - priceMaterial: EMERALD
     priceCount: 6
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: ENDER_PEARL
-      amount: 1
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        display-name: '§2Enderpearl'
+    rewards:
+      - type: ENDER_PEARL
+        amount: 1
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§2Enderpearl'
   - priceMaterial: EMERALD
     priceCount: 16
-    item:
-      custom-item: ARMOR
-      type: ELYTRA
-      amount: 1
-      meta:
-        ==: ItemMeta
-        meta-type: UNSPECIFIC
-        Damage: 400
-        display-name: '§6ELYTRA'
+    rewards:
+      - custom-item: ARMOR
+        type: ELYTRA
+        amount: 1
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          Damage: 400
+          display-name: '§6ELYTRA'
   - priceMaterial: GOLD_INGOT
     priceCount: 4
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: FIREWORK_ROCKET
-      amount: 1
+    rewards:
+      - type: FIREWORK_ROCKET
+        amount: 1
   - priceMaterial: IRON_INGOT
     priceCount: 24
-    item:
-      ==: org.bukkit.inventory.ItemStack
-      v: 1976
-      type: FIRE_CHARGE
-      amount: 1
+    rewards:
+      - type: FIRE_CHARGE
+        amount: 1
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§cBoom Boom Ball'
+  - priceMaterial: GOLD_INGOT
+    priceCount: 6
+    rewards:
+      - type: GOLDEN_APPLE
+        amount: 1
+- name: '&aKits'
+  material: CRAFTING_TABLE
+  shopentries:
+  - priceMaterial: BRICK
+    priceCount: 40
+    display-item:
+      type: STICK
       meta:
         ==: ItemMeta
         meta-type: UNSPECIFIC
-        display-name: '§cBoom Boom Ball'
+        display-name: '§bStarter Kit'
+        lore:
+          - 1x Lvl.1 Knockback Stick
+          - 64x Wool
+    rewards:
+      - type: STICK
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          enchants:
+            KNOCKBACK: 1
+          display-name: '§bLvl.1 Knockback Stick'
+      - custom-item: COLORED_WOOL
+        amount: 64

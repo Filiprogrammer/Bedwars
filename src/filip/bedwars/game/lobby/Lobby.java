@@ -246,6 +246,7 @@ public class Lobby {
 		
 		usables.add(usable);
 		player.getInventory().setItem(8, usable.getItemStack());
+		updateTeamSelectorLores();
 	}
 	
 	/**
