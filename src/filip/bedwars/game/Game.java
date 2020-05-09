@@ -182,6 +182,8 @@ public class Game implements Listener {
 			else
 				lobby.leavePlayer(player);
 			
+			gamePlayer.cleanup();
+			
 			for(GamePlayer gp : players) {
 				Player p = gp.getPlayer();
 				MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "player-left").replace("%player%", player.getName()));

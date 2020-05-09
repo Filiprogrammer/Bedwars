@@ -36,3 +36,4 @@ lobby-bossbar-color: YELLOW
 hunger: false
 drop-only-spawner-resources-on-death: true
 attack-cooldown: false
+respawn-delay: 5

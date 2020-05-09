@@ -10,6 +10,7 @@ public class GamePlayer {
 
 	public final UUID uuid;
 	public final Game game;
+	private Countdown countdown;
 	
 	public GamePlayer(UUID uuid, Game game) {
 		this.uuid = uuid;
@@ -30,6 +31,21 @@ public class GamePlayer {
 		}
 		
 		return null;
+	}
+	
+	public void scheduleCountdown(Countdown countdown) {
+		if (countdown != null)
+			countdown.cancel();
+		
+		this.countdown = countdown;
+		countdown.start();
+	}
+	
+	public void cleanup() {
+		if (countdown != null) {
+			countdown.cancel();
+			countdown = null;
+		}
 	}
 	
 }

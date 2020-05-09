@@ -1,6 +1,7 @@
 package filip.bedwars.game;
 
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.lang.reflect.Field;
@@ -18,6 +19,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -27,6 +29,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -58,7 +62,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import com.destroystokyo.paper.Title;
-import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import com.mojang.authlib.GameProfile;
 
 import filip.bedwars.BedwarsPlugin;
@@ -557,6 +560,13 @@ public class GameLogic implements Listener {
 			}
 		}
 		
+		net.minecraft.server.v1_14_R1.ItemStack nmsItemStack = org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack.asNMSCopy(event.getItemInHand());
+		
+		if (nmsItemStack.hasTag() && nmsItemStack.getTag().hasKey("bedwars-blast-proof"))
+			block.setMetadata("bedwars_blast_proof", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
+		else
+			block.removeMetadata("bedwars_blast_proof", BedwarsPlugin.getInstance());
+		
 		block.setMetadata("bedwars_placed", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
 	}
 	
@@ -611,6 +621,72 @@ public class GameLogic implements Listener {
 	}
 	
 	@EventHandler
+	public void onBlockPistonExtend(BlockPistonExtendEvent event) {
+		List<Block> blocks = event.getBlocks();
+		
+		if (event.getBlock().hasMetadata("bedwars_placed")) {
+			for (Block b : blocks) {
+				if (!b.hasMetadata("bedwars_placed")) {
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
+		
+		BlockFace direction = event.getDirection();
+		ListIterator<Block> iterator = blocks.listIterator(blocks.size());
+		
+		while (iterator.hasPrevious()) {
+			Block b = iterator.previous();
+			
+			if (b.hasMetadata("bedwars_placed")) {
+				b.removeMetadata("bedwars_placed", BedwarsPlugin.getInstance());
+				b.getLocation().clone().add(direction.getDirection()).getBlock().setMetadata("bedwars_placed", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
+				
+				if (b.hasMetadata("bedwars_blast_proof")) {
+					b.removeMetadata("bedwars_blast_proof", BedwarsPlugin.getInstance());
+					b.getLocation().clone().add(direction.getDirection()).getBlock().setMetadata("bedwars_blast_proof", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
+				}
+			} else {
+				b.getLocation().clone().add(direction.getDirection()).getBlock().removeMetadata("bedwars_placed", BedwarsPlugin.getInstance());
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onBlockPistonRetract(BlockPistonRetractEvent event) {
+		List<Block> blocks = event.getBlocks();
+		
+		if (event.getBlock().hasMetadata("bedwars_placed")) {
+			for (Block b : blocks) {
+				if (!b.hasMetadata("bedwars_placed")) {
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
+		
+		BlockFace direction = event.getDirection();
+		ListIterator<Block> iterator = blocks.listIterator(blocks.size());
+		
+		while (iterator.hasPrevious()) {
+			Block b = iterator.previous();
+			
+			if (b.hasMetadata("bedwars_placed")) {
+				b.removeMetadata("bedwars_placed", BedwarsPlugin.getInstance());
+				b.getLocation().clone().add(direction.getDirection()).getBlock().setMetadata("bedwars_placed", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
+				
+				if (b.hasMetadata("bedwars_blast_proof")) {
+					b.removeMetadata("bedwars_blast_proof", BedwarsPlugin.getInstance());
+					b.getLocation().clone().add(direction.getDirection()).getBlock().setMetadata("bedwars_blast_proof", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
+				}
+			} else {
+				b.getLocation().clone().add(direction.getDirection()).getBlock().removeMetadata("bedwars_placed", BedwarsPlugin.getInstance());
+			}
+		}
+	}
+	
+	@EventHandler
 	public void onEntityExplode(EntityExplodeEvent event) {
 		// Check if the explosion is in the game world
 		if (event.getLocation().getWorld().getName().equals(getGameWorld().getWorld().getName())) {
@@ -624,7 +700,7 @@ public class GameLogic implements Listener {
 	        	if (block.getBlockData() instanceof Bed)
 	        		event.blockList().remove(block);
 	        	
-	        	if (!block.hasMetadata("bedwars_placed"))
+	        	if (!block.hasMetadata("bedwars_placed") || block.hasMetadata("bedwars_blast_proof"))
 	        		event.blockList().remove(block);
 	        }
 		}
@@ -725,6 +801,35 @@ public class GameLogic implements Listener {
 						
 						joinSpectator(player);
 					}, 1L);
+				} else {
+					gamePlayer.scheduleCountdown(new Countdown(MainConfig.getInstance().getRespawnDelay()) {
+						@Override
+						public void onTick() {
+							if (getSecondsLeft() != 0) {
+								MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "you-will-respawn-in").replace("%seconds%", "" + getSecondsLeft()));
+								player.sendTitle(
+										MessagesConfig.getInstance().getStringValue(player.getLocale(), "you-died"),
+										MessagesConfig.getInstance().getStringValue(player.getLocale(), "you-will-respawn-in").replace("%seconds%", "" + getSecondsLeft()),
+										0, 25, 10);
+							}
+						}
+						
+						@Override
+						public void onStart() {
+							player.setItemOnCursor(null);
+							player.spigot().respawn();
+							player.setGameMode(GameMode.SPECTATOR);
+						}
+						
+						@Override
+						public boolean onFinish() {
+							respawnPlayerAtBase(player);
+							return false;
+						}
+						
+						@Override
+						public void onCancel() {}
+					});
 				}
 				
 				for (Player p : gameWorld.getWorld().getPlayers()) {
@@ -744,31 +849,8 @@ public class GameLogic implements Listener {
 		Player player = event.getPlayer();
 		
 		// Check if the player is in the game world
-		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
-			Team team = game.getTeamOfPlayer(player.getUniqueId());
-			
-			if (team == null)
-				event.setRespawnLocation(getSpectatorSpawn());
-			else
-				event.setRespawnLocation(team.getBase().getSpawn(gameWorld.getWorld()));
-		}
-	}
-	
-	@EventHandler
-	public void onPlayerPostRespawn(PlayerPostRespawnEvent event) {
-		Player player = event.getPlayer();
-		
-		// Check if the player is in the game world
-		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
-			for (VillagerNPC itemShopNPC : itemShopNPCs)
-				itemShopNPC.respawn(player);
-			
-			for (VillagerNPC teamShopNPC : teamShopNPCs)
-				teamShopNPC.respawn(player);
-			
-			for (EnderDragonController enderDragonController : enderDragonControllers)
-				enderDragonController.respawn(player);
-		}
+		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
+			event.setRespawnLocation(getSpectatorSpawn());
 	}
 	
 	@EventHandler
@@ -932,6 +1014,23 @@ public class GameLogic implements Listener {
 			return game.getTeams().get(0).getBase().getSpawn(gameWorld.getWorld());
 		
 		return spectatorSpawn;
+	}
+	
+	private void respawnPlayerAtBase(Player player) {
+		PlayerUtils.playerReset(player);
+		Team team = game.getTeamOfPlayer(player.getUniqueId());
+		
+		if (team != null)
+			player.teleport(team.getBase().getSpawn(gameWorld.getWorld()));
+		
+		for (VillagerNPC itemShopNPC : itemShopNPCs)
+			itemShopNPC.respawn(player);
+		
+		for (VillagerNPC teamShopNPC : teamShopNPCs)
+			teamShopNPC.respawn(player);
+		
+		for (EnderDragonController enderDragonController : enderDragonControllers)
+			enderDragonController.respawn(player);
 	}
 	
 }

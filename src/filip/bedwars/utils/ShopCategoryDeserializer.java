@@ -68,26 +68,33 @@ public class ShopCategoryDeserializer {
 							itemMeta = (ItemMeta) itemMetaObject;
 						
 						Object customItemNameObject = itemMap.get("custom-item");
+						ItemStack itemStack = new ItemStack(itemType, itemAmount);
+						itemStack.setItemMeta(itemMeta);
+						Object blastProofObject = itemMap.get("blast-proof");
+						
+						if (blastProofObject != null && blastProofObject instanceof Boolean && (Boolean)blastProofObject) {
+							net.minecraft.server.v1_14_R1.ItemStack nmsItemStack = org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack.asNMSCopy(itemStack);
+							net.minecraft.server.v1_14_R1.NBTTagCompound nbtTagCompound = nmsItemStack.getOrCreateTag();
+							nbtTagCompound.set("bedwars-blast-proof", new net.minecraft.server.v1_14_R1.NBTTagInt(0));
+							nmsItemStack.setTag(nbtTagCompound);
+							itemStack = org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack.asBukkitCopy(nmsItemStack);
+						}
 						
 						if (customItemNameObject != null && customItemNameObject instanceof String) {
 							String customItemName = (String) customItemNameObject;
 							
 							switch (customItemName) {
 							case "COLORED_WOOL":
-								rewards.add(new ColoredWoolItemShopReward(itemAmount));
+								rewards.add(new ColoredWoolItemShopReward(itemStack));
 								break;
 							case "COLORED_GLASS":
-								rewards.add(new ColoredGlassItemShopReward(itemAmount));
+								rewards.add(new ColoredGlassItemShopReward(itemStack));
 								break;
 							case "ARMOR":
-								ItemStack customItem = new ItemStack(itemType, itemAmount);
-								customItem.setItemMeta(itemMeta);
-								rewards.add(new ArmorItemShopReward(customItem));
+								rewards.add(new ArmorItemShopReward(itemStack));
 								break;
 							}
 						} else {
-							ItemStack itemStack = new ItemStack(itemType, itemAmount);
-							itemStack.setItemMeta(itemMeta);
 							rewards.add(new ItemShopReward(itemStack));
 						}
 					} else {

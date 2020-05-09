@@ -21,6 +21,7 @@ categories:
     priceCount: 1
     rewards:
       - custom-item: COLORED_GLASS
+        blast-proof: true
         amount: 2
   - priceMaterial: BRICK
     priceCount: 10
@@ -540,8 +541,8 @@ categories:
         meta-type: UNSPECIFIC
         display-name: '§bStarter Kit'
         lore:
-          - 1x Lvl.1 Knockback Stick
-          - 64x Wool
+          - '§71x Lvl.1 Knockback Stick'
+          - '§764x Wool'
     rewards:
       - type: STICK
         meta:

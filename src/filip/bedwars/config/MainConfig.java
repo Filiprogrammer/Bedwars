@@ -27,6 +27,7 @@ public class MainConfig extends SingleConfig {
 	private boolean attackCooldown = false;
 	private boolean lobbyBossbar = true;
 	private BarColor lobbyBossbarColor = BarColor.YELLOW;
+	private int respawnDelay = 5;
 	
 	protected MainConfig() {
 		super("config.yml");
@@ -92,6 +93,10 @@ public class MainConfig extends SingleConfig {
 		return lobbyBossbarColor;
 	}
 	
+	public int getRespawnDelay() {
+		return respawnDelay;
+	}
+	
 	public void setMainLobby(Location loc) {
 		mainLobby = loc;
 	}
@@ -119,6 +124,7 @@ public class MainConfig extends SingleConfig {
 		config.set("hunger", hunger);
 		config.set("drop-only-spawner-resources-on-death", dropOnlySpawnerResourcesOnDeath);
 		config.set("attack-cooldown", attackCooldown);
+		config.set("respawn-delay", respawnDelay);
 		
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
 		
@@ -168,6 +174,7 @@ public class MainConfig extends SingleConfig {
 		joinSignLines[2] = config.getString("join-sign-line-three", "").replace('&', '§');
 		joinSignLines[3] = config.getString("join-sign-line-four", "&b<Join Arena>").replace('&', '§');
 		lobbyBossbar = config.getBoolean("lobby-bossbar", true);
+		respawnDelay = config.getInt("respawn-delay", 5);
 		
 		try {
 			lobbyBossbarColor = BarColor.valueOf(config.getString("lobby-bossbar-color", "YELLOW"));
