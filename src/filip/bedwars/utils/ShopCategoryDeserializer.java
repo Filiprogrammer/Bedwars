@@ -93,6 +93,13 @@ public class ShopCategoryDeserializer {
 							case "ARMOR":
 								rewards.add(new ArmorItemShopReward(itemStack));
 								break;
+							case "FIREBALL":
+								net.minecraft.server.v1_14_R1.ItemStack nmsItemStack = org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack.asNMSCopy(itemStack);
+								net.minecraft.server.v1_14_R1.NBTTagCompound nbtTagCompound = nmsItemStack.getOrCreateTag();
+								nbtTagCompound.set("bedwars-fireball", new net.minecraft.server.v1_14_R1.NBTTagInt(0));
+								nmsItemStack.setTag(nbtTagCompound);
+								rewards.add(new ItemShopReward(org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack.asBukkitCopy(nmsItemStack)));
+								break;
 							}
 						} else {
 							rewards.add(new ItemShopReward(itemStack));

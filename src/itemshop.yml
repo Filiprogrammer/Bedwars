@@ -522,7 +522,8 @@ categories:
   - priceMaterial: IRON_INGOT
     priceCount: 24
     rewards:
-      - type: FIRE_CHARGE
+      - custom-item: FIREBALL
+        type: FIRE_CHARGE
         amount: 1
         meta:
           ==: ItemMeta

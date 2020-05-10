@@ -23,6 +23,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -55,6 +56,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -445,6 +447,34 @@ public class GameLogic implements Listener {
 			} else if (event.getAction() == org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK) {
 				if (event.getClickedBlock().getType() == Material.FLOWER_POT || event.getClickedBlock().getType().toString().startsWith("POTTED_"))
 					event.setCancelled(true);
+			}
+		}
+		
+		if (event.hasItem()) {
+			if (event.getAction() == org.bukkit.event.block.Action.RIGHT_CLICK_AIR || event.getAction() == org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK) {
+				net.minecraft.server.v1_14_R1.ItemStack nmsItemStack = org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack.asNMSCopy(event.getItem());
+				
+				if (nmsItemStack.hasTag() && nmsItemStack.getTag().hasKey("bedwars-fireball")) {
+					boolean shouldLaunchFireball = false;
+					
+					if (event.getHand() == EquipmentSlot.HAND) {
+						net.minecraft.server.v1_14_R1.ItemStack nmsOffHandItemStack = org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack.asNMSCopy(player.getInventory().getItemInOffHand());
+						
+						if (!(nmsOffHandItemStack.hasTag() && nmsOffHandItemStack.getTag().hasKey("bedwars-fireball")))
+							shouldLaunchFireball = true;
+					} else {
+						shouldLaunchFireball = true;
+					}
+					
+					if (shouldLaunchFireball) {
+						Fireball fireball = (Fireball) gameWorld.getWorld().spawnEntity(player.getLocation().clone().add(player.getLocation().getDirection()).add(0, 1, 0), EntityType.FIREBALL);
+						fireball.setVelocity(player.getLocation().getDirection());
+						fireball.setYield(3);
+						event.setCancelled(true);
+						event.getItem().subtract();
+						SoundPlayer.playSound("fireball-shoot", player);
+					}
+				}
 			}
 		}
 	}
