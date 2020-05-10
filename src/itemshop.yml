@@ -23,6 +23,10 @@ categories:
       - custom-item: COLORED_GLASS
         blast-proof: true
         amount: 2
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§rBlast Proof Glass'
   - priceMaterial: BRICK
     priceCount: 10
     rewards:

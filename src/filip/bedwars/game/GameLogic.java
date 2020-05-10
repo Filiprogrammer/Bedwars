@@ -747,10 +747,12 @@ public class GameLogic implements Listener {
 				EntityDamageEvent entityDamageEvent = player.getLastDamageCause();
 				
 				if (entityDamageEvent != null) {
-					if (entityDamageEvent.getCause() == DamageCause.PROJECTILE || entityDamageEvent.getCause() == DamageCause.VOID) {
-						Player killer = player.getKiller();
+					Player killer = player.getKiller();
+					
+					if (killer != null) {
+						SoundPlayer.playSound("kill", killer);
 						
-						if (killer != null) {
+						if (entityDamageEvent.getCause() == DamageCause.PROJECTILE || entityDamageEvent.getCause() == DamageCause.VOID) {
 							Iterator<ItemStack> iter = event.getDrops().iterator();
 							
 							while (iter.hasNext()) {

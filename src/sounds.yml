@@ -37,3 +37,6 @@ game-started:
 victory:
   sound: UI_TOAST_CHALLENGE_COMPLETE
   pitch: 1.25
+kill:
+  sound: ENTITY_ARROW_HIT_PLAYER
+  pitch: 0.9
