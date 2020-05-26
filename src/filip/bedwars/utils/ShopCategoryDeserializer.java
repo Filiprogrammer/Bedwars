@@ -39,8 +39,31 @@ public class ShopCategoryDeserializer {
 		List<ShopEntry> shopEntries = new ArrayList<ShopEntry>();
 		
 		for (Map<String, Object> serializedShopEntry : shopEntriesList) {
-			Material priceMaterial = Material.valueOf((String) serializedShopEntry.get("priceMaterial"));
-			int priceCount = (int) serializedShopEntry.get("priceCount");
+			Object priceMaterialObject = serializedShopEntry.get("priceMaterial");
+			Material priceMaterial = Material.STONE;
+			
+			if (priceMaterialObject == null) {
+				MessageSender.sendWarning("priceMaterial of an item in the shop category §6\"" + categoryName + "\" §e was not specified");
+			} else if (!(priceMaterialObject instanceof String)) {
+				MessageSender.sendWarning("priceMaterial of an item in the shop category §6\"" + categoryName + "\" §e has an invalid value");
+			} else {
+				try {
+					priceMaterial = Material.valueOf((String) priceMaterialObject);
+				} catch (IllegalArgumentException e) {
+					MessageSender.sendWarning("priceMaterial of an item in the shop category §6\"" + categoryName + "\" §e has an invalid value");
+				}
+			}
+			
+			Object priceCountObject = serializedShopEntry.get("priceCount");
+			int priceCount = 1;
+			
+			if (priceCountObject == null)
+				MessageSender.sendWarning("priceCount of an item in the shop category §6\"" + categoryName + "\" §e was not specified");
+			else if (!(priceCountObject instanceof Integer))
+				MessageSender.sendWarning("priceCount of an item in the shop category §6\"" + categoryName + "\" §e has an invalid value");
+			else
+				priceCount = (int) priceCountObject;
+			
 			Object serializedRewards = serializedShopEntry.get("rewards");
 			List<ItemShopReward> rewards = new ArrayList<>();
 			

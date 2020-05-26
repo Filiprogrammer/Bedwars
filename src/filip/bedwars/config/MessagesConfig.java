@@ -38,11 +38,17 @@ public class MessagesConfig extends MultipleConfig {
 	
 	public String getStringValue(String language, String key) {
 		Map<String, String> msgs = messages.get(language);
+		String ret = null;
 		
 		if (msgs == null)
-			return messages.get(MainConfig.getInstance().getLanguage()).get(key); // If the language was not found it will use the default language from the config
+			ret = messages.get(MainConfig.getInstance().getLanguage()).get(key); // If the language was not found, use the default language from the config
+		else
+			ret = msgs.get(key);
 		
-		return msgs.get(key);
+		if (ret == null)
+			ret = "";
+		
+		return ret;
 	}
 	
 	public static MessagesConfig getInstance() {
