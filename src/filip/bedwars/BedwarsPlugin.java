@@ -41,12 +41,14 @@ import filip.bedwars.listener.player.PlayerQuitListener;
 import filip.bedwars.listener.player.WorldInitHandler;
 import filip.bedwars.listener.player.WorldInitListener;
 import filip.bedwars.sign.GameJoinSignListener;
+import filip.bedwars.utils.ReflectionUtils;
 
 public class BedwarsPlugin extends JavaPlugin {
 
 	private static BedwarsPlugin plugin;
 	
 	private MultiverseCore mv;
+	private String serverVersion;
 	
 	private List<IClickable> clickables = new ArrayList<IClickable>();
 	private List<IUsable> usables = new ArrayList<IUsable>();
@@ -57,9 +59,12 @@ public class BedwarsPlugin extends JavaPlugin {
 	private List<PacketReader> packetReaders = new ArrayList<PacketReader>();
 	private WorldInitListener worldInitListener;
 	
+	public ReflectionUtils reflectionUtils;
+	
 	@Override
 	public void onEnable() {
 		plugin = this;
+		reflectionUtils = new ReflectionUtils();
 		
 		mv = (MultiverseCore) getServer().getPluginManager().getPlugin("Multiverse-Core");
 		
@@ -296,6 +301,13 @@ public class BedwarsPlugin extends JavaPlugin {
     
     public MultiverseCore getMultiverse() {
     	return mv;
+    }
+    
+    public String getServerVersion() {
+    	if (serverVersion == null)
+    		serverVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+    	
+    	return serverVersion;
     }
     
 }

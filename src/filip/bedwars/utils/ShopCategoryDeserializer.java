@@ -1,5 +1,6 @@
 package filip.bedwars.utils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.game.shop.ArmorItemShopReward;
 import filip.bedwars.game.shop.ColoredGlassItemShopReward;
 import filip.bedwars.game.shop.ColoredWoolItemShopReward;
@@ -96,11 +98,15 @@ public class ShopCategoryDeserializer {
 						Object blastProofObject = itemMap.get("blast-proof");
 						
 						if (blastProofObject != null && blastProofObject instanceof Boolean && (Boolean)blastProofObject) {
-							net.minecraft.server.v1_14_R1.ItemStack nmsItemStack = org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack.asNMSCopy(itemStack);
-							net.minecraft.server.v1_14_R1.NBTTagCompound nbtTagCompound = nmsItemStack.getOrCreateTag();
-							nbtTagCompound.set("bedwars-blast-proof", new net.minecraft.server.v1_14_R1.NBTTagInt(0));
-							nmsItemStack.setTag(nbtTagCompound);
-							itemStack = org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack.asBukkitCopy(nmsItemStack);
+							try {
+								Object nmsItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, itemStack);
+								Object nbtTagCompound = BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsItemStack);
+								BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundSetMethod.invoke(nbtTagCompound, "bedwars-blast-proof", BedwarsPlugin.getInstance().reflectionUtils.nbtTagIntConstructor.newInstance(0));
+								BedwarsPlugin.getInstance().reflectionUtils.itemStackSetTagMethod.invoke(nmsItemStack, nbtTagCompound);
+								itemStack = (ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsBukkitCopyMethod.invoke(null, nmsItemStack);
+							} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+								e.printStackTrace();
+							}
 						}
 						
 						if (customItemNameObject != null && customItemNameObject instanceof String) {
@@ -117,11 +123,15 @@ public class ShopCategoryDeserializer {
 								rewards.add(new ArmorItemShopReward(itemStack));
 								break;
 							case "FIREBALL":
-								net.minecraft.server.v1_14_R1.ItemStack nmsItemStack = org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack.asNMSCopy(itemStack);
-								net.minecraft.server.v1_14_R1.NBTTagCompound nbtTagCompound = nmsItemStack.getOrCreateTag();
-								nbtTagCompound.set("bedwars-fireball", new net.minecraft.server.v1_14_R1.NBTTagInt(0));
-								nmsItemStack.setTag(nbtTagCompound);
-								rewards.add(new ItemShopReward(org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack.asBukkitCopy(nmsItemStack)));
+								try {
+									Object nmsItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, itemStack);
+									Object nbtTagCompound = BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsItemStack);
+									BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundSetMethod.invoke(nbtTagCompound, "bedwars-fireball", BedwarsPlugin.getInstance().reflectionUtils.nbtTagIntConstructor.newInstance(0));
+									BedwarsPlugin.getInstance().reflectionUtils.itemStackSetTagMethod.invoke(nmsItemStack, nbtTagCompound);
+									rewards.add(new ItemShopReward((ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsBukkitCopyMethod.invoke(null, nmsItemStack)));
+								} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+									e.printStackTrace();
+								}
 								break;
 							}
 						} else {

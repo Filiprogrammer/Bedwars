@@ -1,6 +1,7 @@
 package filip.bedwars.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -10,8 +11,7 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.IllegalPluginAccessException;
@@ -19,28 +19,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import filip.bedwars.BedwarsPlugin;
-import net.minecraft.server.v1_14_R1.DragonControllerHold;
-import net.minecraft.server.v1_14_R1.DragonControllerLanding;
-import net.minecraft.server.v1_14_R1.DragonControllerLandingFly;
-import net.minecraft.server.v1_14_R1.DragonControllerPhase;
-import net.minecraft.server.v1_14_R1.EntityEnderDragon;
-import net.minecraft.server.v1_14_R1.EntityLiving;
-import net.minecraft.server.v1_14_R1.EntityPlayer;
-import net.minecraft.server.v1_14_R1.EntityTypes;
-import net.minecraft.server.v1_14_R1.PacketPlayOutEntityDestroy;
-import net.minecraft.server.v1_14_R1.PacketPlayOutEntityTeleport;
-import net.minecraft.server.v1_14_R1.PacketPlayOutSpawnEntityLiving;
-import net.minecraft.server.v1_14_R1.PlayerConnection;
-import net.minecraft.server.v1_14_R1.Vec3D;
-import net.minecraft.server.v1_14_R1.WorldServer;
 
 public class EnderDragonController {
 
+	private final ReflectionUtils reflectionUtils;
 	private final List<Entity> targetEntities;
 	private final Map<Player, Boolean> viewers = new HashMap<>();
 	private BukkitTask task;
 	private BukkitRunnable bukkitRunnable;
-	private EntityEnderDragon dragon;
+	private Object dragon;
 	
 	private Entity currentTargetEntity;
 	private int dragonPhase;
@@ -48,6 +35,8 @@ public class EnderDragonController {
 	private final Location spawnLoc;
 	
 	public EnderDragonController(Location loc, List<Entity> targetEntities, Set<Player> viewers) {
+		reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
+		
 		this.targetEntities = targetEntities;
 		
 		for (Player viewer : viewers)
@@ -116,8 +105,8 @@ public class EnderDragonController {
 						dragonHoldingPattern(currentTargetEntity.getLocation());
 						break;
 					case 1:
-						if (currentTargetEntity instanceof EntityLiving)
-							dragonStrafePlayer((EntityLiving) currentTargetEntity);
+						if (reflectionUtils.entityLivingClass.isInstance(currentTargetEntity))
+							dragonStrafePlayer(currentTargetEntity);
 						break;
 					case 2:
 						dragonChargingPlayer(currentTargetEntity.getLocation());
@@ -131,7 +120,11 @@ public class EnderDragonController {
 					}
 				}
 				
-				dragon.tick();
+				try {
+					reflectionUtils.entityEnderDragonTickMethod.invoke(dragon);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					e.printStackTrace();
+				}
 				updateLocation();
 			}
 		};
@@ -142,20 +135,36 @@ public class EnderDragonController {
 	}
 	
 	public void respawn(Player... viewers) {
-		for (Player p : viewers) {
-			EntityPlayer entityPlayer = ((CraftPlayer) p).getHandle();
-			PacketPlayOutSpawnEntityLiving packet = new PacketPlayOutSpawnEntityLiving(dragon);
-			PlayerConnection playerConnection = entityPlayer.playerConnection;
-			playerConnection.sendPacket(packet);
+		try {
+			for (Player p : viewers) {
+				// EntityPlayer entityPlayer = ((CraftPlayer) p).getHandle();
+				Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(p));
+				// PacketPlayOutSpawnEntityLiving packet = new PacketPlayOutSpawnEntityLiving(dragon);
+				Object packet = reflectionUtils.packetPlayOutSpawnEntityLivingConstructor.newInstance(dragon);
+				// PlayerConnection playerConnection = entityPlayer.playerConnection;
+				Object playerConnection = reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
+				// playerConnection.sendPacket(packet);
+				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
+			}
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+			e.printStackTrace();
 		}
 	}
 	
 	public void despawn(Player... viewers) {
-		for (Player p : viewers) {
-			EntityPlayer entityPlayer = ((CraftPlayer) p).getHandle();
-			PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(dragon.getId());
-			PlayerConnection playerConnection = entityPlayer.playerConnection;
-			playerConnection.sendPacket(packet);
+		try {
+			for (Player p : viewers) {
+				// EntityPlayer entityPlayer = ((CraftPlayer) p).getHandle();
+				Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(p));
+				// PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(dragon.getId());
+				Object packet = reflectionUtils.packetPlayOutEntityDestroyConstructor.newInstance(new int[] {(int) reflectionUtils.entityGetIdMethod.invoke(dragon)});
+				// PlayerConnection playerConnection = entityPlayer.playerConnection;
+				Object playerConnection = reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
+				// playerConnection.sendPacket(packet);
+				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
+			}
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -167,88 +176,128 @@ public class EnderDragonController {
 	}
 	
 	private void spawn(Location loc) {
-		WorldServer worldServer = ((CraftWorld)loc.getWorld()).getHandle();
-		dragon = new EntityEnderDragon(EntityTypes.ENDER_DRAGON, worldServer);
-		dragon.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
-		
+		try {
+			// WorldServer worldServer = ((CraftWorld)loc.getWorld()).getHandle();
+			Object worldServer = reflectionUtils.craftWorldGetHandleMethod.invoke(reflectionUtils.craftWorldClass.cast(loc.getWorld()));
+			// dragon = new EntityEnderDragon(EntityTypes.ENDER_DRAGON, worldServer);
+			dragon = reflectionUtils.entityEnderDragonConstructor.newInstance(reflectionUtils.entityTypesEnderDragonField.get(null), worldServer);
+			// dragon.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
+			reflectionUtils.entitySetLocationMethod.invoke(dragon, loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+			e.printStackTrace();
+		}
 		respawn(viewers.keySet().toArray(new Player[0]));
 	}
 	
 	private void updateLocation() {
 		Iterator<Player> iter = viewers.keySet().iterator();
 		
-		while (iter.hasNext()) {
-			Player p = iter.next();
-			
-			if (!p.getWorld().getName().equals(dragon.getWorld().getWorld().getName())) {
-				iter.remove();
-				continue;
-			}
-			
-			double dist = p.getLocation().distance(new Location(dragon.getWorld().getWorld(), dragon.locX, dragon.locY, dragon.locZ));
-			int viewDistance = Math.min(Bukkit.getServer().getViewDistance(), p.getClientViewDistance());
-			
-			if (viewers.get(p)) {
-				if (dist > viewDistance * 16) {
-					despawn(p);
-					viewers.put(p, false);
-				}
-			} else {
-				if (dist < viewDistance * 16) {
-					respawn(p);
-					viewers.put(p, true);
-				}
-			}
-			
-			EntityPlayer entityPlayer = ((CraftPlayer) p).getHandle();
-			PacketPlayOutEntityTeleport packet = new PacketPlayOutEntityTeleport(dragon);
-			PlayerConnection playerConnection = entityPlayer.playerConnection;
-			playerConnection.sendPacket(packet);
-		}
-	}
-	
-	private void dragonHoldingPattern(Location loc) {
-		dragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.HOLDING_PATTERN);
-		DragonControllerHold dragonControllerHold = dragon.getDragonControllerManager().b(DragonControllerPhase.HOLDING_PATTERN);
 		try {
-			Field dField = Class.forName("net.minecraft.server.v1_14_R1.DragonControllerHold").getDeclaredField("d");
-			dField.setAccessible(true);
-			dField.set(dragonControllerHold, new Vec3D(loc.getX(), loc.getY(), loc.getZ()));
-		} catch (NoSuchFieldException | SecurityException | ClassNotFoundException | IllegalArgumentException | IllegalAccessException e) {
+			while (iter.hasNext()) {
+				Player p = iter.next();
+				
+				Object craftWorld = reflectionUtils.worldGetWorldMethod.invoke(reflectionUtils.entityGetWorldMethod.invoke(dragon));
+				
+				if (!p.getWorld().getName().equals(reflectionUtils.craftWorldGetNameMethod.invoke(craftWorld))) {
+					iter.remove();
+					continue;
+				}
+				
+				double dist = p.getLocation().distance(new Location((World) craftWorld, (double) reflectionUtils.entityLocXField.get(dragon), (double) reflectionUtils.entityLocYField.get(dragon), (double) reflectionUtils.entityLocZField.get(dragon)));
+				int viewDistance = Math.min(Bukkit.getServer().getViewDistance(), p.getClientViewDistance());
+				
+				if (viewers.get(p)) {
+					if (dist > viewDistance * 16) {
+						despawn(p);
+						viewers.put(p, false);
+					}
+				} else {
+					if (dist < viewDistance * 16) {
+						respawn(p);
+						viewers.put(p, true);
+					}
+				}
+				
+				// EntityPlayer entityPlayer = ((CraftPlayer) p).getHandle();
+				Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(p));
+				// PacketPlayOutEntityTeleport packet = new PacketPlayOutEntityTeleport(dragon);
+				Object packet = reflectionUtils.packetPlayOutEntityTeleportConstructor.newInstance(dragon);
+				// PlayerConnection playerConnection = entityPlayer.playerConnection;
+				Object playerConnection = reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
+				// playerConnection.sendPacket(packet);
+				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
+			}
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private void dragonStrafePlayer(EntityLiving entityLiving) {
-		dragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.STRAFE_PLAYER);
-		dragon.getDragonControllerManager().b(DragonControllerPhase.STRAFE_PLAYER).a(entityLiving);
+	private void dragonHoldingPattern(Location loc) {
+		try {
+			// dragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.HOLDING_PATTERN);
+			Object dragonControllerManager = reflectionUtils.entityEnderDragonGetDragonControllerManagerMethod.invoke(dragon);
+			reflectionUtils.dragonControllerManagerSetControllerPhaseMethod.invoke(dragonControllerManager, reflectionUtils.dragonControllerPhaseHoldingPatternField.get(null));
+			// DragonControllerHold dragonControllerHold = dragon.getDragonControllerManager().b(DragonControllerPhase.HOLDING_PATTERN);
+			Object dragonControllerHold = reflectionUtils.dragonControllerManagerBMethod.invoke(dragonControllerManager, reflectionUtils.dragonControllerPhaseHoldingPatternField.get(null));
+			Field dField = Class.forName("net.minecraft.server." + BedwarsPlugin.getInstance().getServerVersion() + ".DragonControllerHold").getDeclaredField("d");
+			dField.setAccessible(true);
+			dField.set(dragonControllerHold, reflectionUtils.vec3DConstructor.newInstance(loc.getX(), loc.getY(), loc.getZ()));
+		} catch (NoSuchFieldException | SecurityException | ClassNotFoundException | IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void dragonStrafePlayer(Object entityLiving) {
+		try {
+			Object dragonControllerManager = reflectionUtils.entityEnderDragonGetDragonControllerManagerMethod.invoke(dragon);
+			// dragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.STRAFE_PLAYER);
+			reflectionUtils.dragonControllerManagerSetControllerPhaseMethod.invoke(dragonControllerManager, reflectionUtils.dragonControllerPhaseStrafePlayerField.get(null));
+			// dragon.getDragonControllerManager().b(DragonControllerPhase.STRAFE_PLAYER).a(entityLiving);
+			reflectionUtils.dragonControllerStrafeAMethod.invoke(reflectionUtils.dragonControllerManagerBMethod.invoke(dragonControllerManager, reflectionUtils.dragonControllerPhaseStrafePlayerField.get(null)), entityLiving);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void dragonChargingPlayer(Location loc) {
-		dragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.CHARGING_PLAYER);
-		dragon.getDragonControllerManager().b(DragonControllerPhase.CHARGING_PLAYER).a(new Vec3D(loc.getX(), loc.getY(), loc.getZ()));
+		try {
+			Object dragonControllerManager = reflectionUtils.entityEnderDragonGetDragonControllerManagerMethod.invoke(dragon);
+			// dragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.CHARGING_PLAYER);
+			reflectionUtils.dragonControllerManagerSetControllerPhaseMethod.invoke(dragonControllerManager, reflectionUtils.dragonControllerPhaseChargingPlayerField.get(null));
+			// dragon.getDragonControllerManager().b(DragonControllerPhase.CHARGING_PLAYER).a(new Vec3D(loc.getX(), loc.getY(), loc.getZ()));
+			reflectionUtils.dragonControllerChargeAMethod.invoke(reflectionUtils.dragonControllerManagerBMethod.invoke(dragonControllerManager, reflectionUtils.dragonControllerPhaseChargingPlayerField.get(null)),
+					reflectionUtils.vec3DConstructor.newInstance(loc.getX(), loc.getY(), loc.getZ()));
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void dragonLandingApproach(Location loc) {
-		dragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.LANDING_APPROACH);
-		DragonControllerLandingFly dragonControllerLandingFly = dragon.getDragonControllerManager().b(DragonControllerPhase.LANDING_APPROACH);
 		try {
-			Field dField = Class.forName("net.minecraft.server.v1_14_R1.DragonControllerLandingFly").getDeclaredField("d");
+			Object dragonControllerManager = reflectionUtils.entityEnderDragonGetDragonControllerManagerMethod.invoke(dragon);
+			// dragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.LANDING_APPROACH);
+			reflectionUtils.dragonControllerManagerSetControllerPhaseMethod.invoke(dragonControllerManager, reflectionUtils.dragonControllerPhaseLandingApproachField.get(null));
+			// DragonControllerLandingFly dragonControllerLandingFly = dragon.getDragonControllerManager().b(DragonControllerPhase.LANDING_APPROACH);
+			Object dragonControllerLandingFly = reflectionUtils.dragonControllerManagerBMethod.invoke(dragonControllerManager, reflectionUtils.dragonControllerPhaseLandingApproachField.get(null));
+			Field dField = Class.forName("net.minecraft.server." + BedwarsPlugin.getInstance().getServerVersion() + ".DragonControllerLandingFly").getDeclaredField("d");
 			dField.setAccessible(true);
-			dField.set(dragonControllerLandingFly, new Vec3D(loc.getX(), loc.getY(), loc.getZ()));
-		} catch (NoSuchFieldException | SecurityException | ClassNotFoundException | IllegalArgumentException | IllegalAccessException e) {
+			dField.set(dragonControllerLandingFly, reflectionUtils.vec3DConstructor.newInstance(loc.getX(), loc.getY(), loc.getZ()));
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchFieldException | SecurityException | ClassNotFoundException | InstantiationException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	private void dragonLanding(Location loc) {
-		dragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.LANDING);
-		DragonControllerLanding dragonControllerLanding = dragon.getDragonControllerManager().b(DragonControllerPhase.LANDING);
 		try {
-			Field dField = Class.forName("net.minecraft.server.v1_14_R1.DragonControllerLanding").getDeclaredField("b");
+			Object dragonControllerManager = reflectionUtils.entityEnderDragonGetDragonControllerManagerMethod.invoke(dragon);
+			// dragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.LANDING);
+			reflectionUtils.dragonControllerManagerSetControllerPhaseMethod.invoke(dragonControllerManager, reflectionUtils.dragonControllerPhaseLandingField.get(null));
+			// DragonControllerLanding dragonControllerLanding = dragon.getDragonControllerManager().b(DragonControllerPhase.LANDING);
+			Object dragonControllerLanding = reflectionUtils.dragonControllerManagerBMethod.invoke(dragonControllerManager, reflectionUtils.dragonControllerPhaseLandingField.get(null));
+			Field dField = Class.forName("net.minecraft.server." + BedwarsPlugin.getInstance().getServerVersion() + ".DragonControllerLanding").getDeclaredField("b");
 			dField.setAccessible(true);
-			dField.set(dragonControllerLanding, new Vec3D(loc.getX(), loc.getY(), loc.getZ()));
-		} catch (NoSuchFieldException | SecurityException | ClassNotFoundException | IllegalArgumentException | IllegalAccessException e) {
+			dField.set(dragonControllerLanding, reflectionUtils.vec3DConstructor.newInstance(loc.getX(), loc.getY(), loc.getZ()));
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchFieldException | SecurityException | ClassNotFoundException | InstantiationException e) {
 			e.printStackTrace();
 		}
 	}
