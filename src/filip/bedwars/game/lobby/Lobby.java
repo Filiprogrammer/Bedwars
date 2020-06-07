@@ -245,8 +245,24 @@ public class Lobby {
 		};
 		
 		usables.add(usable);
-		player.getInventory().setItem(8, usable.getItemStack());
+		player.getInventory().setItem(4, usable.getItemStack());
 		updateTeamSelectorLores();
+		
+		usable = new UsableItem(new ItemBuilder().setMaterial(Material.RED_BED).setName("§rLeave Game").build(), player) {
+			@Override
+			public void use(PlayerInteractEvent event) {
+				Player p = event.getPlayer();
+				
+				if (p != player)
+					return;
+				
+				if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
+					leavePlayer(p);
+			}
+		};
+		
+		usables.add(usable);
+		player.getInventory().setItem(8, usable.getItemStack());
 	}
 	
 	/**
