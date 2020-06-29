@@ -28,6 +28,7 @@ public class MainConfig extends SingleConfig {
 	private boolean lobbyBossbar = true;
 	private BarColor lobbyBossbarColor = BarColor.YELLOW;
 	private int respawnDelay = 5;
+	private boolean bedwarsChat = true;
 	
 	protected MainConfig() {
 		super("config.yml");
@@ -97,6 +98,10 @@ public class MainConfig extends SingleConfig {
 		return respawnDelay;
 	}
 	
+	public boolean getBedwarsChat() {
+		return bedwarsChat;
+	}
+	
 	public void setMainLobby(Location loc) {
 		mainLobby = loc;
 	}
@@ -125,6 +130,7 @@ public class MainConfig extends SingleConfig {
 		config.set("drop-only-spawner-resources-on-death", dropOnlySpawnerResourcesOnDeath);
 		config.set("attack-cooldown", attackCooldown);
 		config.set("respawn-delay", respawnDelay);
+		config.set("bedwars-chat", bedwarsChat);
 		
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
 		
@@ -175,6 +181,7 @@ public class MainConfig extends SingleConfig {
 		joinSignLines[3] = config.getString("join-sign-line-four", "&b<Join Arena>").replace('&', '§');
 		lobbyBossbar = config.getBoolean("lobby-bossbar", true);
 		respawnDelay = config.getInt("respawn-delay", 5);
+		bedwarsChat = config.getBoolean("bedwars-chat", true);
 		
 		try {
 			lobbyBossbarColor = BarColor.valueOf(config.getString("lobby-bossbar-color", "YELLOW"));

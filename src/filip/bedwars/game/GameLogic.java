@@ -49,6 +49,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -1017,6 +1018,47 @@ public class GameLogic implements Listener {
     public void onPlayerTeleport(PlayerTeleportEvent event) {
 		if (event.getPlayer().getWorld().getName().equals(gameWorld.getWorld().getName()) && event.getCause().equals(TeleportCause.SPECTATE))
 			event.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+		Player player = event.getPlayer();
+		
+		if (!player.getWorld().getName().equals(gameWorld.getWorld().getName()))
+			return;
+		
+		event.setCancelled(true);
+		String msg = event.getMessage();
+		GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
+		
+		if (gamePlayer == null) {
+			msg = MessagesConfig.getInstance().getStringValue(player.getLocale(), "chat-prefix-spectator")
+					.replace("%player%", player.getName())
+					.replace("%msg%", msg);
+			
+			for (Player p : gameWorld.getWorld().getPlayers()) {
+				if (!game.containsPlayer(p.getUniqueId()))
+					p.sendMessage(msg);
+			}
+		} else {
+			if (msg.startsWith("@")) {
+				msg = MessagesConfig.getInstance().getStringValue(player.getLocale(), "chat-prefix-all")
+						.replace("%player%", player.getName())
+						.replace("%msg%", msg.substring(1))
+						.replace("%team%", TeamColorConverter.convertTeamColorToStringForMessages(gamePlayer.getTeam().getBase().getTeamColor(), player.getLocale()));
+				
+				for (Player p : gameWorld.getWorld().getPlayers())
+					p.sendMessage(msg);
+			} else {
+				msg = MessagesConfig.getInstance().getStringValue(player.getLocale(), "chat-prefix-team")
+						.replace("%player%", player.getName())
+						.replace("%msg%", msg)
+						.replace("%team%", TeamColorConverter.convertTeamColorToStringForMessages(gamePlayer.getTeam().getBase().getTeamColor(), player.getLocale()));
+				
+				for (GamePlayer gp : gamePlayer.getTeam().getMembers())
+					gp.getPlayer().sendMessage(msg);
+			}
+		}
 	}
 	
 	private void removePlayerListeners(Player player) {
