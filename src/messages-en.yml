@@ -40,6 +40,7 @@ bed-set-error: '&cYou have to rightclick an &4EXISTING BED &cto set the team bed
 bed-bottom-error: '&cBed bottom was not found!'
 you-cant-destroy-own-bed: '&cYou cannot destroy your own bed!'
 bed-destroyed: '&5%player% &4destroyed the bed of team %teamcolor%&4!'
+bed-restored: '&aThe bed of team %teamcolor% was restored!'
 bought-item: '&7You bought &b%amount%x %item%&7!'
 cant-afford-item: '&cYou do not have enough resources to buy this!'
 no-permission: '&cIm sorry, but I think you are not allowed to do whatever you just tried!'

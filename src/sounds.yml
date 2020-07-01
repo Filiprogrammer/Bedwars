@@ -14,6 +14,8 @@ arena-setup:
   pitch: 1.15
 bed-destroyed:
   sound: ENTITY_WITHER_DEATH
+bed-restored:
+  sound: ENTITY_WITHER_SPAWN
 fireball-shoot:
   sound: ENTITY_ZOMBIE_INFECT
   pitch: 0.8
