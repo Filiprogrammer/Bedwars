@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Bed;
+import org.bukkit.block.data.type.Bed.Part;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -277,8 +278,13 @@ public class ArenaSetup implements Listener {
 					
 					if (block.getBlockData() instanceof Bed) {
 						Location loc = block.getLocation();
-						baseBuilder.setBedTop(loc);
-						baseBuilder.setBedBottom(null);
+						if (((Bed) block.getBlockData()).getPart() == Part.HEAD) {
+							baseBuilder.setBedTop(loc);
+							baseBuilder.setBedBottom(null);
+						} else {
+							baseBuilder.setBedBottom(loc);
+							baseBuilder.setBedTop(null);
+						}
 						
 						List<Block> surroundingBlocks = new ArrayList<Block>();
 						surroundingBlocks.add(loc.clone().add(1, 0, 0).getBlock());
@@ -288,7 +294,11 @@ public class ArenaSetup implements Listener {
 						
 						for (Block b : surroundingBlocks) {
 							if (b.getBlockData() instanceof Bed) {
-								baseBuilder.setBedBottom(b.getLocation());
+								if (baseBuilder.getBedTop() == null)
+									baseBuilder.setBedTop(b.getLocation());
+								else
+									baseBuilder.setBedBottom(b.getLocation());
+								
 								break;
 							}
 						}

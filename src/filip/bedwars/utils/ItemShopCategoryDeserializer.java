@@ -18,7 +18,7 @@ import filip.bedwars.game.shop.ItemShopReward;
 import filip.bedwars.game.shop.ShopCategory;
 import filip.bedwars.game.shop.ShopEntry;
 
-public class ShopCategoryDeserializer {
+public class ItemShopCategoryDeserializer {
 	
 	public static ShopCategory deserializeCategory(Object serializedCategory) {
 		Map<String, Object> mapOfElements = (Map<String, Object>) serializedCategory;

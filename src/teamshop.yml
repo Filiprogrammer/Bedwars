@@ -1,4 +1,64 @@
 categories:
 - name: dev-team-test
   material: BIRCH_SAPLING
-  shopentries: []
+  shopentries:
+  - type: MINING_BOOST
+    maxlevel: 2
+    priceCounts:
+    - 4
+    - 6
+    priceMaterials:
+    - GOLD_INGOT
+    - GOLD_INGOT
+  - type: HEAL_POOL
+    maxlevel: 2
+    priceCounts:
+    - 4
+    - 6
+    priceMaterials:
+    - EMERALD
+    - EMERALD
+  - type: ATTACK_BOOST
+    maxlevel: 1
+    priceCounts:
+    - 4
+    priceMaterials:
+    - GOLD_INGOT
+  - type: PROTECTION_BOOST
+    maxlevel: 2
+    priceCounts:
+    - 3
+    - 5
+    priceMaterials:
+    - GOLD_INGOT
+    - GOLD_INGOT
+  - type: EXTRA_DRAGONS
+    maxlevel: 10
+    priceCounts:
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    priceMaterials:
+    - EMERALD
+    - EMERALD
+    - EMERALD
+    - EMERALD
+    - EMERALD
+    - EMERALD
+    - EMERALD
+    - EMERALD
+    - EMERALD
+    - EMERALD
+  - type: BED_RESTORE
+    maxlevel: 1
+    priceCounts:
+    - 32
+    priceMaterials:
+    - EMERALD

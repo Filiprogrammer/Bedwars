@@ -5,7 +5,7 @@ import java.util.List;
 
 import filip.bedwars.game.shop.Shop;
 import filip.bedwars.game.shop.ShopCategory;
-import filip.bedwars.utils.ShopCategoryDeserializer;
+import filip.bedwars.utils.TeamShopCategoryDeserializer;
 
 public class TeamShopConfig extends SingleConfig{
 
@@ -38,7 +38,7 @@ public class TeamShopConfig extends SingleConfig{
 			List<ShopCategory> shopCategories = new ArrayList<ShopCategory>();
 			
 			for (Object serializedCategory : serializedCategories)
-				shopCategories.add(ShopCategoryDeserializer.deserializeCategory(serializedCategory));
+				shopCategories.add(TeamShopCategoryDeserializer.deserializeCategory(serializedCategory));
 			
 			shop = new Shop(MainConfig.getInstance().getTeamShopName(), shopCategories.toArray(new ShopCategory[0]));
 		}

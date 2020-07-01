@@ -63,7 +63,11 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.plugin.IllegalPluginAccessException;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import com.destroystokyo.paper.Title;
@@ -76,6 +80,7 @@ import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.config.SpawnerConfig;
 import filip.bedwars.config.TeamShopConfig;
+import filip.bedwars.game.Team.TeamUpgradeType;
 import filip.bedwars.game.action.Action;
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
@@ -110,8 +115,11 @@ public class GameLogic implements Listener {
 	private List<UseEntityPacketListener> itemShopNPCListeners = new ArrayList<UseEntityPacketListener>();
 	private List<UseEntityPacketListener> teamShopNPCListeners = new ArrayList<UseEntityPacketListener>();
 	private List<IClickable> itemShopClickables = new ArrayList<IClickable>();
+	private List<IClickable> teamShopClickables = new ArrayList<IClickable>();
 	private Map<UUID, Integer> selectedItemShopCategory = new HashMap<UUID, Integer>();
 	private IPacketListener packetListener;
+	private BukkitTask bukkitTask;
+	private BukkitRunnable bukkitRunnable;
 	public final Set<EnderDragonController> enderDragonControllers = new HashSet<>();
 	public final ScoreboardManager scoreboardManager;
 	
@@ -332,7 +340,81 @@ public class GameLogic implements Listener {
 				@Override
 				public void drag(InventoryDragEvent event) {}
 			});
+			
+			teamShopClickables.add(new ClickableInventory(TeamShopConfig.getInstance().getShop().getCategoryListInventory(), gamePlayer.getPlayer()) {
+				@Override
+				public void click(InventoryClickEvent event) {
+					HumanEntity player = event.getWhoClicked();
+					selectedItemShopCategory.put(player.getUniqueId(), TeamShopConfig.getInstance().getShop().handleClick(selectedItemShopCategory.getOrDefault(player.getUniqueId(), -1), event, gamePlayer));
+				}
+
+				@Override
+				public void drag(InventoryDragEvent event) {}
+			});
 		}
+		
+		bukkitRunnable = new BukkitRunnable() {
+			@Override
+			public void run() {
+				for(Team team : game.getTeams()) {
+					int healPoolLevel = team.upgrades.get(TeamUpgradeType.HEAL_POOL);
+					int miningBoostLevel = team.upgrades.get(TeamUpgradeType.MINING_BOOST);
+					int attackBoostLevel = team.upgrades.get(TeamUpgradeType.ATTACK_BOOST);
+					int protectionBoostLevel = team.upgrades.get(TeamUpgradeType.PROTECTION_BOOST);
+					Location baseSpawn = team.getBase().getSpawn(gameWorld.getWorld());
+					
+					if (healPoolLevel > 0) {
+						for (GamePlayer gp : team.getMembers()) {
+							Player p = gp.getPlayer();
+							
+							if (p.getGameMode() == GameMode.SPECTATOR)
+								continue;
+							
+							// TODO: Do not hard code this value
+							if (p.getLocation().distance(baseSpawn) < 20)
+								p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 30, healPoolLevel - 1, true, false, true));
+						}
+					}
+					
+					if (miningBoostLevel > 0) {
+						for (GamePlayer gp : team.getMembers()) {
+							Player p = gp.getPlayer();
+							
+							if (p.getGameMode() == GameMode.SPECTATOR)
+								continue;
+							
+							p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, Integer.MAX_VALUE, miningBoostLevel - 1, true, false, true));
+						}
+					}
+					
+					if (attackBoostLevel > 0) {
+						for (GamePlayer gp : team.getMembers()) {
+							Player p = gp.getPlayer();
+							
+							if (p.getGameMode() == GameMode.SPECTATOR)
+								continue;
+							
+							p.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, attackBoostLevel - 1, true, false, true));
+						}
+					}
+					
+					if (protectionBoostLevel > 0) {
+						for (GamePlayer gp : team.getMembers()) {
+							Player p = gp.getPlayer();
+							
+							if (p.getGameMode() == GameMode.SPECTATOR)
+								continue;
+							
+							p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, protectionBoostLevel - 1, true, false, true));
+						}
+					}
+				}
+			}
+		};
+		
+		try {
+			bukkitTask = bukkitRunnable.runTaskTimer(BedwarsPlugin.getInstance(), 0, 20L);
+		} catch (IllegalPluginAccessException e) {}
 		
 		scoreboardManager.update();
 	}
@@ -413,6 +495,9 @@ public class GameLogic implements Listener {
 			p.teleport(MainConfig.getInstance().getMainLobby());
 		
 		HandlerList.unregisterAll(this);
+		
+		bukkitRunnable.cancel();
+		bukkitTask.cancel();
 		
 		GameWorldManager.getInstance().removeGameWorld(gameWorld);
 	}
@@ -1071,6 +1156,13 @@ public class GameLogic implements Listener {
 		for (IClickable itemShopClickable : itemShopClickables) {
 			if (itemShopClickable.getPlayer().equals(player)) {
 				BedwarsPlugin.getInstance().removeClickable(itemShopClickable);
+				break;
+			}
+		}
+		
+		for (IClickable teamShopClickable : teamShopClickables) {
+			if (teamShopClickable.getPlayer().equals(player)) {
+				BedwarsPlugin.getInstance().removeClickable(teamShopClickable);
 				break;
 			}
 		}

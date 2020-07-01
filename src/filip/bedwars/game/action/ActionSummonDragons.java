@@ -12,6 +12,7 @@ import filip.bedwars.game.Game;
 import filip.bedwars.game.GameLogic;
 import filip.bedwars.game.GamePlayer;
 import filip.bedwars.game.Team;
+import filip.bedwars.game.Team.TeamUpgradeType;
 import filip.bedwars.utils.EnderDragonController;
 
 public class ActionSummonDragons extends Action {
@@ -31,12 +32,16 @@ public class ActionSummonDragons extends Action {
 				}
 			}
 			
-			// TODO: Clean this shit up
-			gameLogic.enderDragonControllers.add(
-					new EnderDragonController(team.getBase().getSpawn(gameLogic.getGameWorld().getWorld()).clone().add(0, 50, 0),
-							targetEntities,
-							new HashSet<Player>(gameLogic.getGameWorld().getWorld().getPlayers()))
-			);
+			int dragonCount = 1 + team.upgrades.get(TeamUpgradeType.EXTRA_DRAGONS);
+			
+			for (int i = 0; i < dragonCount; ++i) {
+				// TODO: Clean this shit up
+				gameLogic.enderDragonControllers.add(
+						new EnderDragonController(team.getBase().getSpawn(gameLogic.getGameWorld().getWorld()).clone().add(0, 50, 0),
+								targetEntities,
+								new HashSet<Player>(gameLogic.getGameWorld().getWorld().getPlayers()))
+				);
+			}
 		}
 	}
 

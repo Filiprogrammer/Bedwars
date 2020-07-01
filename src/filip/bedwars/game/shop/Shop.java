@@ -8,42 +8,36 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import filip.bedwars.game.GamePlayer;
+import filip.bedwars.game.Team;
 import filip.bedwars.inventory.ItemBuilder;
 
 public class Shop {
 	
+	private final String title;
 	private final ShopCategory[] categories;
 	
 	/**
 	 * Inventory containing only the category items
 	 */
 	private final Inventory categoryListInventory;
-	
-	/**
-	 * Inventories for every category
-	 */
-    private final Inventory[] inventories;
     
     public Shop(String title, ShopCategory[] categories) {
+    	this.title = title;
     	this.categories = categories;
-    	this.inventories = new Inventory[categories.length];
         this.categoryListInventory = Bukkit.createInventory(null, 9 * 2, title);
     	
         addCategoryListToInv(this.categoryListInventory);
-        
-        for (int i = 0; i < categories.length; i++)
-            createInventory(i, categories[i], title);
     }
     
     public Inventory getCategoryListInventory() {
     	return categoryListInventory;
     }
     
-    public Inventory getCategoryInventory(int categoryIndex) {
-    	if (categoryIndex >= inventories.length || categoryIndex < 0)
+    public Inventory getCategoryInventory(int categoryIndex, Team team) {
+    	if (categoryIndex >= categories.length || categoryIndex < 0)
     		return null;
     	
-    	return inventories[categoryIndex];
+    	return createInventory(categories[categoryIndex], title, team);
     }
     
 	public int handleClick(int shopCategoryIndex, InventoryClickEvent event, GamePlayer gamePlayer) {
@@ -51,14 +45,15 @@ public class Shop {
 			return shopCategoryIndex;
 		
 		Player player = (Player) event.getWhoClicked();
-		Inventory inv = getCategoryInventory(event.getSlot());
+		Team team = gamePlayer.getTeam();
+		Inventory inv = getCategoryInventory(event.getSlot(), team);
 		
 		if (inv != null) {
 			player.openInventory(inv);
 			return event.getSlot();
 		}
 		
-		inv = getCategoryInventory(shopCategoryIndex);
+		inv = getCategoryInventory(shopCategoryIndex, team);
 		
 		if (inv == null)
 			return shopCategoryIndex;
@@ -71,21 +66,21 @@ public class Shop {
 		else
 			entry = category.getShopEntry(event.getSlot() - 18);
 		
-		if (entry != null)
-			entry.buy(gamePlayer, event.isShiftClick());
+		if (entry != null && entry.buy(gamePlayer, event.isShiftClick()))
+			player.openInventory(getCategoryInventory(shopCategoryIndex, team));
 		
 		return shopCategoryIndex;
 	}
     
     /**
      * Create an Inventory for the given ShopCategory including the category list at the top and puts it in the inventories field at the specified index.
-     * @param index the index of the category
      * @param category the ShopCategory
+     * @param title the title of the inventory
+     * @param team the team that opened the shop
      */
-    private void createInventory(int index, ShopCategory category, String title) {
+    private Inventory createInventory(ShopCategory category, String title, Team team) {
     	// Create a new inventory and put it into the inventories field
     	Inventory thisCategoryInv = Bukkit.createInventory(null, 9 * 4, title);
-    	inventories[index] = thisCategoryInv;
     	
     	// Add the category items at the top of the inventory
     	addCategoryListToInv(thisCategoryInv);
@@ -94,16 +89,18 @@ public class Shop {
     	for (int i = 0; i < category.getShopEntriesCount(); ++i) {
     		ShopEntry shopEntry = category.getShopEntry(i);
     		
-    		ItemStack displayItem = shopEntry.getDisplayItem();
+    		ItemStack displayItem = shopEntry.getDisplayItem(team);
     		thisCategoryInv.setItem(9 * 2 + i, displayItem);
     		
     		ItemStack priceItem = new ItemBuilder()
-    				.setMaterial(shopEntry.getPriceMaterial())
-    				.setAmount(shopEntry.getPriceCount())
-    				.setName(ChatColor.RESET + "" + ChatColor.BOLD + "Preis: " + shopEntry.getPriceCount())
+    				.setMaterial(shopEntry.getPriceMaterial(team))
+    				.setAmount(shopEntry.getPriceCount(team))
+    				.setName(ChatColor.RESET + "" + ChatColor.BOLD + "Preis: " + shopEntry.getPriceCount(team))
     				.build();
     		thisCategoryInv.setItem(9 * 3 + i, priceItem);
     	}
+    	
+    	return thisCategoryInv;
     }
     
     /**

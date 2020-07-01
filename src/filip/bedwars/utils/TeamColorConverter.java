@@ -36,6 +36,10 @@ public class TeamColorConverter {
 		return Material.valueOf(teamColor.toString() + "_STAINED_GLASS");
 	}
 	
+	public static Material convertTeamColorToBedMaterial(@NotNull TeamColor teamColor) {
+		return Material.valueOf(teamColor.toString() + "_BED");
+	}
+	
 	public static String convertTeamColorToStringForMessages(TeamColor teamColor, String locale) {
 		String colorConfigKey = "color-" + teamColor.toString().toLowerCase().replace("_", "-");
 		return MessagesConfig.getInstance().getStringValue(locale, colorConfigKey);
