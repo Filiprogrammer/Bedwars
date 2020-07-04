@@ -101,7 +101,7 @@ public class Team {
     	bedTopBlock.setType(bedMaterial, false);
     	Bed bedTopData = (Bed) bedMaterial.createBlockData();
     	bedTopData.setPart(Part.HEAD);
-    	bedBottomData.setFacing(bedFace);
+    	bedTopData.setFacing(bedFace);
     	bedTopBlock.setBlockData(bedTopData, false);
     }
     
