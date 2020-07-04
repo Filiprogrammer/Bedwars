@@ -95,7 +95,7 @@ public class Shop {
     		ItemStack priceItem = new ItemBuilder()
     				.setMaterial(shopEntry.getPriceMaterial(team))
     				.setAmount(shopEntry.getPriceCount(team))
-    				.setName(ChatColor.RESET + "" + ChatColor.BOLD + "Preis: " + shopEntry.getPriceCount(team))
+    				.setName(ChatColor.RESET + "" + ChatColor.BOLD + "Price: " + shopEntry.getPriceCount(team))
     				.build();
     		thisCategoryInv.setItem(9 * 3 + i, priceItem);
     	}

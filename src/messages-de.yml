@@ -1,7 +1,7 @@
 prefix: '&6>> &eBedWars &6|&7 '
 available-commands: '&bVerfügbare Befehle: '
 config-reloaded: '&aConfig-Files neugelade!'
-select-spawner-item: '&8Suche ein Item für den Spawner aus!'
+select-spawner-item: '&8Wähle ein Item für den Spawner'
 spawner-set: '&3%itemname%-Spawner &awurde erfolgreich gesetzt!'
 spawner-removed: '&7Spawner wurde entfernt!'
 set-spawner: '&7Platziere &a%itemname%-Spawner'
