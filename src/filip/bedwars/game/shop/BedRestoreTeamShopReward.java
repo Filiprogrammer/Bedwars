@@ -40,6 +40,9 @@ public class BedRestoreTeamShopReward extends TeamShopReward {
 		if (team.getMembers().size() == 0)
 			return false;
 		
+		if (team.getMembers().get(0).game.getGameLogic().allBedsPermDestroyed)
+			return false;
+		
 		if (team.hasBed())
 			return false;
 		

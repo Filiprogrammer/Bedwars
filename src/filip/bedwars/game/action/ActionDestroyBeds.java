@@ -29,9 +29,11 @@ public class ActionDestroyBeds extends Action {
 		}
 		
 		for (Player p : gameLogic.getGameWorld().getWorld().getPlayers()) {
-			MessageSender.sendMessage(p, "§4All beds have been destroyed");
+			MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "all-beds-destroyed"));
 			SoundPlayer.playSound("bed-destroyed", p);
 		}
+		
+		gameLogic.allBedsPermDestroyed = true;
 	}
 
 	public static String[] getArgumentNames() {

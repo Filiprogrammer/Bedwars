@@ -212,6 +212,10 @@ public class Game implements Listener {
 		return players;
 	}
 	
+	public GameLogic getGameLogic() {
+		return gameLogic;
+	}
+	
 	public boolean containsPlayer(UUID uuid) {
 		synchronized (players) {
 			return players.stream().anyMatch(gp -> gp.uuid.equals(uuid));

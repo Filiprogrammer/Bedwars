@@ -122,6 +122,7 @@ public class GameLogic implements Listener {
 	private BukkitRunnable bukkitRunnable;
 	public final Set<EnderDragonController> enderDragonControllers = new HashSet<>();
 	public final ScoreboardManager scoreboardManager;
+	public boolean allBedsPermDestroyed = false;
 	
 	public GameLogic(Game game, Arena arena, GameWorld gameWorld) {
 		this.game = game;
@@ -1117,31 +1118,30 @@ public class GameLogic implements Listener {
 		GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
 		
 		if (gamePlayer == null) {
-			msg = MessagesConfig.getInstance().getStringValue(player.getLocale(), "chat-prefix-spectator")
-					.replace("%player%", player.getName())
-					.replace("%msg%", msg);
-			
 			for (Player p : gameWorld.getWorld().getPlayers()) {
 				if (!game.containsPlayer(p.getUniqueId()))
-					p.sendMessage(msg);
+					p.sendMessage(
+							MessagesConfig.getInstance().getStringValue(p.getLocale(), "chat-prefix-spectator")
+									.replace("%player%", player.getName())
+									.replace("%msg%", msg));
 			}
 		} else {
 			if (msg.startsWith("@")) {
-				msg = MessagesConfig.getInstance().getStringValue(player.getLocale(), "chat-prefix-all")
-						.replace("%player%", player.getName())
-						.replace("%msg%", msg.substring(1))
-						.replace("%team%", TeamColorConverter.convertTeamColorToStringForMessages(gamePlayer.getTeam().getBase().getTeamColor(), player.getLocale()));
-				
 				for (Player p : gameWorld.getWorld().getPlayers())
-					p.sendMessage(msg);
+					p.sendMessage(
+							MessagesConfig.getInstance().getStringValue(p.getLocale(), "chat-prefix-all")
+									.replace("%player%", player.getName())
+									.replace("%msg%", msg.substring(1))
+									.replace("%team%", TeamColorConverter.convertTeamColorToStringForMessages(gamePlayer.getTeam().getBase().getTeamColor(), p.getLocale())));
 			} else {
-				msg = MessagesConfig.getInstance().getStringValue(player.getLocale(), "chat-prefix-team")
-						.replace("%player%", player.getName())
-						.replace("%msg%", msg)
-						.replace("%team%", TeamColorConverter.convertTeamColorToStringForMessages(gamePlayer.getTeam().getBase().getTeamColor(), player.getLocale()));
-				
-				for (GamePlayer gp : gamePlayer.getTeam().getMembers())
-					gp.getPlayer().sendMessage(msg);
+				for (GamePlayer gp : gamePlayer.getTeam().getMembers()) {
+					Player p = gp.getPlayer();
+					p.sendMessage(
+							MessagesConfig.getInstance().getStringValue(p.getLocale(), "chat-prefix-team")
+									.replace("%player%", player.getName())
+									.replace("%msg%", msg)
+									.replace("%team%", TeamColorConverter.convertTeamColorToStringForMessages(gamePlayer.getTeam().getBase().getTeamColor(), p.getLocale())));
+				}
 			}
 		}
 	}
