@@ -26,9 +26,9 @@ public class MessagesConfig extends MultipleConfig {
 		put("en_us", "messages-en.yml");
 		put("enp",   "messages-en.yml");
 		put("en_ws", "messages-en.yml");
-		put("de_at", "messages-de_at.yml");
-		put("de_ch", "messages-de_de.yml");
-		put("de_de", "messages-de_de.yml");
+		put("de_at", "messages-de.yml");
+		put("de_ch", "messages-de.yml");
+		put("de_de", "messages-de.yml");
 	}};
 	
 	private MessagesConfig() {
