@@ -330,7 +330,7 @@ public class ArenaSetup implements Listener {
 				
 				if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 					arenaBuilder.setSpectatorSpawn(player.getLocation());
-					MessageSender.sendMessage(player, "Spectator Spawn has been set at your current location");
+					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "spectator-spawn-set"));
 				}
 			}
 		});
