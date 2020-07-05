@@ -44,6 +44,7 @@ public class ReflectionUtils {
 	public Class<?> enumPlayerInfoActionClass;
 	public Class<?> packetPlayOutNamedEntitySpawnClass;
 	public Class<?> damageSourceClass;
+	public Class<?> combatTrackerClass;
 	public Method entityEnderDragonTickMethod;
 	public Method entitySetLocationMethod;
 	public Method entityGetIdMethod;
@@ -70,6 +71,10 @@ public class ReflectionUtils {
 	public Method entitySetCustomNameVisibleMethod;
 	public Method entityVillagerSetVillagerDataMethod;
 	public Method damageSourceDamageEntityMethod;
+	public Method iChatBaseComponentAddSiblingMethod;
+	public Method entityPlayerGetCombatTrackerMethod;
+	public Method entityPlayerSendMessageMethod;
+	public Method combatTrackerGetDeathMessageMethod;
 	public Field entityPlayerPlayerConnectionField;
 	public Field entityTypesEnderDragonField;
 	public Field entityLocXField;
@@ -125,6 +130,7 @@ public class ReflectionUtils {
 			enumPlayerInfoActionClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
 			packetPlayOutNamedEntitySpawnClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutNamedEntitySpawn");
 			damageSourceClass = Class.forName("net.minecraft.server." + serverVersion + ".DamageSource");
+			combatTrackerClass = Class.forName("net.minecraft.server." + serverVersion + ".CombatTracker");
 			entityEnderDragonTickMethod = entityEnderDragonClass.getMethod("tick");
 			entitySetLocationMethod = entityClass.getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
 			entityGetIdMethod = entityClass.getMethod("getId");
@@ -153,6 +159,10 @@ public class ReflectionUtils {
 			entitySetCustomNameVisibleMethod = entityClass.getMethod("setCustomNameVisible", boolean.class);
 			entityVillagerSetVillagerDataMethod = entityVillagerClass.getMethod("setVillagerData", villagerDataClass);
 			damageSourceDamageEntityMethod = entityPlayerClass.getMethod("damageEntity", damageSourceClass, float.class);
+			iChatBaseComponentAddSiblingMethod = iChatBaseComponentClass.getMethod("addSibling", iChatBaseComponentClass);
+			entityPlayerGetCombatTrackerMethod = entityPlayerClass.getMethod("getCombatTracker");
+			entityPlayerSendMessageMethod = entityPlayerClass.getMethod("sendMessage", iChatBaseComponentClass);
+			combatTrackerGetDeathMessageMethod = combatTrackerClass.getMethod("getDeathMessage");
 			entityPlayerPlayerConnectionField = entityPlayerClass.getField("playerConnection");
 			entityTypesEnderDragonField = entityTypesClass.getField("ENDER_DRAGON");
 			entityLocXField = entityClass.getDeclaredField("locX");

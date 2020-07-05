@@ -96,6 +96,7 @@ import filip.bedwars.listener.player.UseEntityPacketListener;
 import filip.bedwars.utils.EnderDragonController;
 import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.PlayerUtils;
+import filip.bedwars.utils.ReflectionUtils;
 import filip.bedwars.utils.SoundPlayer;
 import filip.bedwars.utils.TeamColorConverter;
 import filip.bedwars.utils.VillagerNPC;
@@ -864,7 +865,6 @@ public class GameLogic implements Listener {
 		
 		// Check if the player is in the game world
 		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
-			String deathMsg = event.getDeathMessage();
 			event.setDeathMessage(null);
 			GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
 			
@@ -987,12 +987,22 @@ public class GameLogic implements Listener {
 				}
 				
 				for (Player p : gameWorld.getWorld().getPlayers()) {
-					String deathMessage = deathMsg;
+					ReflectionUtils reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
 					
-					if(isFinalKill)
-						deathMessage += MessagesConfig.getInstance().getStringValue(p.getLocale(), "final-kill");
-					
-					MessageSender.sendMessage(p, deathMessage);
+					try {
+						Object entityPlayerVictim = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(player));
+						Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(p));
+						
+						Object deathMessage = reflectionUtils.chatComponentConstructor.newInstance(MessagesConfig.getInstance().getStringValue(p.getLocale(), "prefix"));
+						deathMessage = reflectionUtils.iChatBaseComponentAddSiblingMethod.invoke(deathMessage, reflectionUtils.combatTrackerGetDeathMessageMethod.invoke(reflectionUtils.entityPlayerGetCombatTrackerMethod.invoke(entityPlayerVictim)));
+						
+						if(isFinalKill)
+							deathMessage = reflectionUtils.iChatBaseComponentAddSiblingMethod.invoke(deathMessage, reflectionUtils.chatComponentConstructor.newInstance(" �cFINAL KILL!"));
+						
+						reflectionUtils.entityPlayerSendMessageMethod.invoke(entityPlayer, deathMessage);
+					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}
