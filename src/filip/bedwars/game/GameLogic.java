@@ -86,6 +86,9 @@ import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.arena.Spawner;
 import filip.bedwars.game.arena.SpawnerType;
+import filip.bedwars.game.events.BedwarsBedBrokenByPlayerEvent;
+import filip.bedwars.game.events.BedwarsKillEvent;
+import filip.bedwars.game.events.BedwarsVictoryEvent;
 import filip.bedwars.game.scoreboard.ScoreboardManager;
 import filip.bedwars.game.state.GameState;
 import filip.bedwars.game.state.GameStateSetting;
@@ -157,6 +160,13 @@ public class GameLogic implements Listener {
 						if(winnerTeam.containsMember(p.getUniqueId()))
 							p.sendTitle(MessagesConfig.getInstance().getStringValue(p.getLocale(), "victory"), teamHasWonMsg, 10, 70, 20);
 					}
+					
+					Set<Player> winners = new HashSet<>();
+					
+					for (GamePlayer gp : winnerTeam.getMembers())
+						winners.add(gp.getPlayer());
+					
+					BedwarsPlugin.getInstance().getServer().getPluginManager().callEvent(new BedwarsVictoryEvent(winners));
 				}
 			}
 		};
@@ -761,6 +771,7 @@ public class GameLogic implements Listener {
 							scoreboardManager.update();
 							event.setCancelled(true);
 							broadcastBedDestroyed(player, team);
+							BedwarsPlugin.getInstance().getServer().getPluginManager().callEvent(new BedwarsBedBrokenByPlayerEvent(player));
 						}
 						
 						break;
@@ -903,6 +914,7 @@ public class GameLogic implements Listener {
 					
 					if (killer != null) {
 						SoundPlayer.playSound("kill", killer);
+						BedwarsPlugin.getInstance().getServer().getPluginManager().callEvent(new BedwarsKillEvent(killer, player));
 						
 						if (entityDamageEvent.getCause() == DamageCause.PROJECTILE || entityDamageEvent.getCause() == DamageCause.VOID) {
 							Iterator<ItemStack> iter = event.getDrops().iterator();
