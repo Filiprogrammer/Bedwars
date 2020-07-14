@@ -36,8 +36,11 @@ public class TeamShopEntry extends ShopEntry {
 		Team team = gamePlayer.getTeam();
 		
 		if (reward.canBuy(gamePlayer)) {
+			Material priceMaterial = reward.getPriceMaterial(team);
+			int priceCount = reward.getPriceCount(team);
+			
 			if (reward.reward(team)) {
-				InventoryUtils.removeItems(player.getInventory(), reward.getPriceMaterial(team), reward.getPriceCount(team));
+				InventoryUtils.removeItems(player.getInventory(), priceMaterial, priceCount);
 				SoundPlayer.playSound("buy-item", player);
 				
 				for (GamePlayer gp : team.getMembers()) {
