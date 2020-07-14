@@ -150,7 +150,7 @@ public class GameLogic implements Listener {
 				if (winnerTeam == null) {
 					// No Team wins
 					for (Player p : gameWorld.getWorld().getPlayers())
-						MessageSender.sendMessage(p, "The game is over and noone wins");
+						MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "no-team-wins"));
 				} else {
 					for (Player p : gameWorld.getWorld().getPlayers()) {
 						String teamHasWonMsg = MessagesConfig.getInstance().getStringValue(p.getLocale(), "team-has-won").replace("%teamcolor%", TeamColorConverter.convertTeamColorToStringForMessages(winnerTeam.getBase().getTeamColor(), p.getLocale()));

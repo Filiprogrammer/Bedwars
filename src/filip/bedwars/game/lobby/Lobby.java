@@ -172,7 +172,7 @@ public class Lobby {
 		if (!countdown.isRunning() && (game.getPlayers().size() >= game.getArena().getMinPlayersToStart()))
 			countdown.start();
 		
-		IClickable clickable = new ClickableInventory(Bukkit.createInventory(null, 9 * 2, "Select a team"), player) {
+		IClickable clickable = new ClickableInventory(Bukkit.createInventory(null, 9 * 2, MessagesConfig.getInstance().getStringValue(player.getLocale(), "item-select-team")), player) {
 			{
 				for (Team team : game.getTeams()) {
 					TeamColor teamColor = team.getBase().getTeamColor();
@@ -223,7 +223,7 @@ public class Lobby {
 					event.getCurrentItem().addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
 					updateTeamSelectorLores();
 				} else {
-					MessageSender.sendMessage(p, "The team is full");
+					MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "team-full"));
 					SoundPlayer.playSound("error", p);
 				}
 			}
@@ -231,7 +231,7 @@ public class Lobby {
 		
 		clickables.add(clickable);
 		
-		IUsable usable = new UsableItem(new ItemBuilder().setMaterial(Material.GLOWSTONE_DUST).setName("§rTeam Selector").build(), player) {
+		IUsable usable = new UsableItem(new ItemBuilder().setMaterial(Material.GLOWSTONE_DUST).setName(MessagesConfig.getInstance().getStringValue(player.getLocale(), "item-select-team")).build(), player) {
 			@Override
 			public void use(PlayerInteractEvent event) {
 				Player p = event.getPlayer();
@@ -248,7 +248,7 @@ public class Lobby {
 		player.getInventory().setItem(4, usable.getItemStack());
 		updateTeamSelectorLores();
 		
-		usable = new UsableItem(new ItemBuilder().setMaterial(Material.RED_BED).setName("§rLeave Game").build(), player) {
+		usable = new UsableItem(new ItemBuilder().setMaterial(Material.RED_BED).setName(MessagesConfig.getInstance().getStringValue(player.getLocale(), "item-leave-game")).build(), player) {
 			@Override
 			public void use(PlayerInteractEvent event) {
 				Player p = event.getPlayer();
