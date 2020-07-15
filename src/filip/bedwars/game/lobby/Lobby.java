@@ -141,6 +141,10 @@ public class Lobby {
 		};
 	}
 	
+	public Countdown getCountdown() {
+		return countdown;
+	}
+	
 	public Location getSpawnPoint() {
 		return spawnPoint;
 	}
@@ -248,6 +252,24 @@ public class Lobby {
 		player.getInventory().setItem(4, usable.getItemStack());
 		updateTeamSelectorLores();
 		
+		if (MainConfig.getInstance().getLobbySkipCountdown() > 0 && player.hasPermission("filip.bedwars.lobby.skip")) {
+			usable = new UsableItem(new ItemBuilder().setMaterial(Material.DIAMOND).setName(MessagesConfig.getInstance().getStringValue(player.getLocale(), "item-skip-lobby")).build(), player) {
+				@Override
+				public void use(PlayerInteractEvent event) {
+					Player p = event.getPlayer();
+					
+					if (p != player)
+						return;
+					
+					if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
+						skipLobbyCountdown(p);
+				}
+			};
+			
+			usables.add(usable);
+			player.getInventory().setItem(0, usable.getItemStack());
+		}
+		
 		usable = new UsableItem(new ItemBuilder().setMaterial(Material.RED_BED).setName(MessagesConfig.getInstance().getStringValue(player.getLocale(), "item-leave-game")).build(), player) {
 			@Override
 			public void use(PlayerInteractEvent event) {
@@ -325,6 +347,19 @@ public class Lobby {
 				contents[i].setLore(lore);
 			}
 		}
+	}
+	
+	public void skipLobbyCountdown(Player player) {
+		if (!countdown.isRunning() || countdown.getSecondsLeft() <= MainConfig.getInstance().getLobbySkipCountdown()) {
+			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "countdown-cannot-skip"));
+			SoundPlayer.playSound("error", player);
+			return;
+		}
+		
+		countdown.setSecondsLeft(MainConfig.getInstance().getLobbySkipCountdown());
+		
+		for(GamePlayer gamePlayer : game.getPlayers())
+			MessageSender.sendMessage(gamePlayer.getPlayer(), MessagesConfig.getInstance().getStringValue(gamePlayer.getPlayer().getLocale(), "countdown-skipped").replace("%seconds%", String.valueOf(game.getLobby().getCountdown().getSecondsLeft())).replace("%player%", player.getDisplayName()));
 	}
 	
 }

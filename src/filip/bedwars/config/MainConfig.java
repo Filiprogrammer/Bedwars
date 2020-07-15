@@ -29,6 +29,7 @@ public class MainConfig extends SingleConfig {
 	private BarColor lobbyBossbarColor = BarColor.YELLOW;
 	private int respawnDelay = 5;
 	private boolean bedwarsChat = true;
+	private int lobbySkipCountdown = 5;
 	
 	protected MainConfig() {
 		super("config.yml");
@@ -102,6 +103,10 @@ public class MainConfig extends SingleConfig {
 		return bedwarsChat;
 	}
 	
+	public int getLobbySkipCountdown() {
+		return lobbySkipCountdown;
+	}
+	
 	public void setMainLobby(Location loc) {
 		mainLobby = loc;
 	}
@@ -131,6 +136,7 @@ public class MainConfig extends SingleConfig {
 		config.set("attack-cooldown", attackCooldown);
 		config.set("respawn-delay", respawnDelay);
 		config.set("bedwars-chat", bedwarsChat);
+		config.set("lobby-skip-countdown", lobbySkipCountdown);
 		
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
 		
@@ -182,6 +188,7 @@ public class MainConfig extends SingleConfig {
 		lobbyBossbar = config.getBoolean("lobby-bossbar", true);
 		respawnDelay = config.getInt("respawn-delay", 5);
 		bedwarsChat = config.getBoolean("bedwars-chat", true);
+		lobbySkipCountdown = config.getInt("lobby-skip-countdown", 5);
 		
 		try {
 			lobbyBossbarColor = BarColor.valueOf(config.getString("lobby-bossbar-color", "YELLOW"));

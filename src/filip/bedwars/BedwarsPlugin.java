@@ -22,6 +22,7 @@ import filip.bedwars.commands.ReloadCommand;
 import filip.bedwars.commands.RemoveArenaCommand;
 import filip.bedwars.commands.SetGameLobbyCommand;
 import filip.bedwars.commands.SetMainLobbyCommand;
+import filip.bedwars.commands.SkipCountdownCommand;
 import filip.bedwars.config.ArenaConfig;
 import filip.bedwars.game.Game;
 import filip.bedwars.game.GameManager;
@@ -87,6 +88,7 @@ public class BedwarsPlugin extends JavaPlugin {
 		commands.add(new RemoveArenaCommand());
 		commands.add(new ListArenasCommand());
 		commands.add(new LeaveCommand());
+		commands.add(new SkipCountdownCommand());
 		helpCommand = new HelpCommand();
 	}
 	

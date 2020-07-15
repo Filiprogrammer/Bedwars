@@ -33,6 +33,10 @@ join-sign-line-four: '&b<Join Arena>'
 
 lobby-bossbar: true
 lobby-bossbar-color: YELLOW
+
+# 0 to make the countdown unskippable
+lobby-skip-countdown: 5
+
 hunger: false
 drop-only-spawner-resources-on-death: true
 attack-cooldown: false

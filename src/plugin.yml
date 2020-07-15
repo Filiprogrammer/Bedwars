@@ -49,6 +49,10 @@ commands:
     description: Leave a game
     usage: /<command>
     permission: filip.bedwars.play.command
+  bw start:
+    description: Skip the lobby countdown
+    usage: /<command>
+    permission: filip.bedwars.lobby.skip
 permissions:
   filip.bedwars.base:
     description: hj
@@ -64,4 +68,7 @@ permissions:
     default: op
   filip.bedwars.reload:
     description: hablydably
+    default: op
+  filip.bedwars.lobby.skip:
+    description: Skip the lobby countdown
     default: op

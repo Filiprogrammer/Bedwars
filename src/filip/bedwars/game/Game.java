@@ -212,6 +212,10 @@ public class Game implements Listener {
 		return players;
 	}
 	
+	public Lobby getLobby() {
+		return lobby;
+	}
+	
 	public GameLogic getGameLogic() {
 		return gameLogic;
 	}
