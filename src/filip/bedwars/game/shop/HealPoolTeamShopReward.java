@@ -1,5 +1,7 @@
 package filip.bedwars.game.shop;
 
+import java.util.ArrayList;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -16,15 +18,26 @@ public class HealPoolTeamShopReward extends TeamShopReward {
 	@Override
 	public ItemStack getDisplayItem(Team team) {
 		int level = team.upgrades.get(type);
+		StringBuilder lore = new StringBuilder();
+		
+		int i;
+		for (i = 0; i < level; ++i)
+			lore.append("§l§a[]");
+		
+		for (; i < maxLevel; ++i)
+			lore.append("§l§7[]");
+		
+		@SuppressWarnings("serial")
+		ItemBuilder itemBuilder = new ItemBuilder().setLore(new ArrayList<String>() {{ add(lore.toString()); }});
 		
 		// TODO: Read the messages from a config file
 		if (level >= maxLevel) {
-			return new ItemBuilder()
+			return itemBuilder
 					.setMaterial(Material.ENCHANTED_GOLDEN_APPLE)
 					.setName("§rHeal Pool is maxed out")
 					.build();
 		} else {
-			return new ItemBuilder()
+			return itemBuilder
 					.setMaterial(Material.GOLDEN_APPLE)
 					.setName("§rBuy Heal Pool Level " + (team.upgrades.get(type) + 1))
 					.build();
