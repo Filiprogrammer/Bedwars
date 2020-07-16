@@ -383,8 +383,13 @@ public class GameLogic implements Listener {
 								continue;
 							
 							// TODO: Do not hard code this value
-							if (p.getLocation().distance(baseSpawn) < 20)
-								p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 30, healPoolLevel - 1, true, false, true));
+							if (p.getLocation().distance(baseSpawn) < 20) {
+								if (p.hasPotionEffect(PotionEffectType.REGENERATION) &&
+									p.getPotionEffect(PotionEffectType.REGENERATION).getAmplifier() <= (healPoolLevel - 1))
+									p.removePotionEffect(PotionEffectType.REGENERATION);
+								
+								p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 40, healPoolLevel - 1, true, false, true));
+							}
 						}
 					}
 					
