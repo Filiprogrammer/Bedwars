@@ -1042,6 +1042,44 @@ public class GameLogic implements Listener {
 				else
 					player.teleport(getSpectatorSpawn());
 			}
+			
+			GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
+			
+			if (gamePlayer != null) {
+				Team playerTeam = gamePlayer.getTeam();
+				
+				for (Team team : game.getTeams()) {
+					if (team == playerTeam)
+						continue;
+					
+					Iterator<Trap> iter = team.getTraps().iterator();
+					
+					while (iter.hasNext()) {
+						Trap trap = iter.next();
+						
+						if (player.getLocation().distance(team.getBase().getBedTop(gameWorld.getWorld())) <= trap.getRange()) {
+							SoundPlayer.playSound("trap", player);
+							MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "trap-you-triggered"));
+							
+							for (PotionEffect effect : trap.getEffectsIntruder())
+								player.addPotionEffect(effect);
+							
+							for (GamePlayer gp : team.getMembers()) {
+								Player p = gp.getPlayer();
+								SoundPlayer.playSound("trap", p);
+								String msg = MessagesConfig.getInstance().getStringValue(p.getLocale(), "trap-triggered").replace("%player%", player.getName());
+								MessageSender.sendMessage(p, msg);
+								p.sendTitle(MessagesConfig.getInstance().getStringValue(p.getLocale(), "trap-alert"), msg, 10, 70, 20);
+								
+								for (PotionEffect effect : trap.getEffectsTeam())
+									p.addPotionEffect(effect);
+							}
+							
+							iter.remove();
+						}
+					}
+				}
+			}
 		}
 	}
 	

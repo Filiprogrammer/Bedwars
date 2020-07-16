@@ -49,6 +49,9 @@ public class TeamShopEntry extends ShopEntry {
 							.replace("%player%", player.getName())
 							.replace("%level%", "" + team.upgrades.get(reward.type));
 					
+					if (reward instanceof TrapTeamShopReward)
+						msg = msg.replace("%trap%", ((TrapTeamShopReward) reward).getTrap().getName());
+					
 					MessageSender.sendMessage(p, msg);
 				}
 				

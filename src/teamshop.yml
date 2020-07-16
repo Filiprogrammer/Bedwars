@@ -1,6 +1,6 @@
 categories:
-- name: dev-team-test
-  material: BIRCH_SAPLING
+- name: Effects
+  material: POTION
   shopentries:
   - type: MINING_BOOST
     maxlevel: 2
@@ -32,16 +32,75 @@ categories:
     priceMaterials:
     - GOLD_INGOT
     - GOLD_INGOT
-  - type: EXTRA_DRAGONS
-    maxlevel: 10
+- name: Traps
+  material: STRING
+  shopentries:
+  - type: TRAP
+    displayName: '&bBlindness Trap'
+    material: SPIDER_EYE
+    trapRange: 20
+    maxlevel: 1
     priceCounts:
-    - 5
-    - 5
-    - 5
-    - 5
-    - 5
-    - 5
-    - 5
+    - 2
+    priceMaterials:
+    - DIAMOND
+    effectsIntruder:
+    - ==: PotionEffect
+      effect: 15
+      duration: 200
+      amplifier: 0
+    effectsTeam: []
+  - type: TRAP
+    displayName: '&bMining Fatigue Trap'
+    material: WOODEN_PICKAXE
+    trapRange: 20
+    maxlevel: 1
+    priceCounts:
+    - 2
+    priceMaterials:
+    - DIAMOND
+    effectsIntruder:
+    - ==: PotionEffect
+      effect: 4
+      duration: 200
+      amplifier: 0
+    effectsTeam: []
+  - type: TRAP
+    displayName: '&bSpeed Trap'
+    material: FEATHER
+    trapRange: 20
+    maxlevel: 1
+    priceCounts:
+    - 2
+    priceMaterials:
+    - DIAMOND
+    effectsIntruder: []
+    effectsTeam:
+    - ==: PotionEffect
+      effect: 1
+      duration: 200
+      amplifier: 0
+  - type: TRAP
+    displayName: '&bNausea Trap'
+    material: ROTTEN_FLESH
+    trapRange: 17
+    maxlevel: 1
+    priceCounts:
+    - 1
+    priceMaterials:
+    - DIAMOND
+    effectsIntruder:
+    - ==: PotionEffect
+      effect: 9
+      duration: 200
+      amplifier: 0
+    effectsTeam: []
+- name: Extras
+  material: NETHER_STAR
+  shopentries:
+  - type: EXTRA_DRAGONS
+    maxlevel: 3
+    priceCounts:
     - 5
     - 5
     - 5
@@ -49,16 +108,9 @@ categories:
     - EMERALD
     - EMERALD
     - EMERALD
-    - EMERALD
-    - EMERALD
-    - EMERALD
-    - EMERALD
-    - EMERALD
-    - EMERALD
-    - EMERALD
   - type: BED_RESTORE
     maxlevel: 1
     priceCounts:
-    - 32
+    - 35
     priceMaterials:
     - EMERALD

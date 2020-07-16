@@ -24,6 +24,7 @@ public class Team {
     private final List<GamePlayer> members = new ArrayList<GamePlayer>();
     private boolean hasBed = true;
     private Inventory teamChestInventory = Bukkit.createInventory(null, 3 * 9, "Team Chest");
+    private List<Trap> traps = new ArrayList<>();
     
     public HashMap<TeamUpgradeType, Integer> upgrades = new HashMap<TeamUpgradeType, Integer>(){{
     	for (TeamUpgradeType type : TeamUpgradeType.values())
@@ -105,13 +106,26 @@ public class Team {
     	bedTopBlock.setBlockData(bedTopData, false);
     }
     
+    public List<Trap> getTraps() {
+    	return traps;
+    }
+    
+    public void addTrap(Trap trap) {
+    	traps.add(trap);
+    }
+    
+    public boolean removeTrap(Trap trap) {
+    	return traps.remove(trap);
+    }
+    
     public enum TeamUpgradeType {
     	HEAL_POOL,
     	MINING_BOOST,
     	ATTACK_BOOST,
     	PROTECTION_BOOST,
     	EXTRA_DRAGONS,
-    	BED_RESTORE
+    	BED_RESTORE,
+    	TRAP
     }
     
 }

@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
+import org.bukkit.potion.PotionEffect;
 
 import filip.bedwars.game.Team.TeamUpgradeType;
+import filip.bedwars.game.Trap;
 import filip.bedwars.game.shop.AttackBoostTeamShopReward;
 import filip.bedwars.game.shop.BedRestoreTeamShopReward;
 import filip.bedwars.game.shop.ExtraDragonTeamShopReward;
@@ -17,6 +19,7 @@ import filip.bedwars.game.shop.ShopCategory;
 import filip.bedwars.game.shop.ShopEntry;
 import filip.bedwars.game.shop.TeamShopEntry;
 import filip.bedwars.game.shop.TeamShopReward;
+import filip.bedwars.game.shop.TrapTeamShopReward;
 
 public class TeamShopCategoryDeserializer {
 
@@ -114,6 +117,56 @@ public class TeamShopCategoryDeserializer {
 				break;
 			case BED_RESTORE:
 				reward = new BedRestoreTeamShopReward(maxlevel, priceCounts, priceMaterials);
+				break;
+			case TRAP:
+				Object displayNameObject = serializedShopEntry.get("displayName");
+				String displayName = null;
+				
+				if (displayNameObject instanceof String)
+					displayName = ((String) displayNameObject).replace('&', '§');
+				
+				Object materialObject = serializedShopEntry.get("material");
+				Material material = null;
+				
+				if (materialObject instanceof String) {
+					try {
+						material = Material.valueOf((String) materialObject);
+					} catch (IllegalArgumentException e) {
+						MessageSender.sendWarning("material of a team shop trap has an invalid value \"" + ((String) materialObject) + "\"");
+					}
+				}
+				
+				Object rangeObject = serializedShopEntry.get("range");
+				int range = 20;
+				
+				if (rangeObject instanceof Integer)
+					range = (int) rangeObject;
+				
+				Object effectsIntruderObject = serializedShopEntry.get("effectsIntruder");
+				List<PotionEffect> effectsIntruder = new ArrayList<>();
+				
+				if (effectsIntruderObject instanceof List) {
+					List<?> effectsIntruderList = (List<?>) effectsIntruderObject;
+					
+					for (Object effectObject : effectsIntruderList) {
+						if (effectObject instanceof PotionEffect)
+							effectsIntruder.add((PotionEffect) effectObject);
+					}
+				}
+				
+				Object effectsTeamObject = serializedShopEntry.get("effectsTeam");
+				List<PotionEffect> effectsTeam = new ArrayList<>();
+				
+				if (effectsTeamObject instanceof List) {
+					List<?> effectsTeamList = (List<?>) effectsTeamObject;
+					
+					for (Object effectObject : effectsTeamList) {
+						if (effectObject instanceof PotionEffect)
+							effectsTeam.add((PotionEffect) effectObject);
+					}
+				}
+				
+				reward = new TrapTeamShopReward(maxlevel, priceCounts, priceMaterials, new Trap(displayName, range, effectsIntruder, effectsTeam), material);
 				break;
 			}
 			
