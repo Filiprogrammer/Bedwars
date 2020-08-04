@@ -19,6 +19,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.config.MainConfig;
@@ -285,6 +286,28 @@ public class Lobby {
 		
 		usables.add(usable);
 		player.getInventory().setItem(8, usable.getItemStack());
+		
+		usable = new UsableItem(new ItemBuilder().setMaterial(Material.BOOK).setName("§rTutorial").build(), player) {
+			@Override
+			public void use(PlayerInteractEvent event) {
+				if (event.getPlayer() == player) {
+					ItemStack bookTutorial = new ItemStack(Material.WRITTEN_BOOK);
+					BookMeta bookMeta = (BookMeta) bookTutorial.getItemMeta();
+					bookMeta.setTitle("Tutorial");
+					bookMeta.setAuthor("Bedwars");
+					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(player.getLocale(), "tutorial-book-page-1").replace("\\n", "\n"));
+					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(player.getLocale(), "tutorial-book-page-2").replace("\\n", "\n"));
+					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(player.getLocale(), "tutorial-book-page-3").replace("\\n", "\n"));
+					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(player.getLocale(), "tutorial-book-page-4").replace("\\n", "\n"));
+					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(player.getLocale(), "tutorial-book-page-5").replace("\\n", "\n"));
+					bookTutorial.setItemMeta(bookMeta);
+					player.openBook(bookTutorial);
+				}
+			}
+		};
+		
+		usables.add(usable);
+		player.getInventory().setItem(2, usable.getItemStack());
 	}
 	
 	/**

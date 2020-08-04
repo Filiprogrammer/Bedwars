@@ -122,3 +122,8 @@ spawner-change-chat: '%itemname% &7-Spawner delays wurden mit %multiplier% multi
 trap-you-triggered: '&cDu hast eine Falle ausgelöst!'
 trap-triggered: '&l&4%player% &chat eine Falle ausgelöst!'
 trap-alert: '&4&lACHTUNG!'
+tutorial-book-page-1: 'In Bedwars geht es darum dein eigenes Bett zu beschützen, und das deiner Gegner zu zerstören. Ist das Bett eines Teams zerstört, können diese Spieler nicht mehr wiederbelebt werden. Ziel ist als einziges Team übrig zu bleiben.'
+tutorial-book-page-2: '&l&nSpawner\n\n&rEs gibt Spawner, die verschiedenne Items erschaffen und unterschiedlich schnell werden:\n&6() &rBronze\n&f() &rEisen\n&e() &rGold\n&b() &rDiamant\n&2() &rSmaragd'
+tutorial-book-page-3: '&l&nItem Shop\n\n&rInteragiere mit dem &lItem Shop - Händler &rum dir Waffen, Ausrüstung und spezielle Items zu kaufen. Klicke auf die Kategorien im Shop um die verschiedenen Items zu erkunden.'
+tutorial-book-page-4: '&l&nTeam Shop\n\n&rInteragiere mit dem &lTeam Shop - Händler &rum dein Team mit Upgrades zu stärken.'
+tutorial-book-page-5: '&l&nChat\n\n&r&l@Hallo &8&o(schickt "Hallo" an alle)\n&r&lHallo &8&o(schickt "Hallo" an dein Team)'
