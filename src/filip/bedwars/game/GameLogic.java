@@ -1286,8 +1286,13 @@ public class GameLogic implements Listener {
 		PlayerUtils.playerReset(player);
 		Team team = game.getTeamOfPlayer(player.getUniqueId());
 		
-		if (team != null)
+		if (team != null) {
 			player.teleport(team.getBase().getSpawn(gameWorld.getWorld()));
+			
+			if (!MainConfig.getInstance().getAttackCooldown())
+				// Disable attack cooldown
+				player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(20);
+		}
 		
 		for (VillagerNPC itemShopNPC : itemShopNPCs)
 			itemShopNPC.respawn(player);
