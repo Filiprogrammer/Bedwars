@@ -181,10 +181,10 @@ public class MainConfig extends SingleConfig {
 		itemShopName = config.getString("item-shop-name", "&2Item Shop").replace('&', '§');
 		teamShopName = config.getString("team-shop-name", "&1Team Shop").replace('&', '§');
 		baseSpawnPointName = config.getString("base-spawn-point-name", "&dSpawn-Point").replace('&', '§');
-		joinSignLines[0] = config.getString("join-sign-line-one", "&a[BedWars]").replace('&', '§');
-		joinSignLines[1] = config.getString("join-sign-line-two", "&d%arenaname%").replace('&', '§');
+		joinSignLines[0] = config.getString("join-sign-line-one", "&1[BedWars]").replace('&', '§');
+		joinSignLines[1] = config.getString("join-sign-line-two", "&5%arenaname%").replace('&', '§');
 		joinSignLines[2] = config.getString("join-sign-line-three", "").replace('&', '§');
-		joinSignLines[3] = config.getString("join-sign-line-four", "&b<Join Arena>").replace('&', '§');
+		joinSignLines[3] = config.getString("join-sign-line-four", "&1<Join Arena>").replace('&', '§');
 		lobbyBossbar = config.getBoolean("lobby-bossbar", true);
 		respawnDelay = config.getInt("respawn-delay", 5);
 		bedwarsChat = config.getBoolean("bedwars-chat", true);

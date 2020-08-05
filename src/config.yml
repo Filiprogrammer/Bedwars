@@ -26,10 +26,10 @@ item-shop-name: '&2Item Shop'
 team-shop-name: '&1Team Shop'
 base-spawn-point-name: '&dSpawn-Point'
 
-join-sign-line-one: '&a[BedWars]'
-join-sign-line-two: '&d%arenaname%'
+join-sign-line-one: '&1[BedWars]'
+join-sign-line-two: '&5%arenaname%'
 join-sign-line-three: ''
-join-sign-line-four: '&b<Join Arena>'
+join-sign-line-four: '&1<Join Arena>'
 
 lobby-bossbar: true
 lobby-bossbar-color: YELLOW
