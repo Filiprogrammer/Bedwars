@@ -703,7 +703,7 @@ public class GameLogic implements Listener {
 		}
 		
 		for (Base base : game.getArena().getBases()) {
-			if (base.getSpawn(gameWorld.getWorld()).distance(block.getLocation()) <= 2) {
+			if (base.getSpawn(gameWorld.getWorld()).getBlock().getLocation().distance(block.getLocation()) <= 2) {
 				event.setCancelled(true);
 				MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "you-cant-place-blocks-near-spawn"));
 				return;

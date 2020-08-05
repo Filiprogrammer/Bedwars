@@ -61,6 +61,8 @@ public class ArenaSerializer {
 					put("x", loc.getBlockX());
 					put("y", loc.getBlockY());
 					put("z", loc.getBlockZ());
+					put("yaw", (int) loc.getYaw());
+					put("pitch", (int) loc.getPitch());
 				}});
 				put("teamColor", base.getTeamColor().toString());
 				put("bedBottom", new HashMap<String, Integer>() {{

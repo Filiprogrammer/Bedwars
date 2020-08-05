@@ -57,8 +57,8 @@ public class ArenaDeserializer {
 			BaseBuilder baseBuilder = new BaseBuilder();
 			
 			Map<String, Integer> spawnLocationMap = (Map<String, Integer>) serializedBase.get("spawn");
-			Location spawnLocation = new Location(null, spawnLocationMap.get("x"), spawnLocationMap.get("y"), spawnLocationMap.get("z"));
-			baseBuilder.setSpawn(spawnLocation);
+			Location spawnLocation = new Location(null, spawnLocationMap.get("x"), spawnLocationMap.get("y"), spawnLocationMap.get("z"), spawnLocationMap.get("yaw"), spawnLocationMap.get("pitch"));
+			baseBuilder.setSpawn(spawnLocation.add(0.5, 0, 0.5));
 			
 			Map<String, Integer> bedTopLocationMap = (Map<String, Integer>) serializedBase.get("bedTop");
 			Location bedTopLocation = new Location(null, bedTopLocationMap.get("x"), bedTopLocationMap.get("y"), bedTopLocationMap.get("z"));

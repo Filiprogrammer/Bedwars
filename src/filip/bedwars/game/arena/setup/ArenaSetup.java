@@ -255,8 +255,10 @@ public class ArenaSetup implements Listener {
 				Block block = event.getBlockPlaced();
 				
 				if (block != null) {
-					baseBuilder.setSpawn(block.getLocation());
-					spawnSpawnNPC(block.getLocation());
+					Location loc = block.getLocation().clone().add(0.5, 0, 0.5);
+					loc.setYaw(Math.round(player.getLocation().getYaw() / 90f) * 90f);
+					baseBuilder.setSpawn(loc);
+					spawnSpawnNPC(loc);
 					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "setup-set").replace("%type%", MainConfig.getInstance().getBaseSpawnPointName()));
 					SoundPlayer.playSound("arena-setup", setuper);
 				}
@@ -561,9 +563,9 @@ public class ArenaSetup implements Listener {
 	
 	private void spawnSpawnNPC(Location loc) {
 		if (spawnNPC == null)
-			spawnNPC = new PlayerNPC(loc.clone().add(0.5, 0, 0.5), MainConfig.getInstance().getBaseSpawnPointName(), setuper);
+			spawnNPC = new PlayerNPC(loc, MainConfig.getInstance().getBaseSpawnPointName(), setuper);
 		else
-			spawnNPC.teleport(loc.getBlockX() + 0.5, loc.getBlockY(), loc.getBlockZ() + 0.5, setuper);
+			spawnNPC.teleport(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getYaw(), loc.getPitch(), setuper);
 	}
 	
 	private void despawnSpawnNPC() {

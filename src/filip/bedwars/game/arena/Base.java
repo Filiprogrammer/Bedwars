@@ -20,7 +20,7 @@ public class Base implements Cloneable {
 	}
 	
 	public Location getSpawn(World world) {
-		return new Location(world, spawn.getX(), spawn.getY(), spawn.getZ());
+		return new Location(world, spawn.getX(), spawn.getY(), spawn.getZ(), spawn.getYaw(), spawn.getPitch());
 	}
 	
 	public Location getItemShop(World world) {
