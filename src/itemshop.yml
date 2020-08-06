@@ -27,11 +27,11 @@ categories:
           ==: ItemMeta
           meta-type: UNSPECIFIC
           display-name: '§rBlast Proof Glass'
-  - priceMaterial: BRICK
-    priceCount: 10
+  - priceMaterial: IRON_INGOT
+    priceCount: 2
     rewards:
       - type: COBWEB
-        amount: 2
+        amount: 1
 - name: '&aMelee Weapons'
   material: GOLDEN_SWORD
   shopentries:
@@ -56,7 +56,7 @@ categories:
             KNOCKBACK: 2
           display-name: '§bLvl.2 Knockback Stick'
   - priceMaterial: IRON_INGOT
-    priceCount: 2
+    priceCount: 4
     rewards:
       - type: GOLDEN_SWORD
         meta:
@@ -65,7 +65,7 @@ categories:
           display-name: '§aLvl.1 Sword'
           Unbreakable: true
   - priceMaterial: IRON_INGOT
-    priceCount: 4
+    priceCount: 8
     rewards:
       - type: STONE_SWORD
         meta:
@@ -74,7 +74,7 @@ categories:
           display-name: '§aLvl.2 Sword'
           Unbreakable: true
   - priceMaterial: IRON_INGOT
-    priceCount: 6
+    priceCount: 12
     rewards:
       - type: IRON_SWORD
         meta:
@@ -83,7 +83,7 @@ categories:
           display-name: '§aLvl.3 Sword'
           Unbreakable: true
   - priceMaterial: GOLD_INGOT
-    priceCount: 3
+    priceCount: 4
     rewards:
       - type: DIAMOND_SWORD
         meta:
@@ -92,7 +92,7 @@ categories:
           display-name: '§aLvl.4 Sword'
           Unbreakable: true
   - priceMaterial: EMERALD
-    priceCount: 4
+    priceCount: 6
     rewards:
       - type: DIAMOND_SWORD
         meta:
@@ -186,10 +186,10 @@ categories:
           meta-type: POTION
           potion-type: minecraft:long_weakness
   - priceMaterial: GOLD_INGOT
-    priceCount: 2
+    priceCount: 1
     rewards:
       - type: TIPPED_ARROW
-        amount: 2
+        amount: 1
         meta:
           ==: ItemMeta
           meta-type: POTION
@@ -291,7 +291,7 @@ categories:
           display-name: '§aLvl.3 Armor'
           Unbreakable: true
   - priceMaterial: EMERALD
-    priceCount: 2
+    priceCount: 4
     rewards:
       - custom-item: ARMOR
         type: DIAMOND_CHESTPLATE
@@ -520,7 +520,7 @@ categories:
       - type: FIREWORK_ROCKET
         amount: 1
   - priceMaterial: IRON_INGOT
-    priceCount: 24
+    priceCount: 12
     rewards:
       - custom-item: FIREBALL
         type: FIRE_CHARGE
@@ -530,7 +530,7 @@ categories:
           meta-type: UNSPECIFIC
           display-name: '§cBoom Boom Ball'
   - priceMaterial: GOLD_INGOT
-    priceCount: 6
+    priceCount: 5
     rewards:
       - type: GOLDEN_APPLE
         amount: 1
