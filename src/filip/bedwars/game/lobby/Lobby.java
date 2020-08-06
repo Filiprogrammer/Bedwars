@@ -300,6 +300,7 @@ public class Lobby {
 					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(player.getLocale(), "tutorial-book-page-3").replace("\\n", "\n"));
 					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(player.getLocale(), "tutorial-book-page-4").replace("\\n", "\n"));
 					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(player.getLocale(), "tutorial-book-page-5").replace("\\n", "\n"));
+					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(player.getLocale(), "tutorial-book-page-6").replace("\\n", "\n"));
 					bookTutorial.setItemMeta(bookMeta);
 					player.openBook(bookTutorial);
 				}

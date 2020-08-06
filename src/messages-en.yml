@@ -126,4 +126,5 @@ tutorial-book-page-1: "Bedwars is about protecting your own bed and destroying y
 tutorial-book-page-2: "&l&nSpawners\n\n&rThere are spawners that create different items and run at different speeds:\n&6() &rBronze\n&f() &rIron\n&e() &rGold\n&b() &rDiamond\n&2() &rEmerald"
 tutorial-book-page-3: "&l&nItem Shop\n\n&rInteract with the &lItem Shop - merchant &rto buy weapons, equipment and special items. Click the categories in the shop to explore various items."
 tutorial-book-page-4: "&l&nTeam Shop\n\n&rInteract with the &lTeam Shop - merchant &rto strengthen your team with upgrades."
-tutorial-book-page-5: '&l&nChat\n\n&r&l@Hello &8&o(sends "Hello" to everyone)\n&r&lHello &8&o(sends "Hello" to your team)'
+tutorial-book-page-5: '&l&nTeam Chest\n\n&rEvery &lender chest &racts as a &lTeam Chest&r. A &lTeam Chest &ris an &lender chest for the entire team&r.'
+tutorial-book-page-6: '&l&nChat\n\n&r&l@Hello &8&o(sends "Hello" to everyone)\n&r&lHello &8&o(sends "Hello" to your team)'
