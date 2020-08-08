@@ -1,11 +1,14 @@
 package filip.bedwars.config;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.ItemStack;
 
 import filip.bedwars.utils.MessageSender;
 
@@ -30,6 +33,7 @@ public class MainConfig extends SingleConfig {
 	private int respawnDelay = 5;
 	private boolean bedwarsChat = true;
 	private int lobbySkipCountdown = 5;
+	private List<ItemStack> spawnItems;
 	
 	protected MainConfig() {
 		super("config.yml");
@@ -107,6 +111,10 @@ public class MainConfig extends SingleConfig {
 		return lobbySkipCountdown;
 	}
 	
+	public List<ItemStack> getSpawnItems() {
+		return spawnItems;
+	}
+	
 	public void setMainLobby(Location loc) {
 		mainLobby = loc;
 	}
@@ -137,6 +145,7 @@ public class MainConfig extends SingleConfig {
 		config.set("respawn-delay", respawnDelay);
 		config.set("bedwars-chat", bedwarsChat);
 		config.set("lobby-skip-countdown", lobbySkipCountdown);
+		config.set("spawn-items", spawnItems);
 		
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
 		
@@ -171,6 +180,7 @@ public class MainConfig extends SingleConfig {
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void reloadConfig() {
 		createAndLoadConfigFileIfNotExistent(false);
@@ -189,6 +199,12 @@ public class MainConfig extends SingleConfig {
 		respawnDelay = config.getInt("respawn-delay", 5);
 		bedwarsChat = config.getBoolean("bedwars-chat", true);
 		lobbySkipCountdown = config.getInt("lobby-skip-countdown", 5);
+		List<?> spawnItemsList = config.getList("spawn-items");
+		
+		if (spawnItemsList.size() > 0 && spawnItemsList.get(0) instanceof ItemStack)
+			spawnItems = (List<ItemStack>) spawnItemsList;
+		else
+			spawnItems = new ArrayList<ItemStack>();
 		
 		try {
 			lobbyBossbarColor = BarColor.valueOf(config.getString("lobby-bossbar-color", "YELLOW"));

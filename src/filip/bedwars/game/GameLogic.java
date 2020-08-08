@@ -444,6 +444,9 @@ public class GameLogic implements Listener {
 		Player player = gamePlayer.getPlayer();
 		player.teleport(spawnLoc);
 		PlayerUtils.playerReset(player);
+		
+		for (ItemStack is : MainConfig.getInstance().getSpawnItems())
+			player.getInventory().addItem(is);
 	}
 	
 	public void joinSpectator(Player player) {
@@ -1302,6 +1305,9 @@ public class GameLogic implements Listener {
 		
 		for (EnderDragonController enderDragonController : enderDragonControllers)
 			enderDragonController.respawn(player);
+		
+		for (ItemStack is : MainConfig.getInstance().getSpawnItems())
+			player.getInventory().addItem(is);
 	}
 	
 }
