@@ -534,6 +534,15 @@ categories:
     rewards:
       - type: GOLDEN_APPLE
         amount: 1
+  - priceMaterial: DIAMOND
+    priceCount: 5
+    rewards:
+      - type: ENDER_CHEST
+        amount: 1
+        meta:
+          ==: ItemMeta
+          meta-type: UNSPECIFIC
+          display-name: '§6Team Chest'
 - name: '&aKits'
   material: CRAFTING_TABLE
   shopentries:
