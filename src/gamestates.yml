@@ -25,13 +25,13 @@
 
 gamestates:
 - name: 'Start-Phase'
-  duration-seconds: 190
+  duration-seconds: 220
   countdown-message: 'spawner-will-be-faster'
   countdown-message-one-minute: 'spawner-will-be-faster-one'
   actions-start: []
   actions-end: []
 - name: 'Spawner+'
-  duration-seconds: 280
+  duration-seconds: 310
   countdown-message: 'spawner-will-be-faster'
   countdown-message-one-minute: 'spawner-will-be-faster-one'
   actions-start:
@@ -48,7 +48,7 @@ gamestates:
     alert: CHAT
   actions-end: []
 - name: 'Ultra-Spawner'
-  duration-seconds: 300
+  duration-seconds: 330
   countdown-message: 'beds-gone-in'
   countdown-message-one-minute: 'beds-gone-in-one'
   actions-start:
@@ -65,7 +65,7 @@ gamestates:
     alert: CHAT
   actions-end: []
 - name: 'Beds gone'
-  duration-seconds: 300
+  duration-seconds: 330
   countdown-message: 'dragons-will-spawn'
   countdown-message-one-minute: 'dragons-will-spawn-one'
   actions-start:
