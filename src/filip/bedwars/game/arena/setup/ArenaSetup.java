@@ -565,7 +565,7 @@ public class ArenaSetup implements Listener {
 		if (spawnNPC == null)
 			spawnNPC = new PlayerNPC(loc, MainConfig.getInstance().getBaseSpawnPointName(), setuper);
 		else
-			spawnNPC.teleport(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getYaw(), loc.getPitch(), setuper);
+			spawnNPC.teleport(loc.getBlockX() + 0.5, loc.getBlockY(), loc.getBlockZ() + 0.5, loc.getYaw(), loc.getPitch(), setuper);
 	}
 	
 	private void despawnSpawnNPC() {
