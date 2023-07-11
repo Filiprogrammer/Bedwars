@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -17,13 +18,14 @@ import filip.bedwars.game.shop.ItemShopEntry;
 import filip.bedwars.game.shop.ItemShopReward;
 import filip.bedwars.game.shop.ShopCategory;
 import filip.bedwars.game.shop.ShopEntry;
+import net.minecraft.nbt.CompoundTag;
 
 public class ItemShopCategoryDeserializer {
 	
 	public static ShopCategory deserializeCategory(Object serializedCategory) {
 		Map<String, Object> mapOfElements = (Map<String, Object>) serializedCategory;
 		
-		String categoryName = ((String) mapOfElements.get("name")).replace('&', '§');
+		String categoryName = ((String) mapOfElements.get("name")).replace('&', 'Â§');
 		
 		if (categoryName == null) {
 			MessageSender.sendWarning("A Shop Category does not have a name");
@@ -33,7 +35,7 @@ public class ItemShopCategoryDeserializer {
 		Material categoryMaterial = Material.valueOf((String) mapOfElements.get("material"));
 		
 		if (categoryMaterial == null) {
-			MessageSender.sendWarning("§eThe Shop Category §6\"" + categoryName + "\" §edoes not have a valid material");
+			MessageSender.sendWarning("Â§eThe Shop Category Â§6\"" + categoryName + "\" Â§edoes not have a valid material");
 			return null;
 		}
 		
@@ -45,14 +47,14 @@ public class ItemShopCategoryDeserializer {
 			Material priceMaterial = Material.STONE;
 			
 			if (priceMaterialObject == null) {
-				MessageSender.sendWarning("priceMaterial of an item in the shop category §6\"" + categoryName + "\" §e was not specified");
+				MessageSender.sendWarning("priceMaterial of an item in the shop category Â§6\"" + categoryName + "\" Â§e was not specified");
 			} else if (!(priceMaterialObject instanceof String)) {
-				MessageSender.sendWarning("priceMaterial of an item in the shop category §6\"" + categoryName + "\" §e has an invalid value");
+				MessageSender.sendWarning("priceMaterial of an item in the shop category Â§6\"" + categoryName + "\" Â§e has an invalid value");
 			} else {
 				try {
 					priceMaterial = Material.valueOf((String) priceMaterialObject);
 				} catch (IllegalArgumentException e) {
-					MessageSender.sendWarning("priceMaterial of an item in the shop category §6\"" + categoryName + "\" §e has an invalid value");
+					MessageSender.sendWarning("priceMaterial of an item in the shop category Â§6\"" + categoryName + "\" Â§e has an invalid value");
 				}
 			}
 			
@@ -60,9 +62,9 @@ public class ItemShopCategoryDeserializer {
 			int priceCount = 1;
 			
 			if (priceCountObject == null)
-				MessageSender.sendWarning("priceCount of an item in the shop category §6\"" + categoryName + "\" §e was not specified");
+				MessageSender.sendWarning("priceCount of an item in the shop category Â§6\"" + categoryName + "\" Â§e was not specified");
 			else if (!(priceCountObject instanceof Integer))
-				MessageSender.sendWarning("priceCount of an item in the shop category §6\"" + categoryName + "\" §e has an invalid value");
+				MessageSender.sendWarning("priceCount of an item in the shop category Â§6\"" + categoryName + "\" Â§e has an invalid value");
 			else
 				priceCount = (int) priceCountObject;
 			
@@ -99,12 +101,17 @@ public class ItemShopCategoryDeserializer {
 						
 						if (blastProofObject != null && blastProofObject instanceof Boolean && (Boolean)blastProofObject) {
 							try {
-								Object nmsItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, itemStack);
-								Object nbtTagCompound = BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsItemStack);
-								BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundSetMethod.invoke(nbtTagCompound, "bedwars-blast-proof", BedwarsPlugin.getInstance().reflectionUtils.nbtTagIntConstructor.newInstance(0));
-								BedwarsPlugin.getInstance().reflectionUtils.itemStackSetTagMethod.invoke(nmsItemStack, nbtTagCompound);
-								itemStack = (ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsBukkitCopyMethod.invoke(null, nmsItemStack);
-							} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+								net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
+								//Object nmsItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, itemStack);
+								CompoundTag nbtTagCompound = nmsItemStack.getOrCreateTag();
+								//Object nbtTagCompound = BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsItemStack);
+								nbtTagCompound.putInt("bedwars-blast-proof", 0);
+								//BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundSetMethod.invoke(nbtTagCompound, "bedwars-blast-proof", BedwarsPlugin.getInstance().reflectionUtils.nbtTagIntConstructor.newInstance(0));
+								nmsItemStack.setTag(nbtTagCompound);
+								//BedwarsPlugin.getInstance().reflectionUtils.itemStackSetTagMethod.invoke(nmsItemStack, nbtTagCompound);
+								itemStack = CraftItemStack.asBukkitCopy(nmsItemStack);
+								//itemStack = (ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsBukkitCopyMethod.invoke(null, nmsItemStack);
+							} catch (IllegalArgumentException e) {
 								e.printStackTrace();
 							}
 						}
@@ -124,12 +131,16 @@ public class ItemShopCategoryDeserializer {
 								break;
 							case "FIREBALL":
 								try {
-									Object nmsItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, itemStack);
-									Object nbtTagCompound = BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsItemStack);
-									BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundSetMethod.invoke(nbtTagCompound, "bedwars-fireball", BedwarsPlugin.getInstance().reflectionUtils.nbtTagIntConstructor.newInstance(0));
-									BedwarsPlugin.getInstance().reflectionUtils.itemStackSetTagMethod.invoke(nmsItemStack, nbtTagCompound);
-									rewards.add(new ItemShopReward((ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsBukkitCopyMethod.invoke(null, nmsItemStack)));
-								} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+									net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
+									//Object nmsItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, itemStack);
+									CompoundTag nbtTagCompound = nmsItemStack.getOrCreateTag();
+									//Object nbtTagCompound = BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsItemStack);
+									nbtTagCompound.putInt("bedwars-fireball", 0);
+									//BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundSetMethod.invoke(nbtTagCompound, "bedwars-fireball", BedwarsPlugin.getInstance().reflectionUtils.nbtTagIntConstructor.newInstance(0));
+									nmsItemStack.setTag(nbtTagCompound);
+									//BedwarsPlugin.getInstance().reflectionUtils.itemStackSetTagMethod.invoke(nmsItemStack, nbtTagCompound);
+									rewards.add(new ItemShopReward(nmsItemStack.asBukkitCopy()));
+								} catch (IllegalArgumentException e) {
 									e.printStackTrace();
 								}
 								break;
@@ -138,12 +149,12 @@ public class ItemShopCategoryDeserializer {
 							rewards.add(new ItemShopReward(itemStack));
 						}
 					} else {
-						MessageSender.sendWarning("An item in the shop category §6\"" + categoryName + "\" §eis not valid");
+						MessageSender.sendWarning("An item in the shop category Â§6\"" + categoryName + "\" Â§eis not valid");
 						return null;
 					}
 				}
 			} else {
-				MessageSender.sendWarning("An item in the shop category §6\"" + categoryName + "\" §eis not valid");
+				MessageSender.sendWarning("An item in the shop category Â§6\"" + categoryName + "\" Â§eis not valid");
 				return null;
 			}
 			

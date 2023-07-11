@@ -71,7 +71,7 @@ public class ActionDeserializer {
 			}
 			
 			if (arg instanceof String)
-				arg = ((String) arg).replace('&', 'ง');
+				arg = ((String) arg).replace('&', 'ยง');
 			
 			initArgs[i] = arg;
 		}

@@ -22,10 +22,10 @@ public class ExtraDragonTeamShopReward extends TeamShopReward {
 		
 		int i;
 		for (i = 0; i < level; ++i)
-			lore.append("§l§a[]");
+			lore.append("Â§lÂ§a[]");
 		
 		for (; i < maxLevel; ++i)
-			lore.append("§l§7[]");
+			lore.append("Â§lÂ§7[]");
 		
 		@SuppressWarnings("serial")
 		ItemBuilder itemBuilder = new ItemBuilder().setLore(new ArrayList<String>() {{ add(lore.toString()); }});
@@ -34,12 +34,12 @@ public class ExtraDragonTeamShopReward extends TeamShopReward {
 		if (level >= maxLevel) {
 			return itemBuilder
 					.setMaterial(Material.DRAGON_HEAD)
-					.setName("§rExtra dragons are maxed out")
+					.setName("Â§rExtra dragons are maxed out")
 					.build();
 		} else {
 			return itemBuilder
 					.setMaterial(Material.DRAGON_HEAD)
-					.setName("§rUpgrade to " + (team.upgrades.get(type) + 1) + " Extra Dragons")
+					.setName("Â§rUpgrade to " + (team.upgrades.get(type) + 1) + " Extra Dragons")
 					.build();
 		}
 	}

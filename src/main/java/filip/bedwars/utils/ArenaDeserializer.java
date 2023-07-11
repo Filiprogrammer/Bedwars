@@ -42,7 +42,7 @@ public class ArenaDeserializer {
 			SpawnerBuilder spawnerBuilder = new SpawnerBuilder();
 			spawnerBuilder.setTicksPerSpawn((int) serializedSpawner.get("ticksPerSpawn"));
 			spawnerBuilder.setItem(Material.valueOf((String) serializedSpawner.get("itemMaterial")));
-			spawnerBuilder.setItemName(((String) serializedSpawner.get("itemName")).replace('&', 'ง'));
+			spawnerBuilder.setItemName(((String) serializedSpawner.get("itemName")).replace('&', 'ยง'));
 			
 			Map<String, Integer> spawnerLocationMap = (Map<String, Integer>) serializedSpawner.get("location");
 			Location spawnerLocation = new Location(null, spawnerLocationMap.get("x"), spawnerLocationMap.get("y"), spawnerLocationMap.get("z"));

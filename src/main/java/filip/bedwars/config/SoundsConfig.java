@@ -76,7 +76,7 @@ public class SoundsConfig extends SingleConfig {
 					sound = Sound.valueOf(section.getString("sound")); // if no sound is specified in the config, then play no sound
 			} catch(Exception e) {
 				// if the inputted sound IS NOT a sound, print a warning in the console
-				MessageSender.sendWarning("The inputted sound for §c" + key + " §ewas not found! Please check your sounds.yml! Be sure to only use the correct minecraft-spigot-sounds from this page: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html");
+				MessageSender.sendWarning("The inputted sound for Â§c" + key + " Â§ewas not found! Please check your sounds.yml! Be sure to only use the correct minecraft-spigot-sounds from this page: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html");
 			}
 			
 			float pitch = (float) section.getDouble("pitch", 1.0);

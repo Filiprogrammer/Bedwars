@@ -24,6 +24,9 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Bed;
+import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
@@ -107,6 +110,9 @@ import filip.bedwars.utils.TeamColorConverter;
 import filip.bedwars.utils.VillagerNPC;
 import filip.bedwars.world.GameWorld;
 import filip.bedwars.world.GameWorldManager;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
 
 public class GameLogic implements Listener {
 
@@ -566,21 +572,26 @@ public class GameLogic implements Listener {
 		if (event.hasItem()) {
 			if (event.getAction() == org.bukkit.event.block.Action.RIGHT_CLICK_AIR || event.getAction() == org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK) {
 				try {
-					Object nmsItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, event.getItem());
-					boolean hasTag = (boolean) BedwarsPlugin.getInstance().reflectionUtils.itemStackHasTagMethod.invoke(nmsItemStack);
+					net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(event.getItem());
+					//Object nmsItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, event.getItem());
+					boolean hasTag = nmsItemStack.hasTag();
+					//boolean hasTag = (boolean) BedwarsPlugin.getInstance().reflectionUtils.itemStackHasTagMethod.invoke(nmsItemStack);
 					boolean hasKey = false;
 					if (hasTag)
-						hasKey = (boolean) BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundHasKeyMethod.invoke(BedwarsPlugin.getInstance().reflectionUtils.itemStackGetTagMethod.invoke(nmsItemStack), "bedwars-fireball");
-					
+						hasKey = nmsItemStack.getTag().contains("bedwars-fireball");
+
 					if (hasTag && hasKey) {
 						boolean shouldLaunchFireball = false;
 						
 						if (event.getHand() == EquipmentSlot.HAND) {
-							Object nmsOffHandItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, player.getInventory().getItemInOffHand());
-							
-							hasTag = (boolean) BedwarsPlugin.getInstance().reflectionUtils.itemStackHasTagMethod.invoke(nmsOffHandItemStack);
+							net.minecraft.world.item.ItemStack nmsOffHandItemStack = CraftItemStack.asNMSCopy(player.getInventory().getItemInOffHand());
+							//Object nmsOffHandItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, player.getInventory().getItemInOffHand());
+
+							hasTag = nmsOffHandItemStack.hasTag();
+							//hasTag = (boolean) BedwarsPlugin.getInstance().reflectionUtils.itemStackHasTagMethod.invoke(nmsOffHandItemStack);
 							if (hasTag)
-								hasKey = (boolean) BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundHasKeyMethod.invoke(BedwarsPlugin.getInstance().reflectionUtils.itemStackGetTagMethod.invoke(nmsOffHandItemStack), "bedwars-fireball");
+								hasKey = nmsOffHandItemStack.getTag().contains("bedwars-fireball");
+								//hasKey = (boolean) BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundHasKeyMethod.invoke(nmsOffHandItemStack.getTag(), "bedwars-fireball");
 							
 							if (!(hasTag && hasKey))
 								shouldLaunchFireball = true;
@@ -597,7 +608,7 @@ public class GameLogic implements Listener {
 							SoundPlayer.playSound("fireball-shoot", player);
 						}
 					}
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
+				} catch (IllegalArgumentException | SecurityException e) {
 					e.printStackTrace();
 				}
 			}
@@ -1009,20 +1020,26 @@ public class GameLogic implements Listener {
 				}
 				
 				for (Player p : gameWorld.getWorld().getPlayers()) {
-					ReflectionUtils reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
+					//ReflectionUtils reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
 					
 					try {
-						Object entityPlayerVictim = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(player));
-						Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(p));
+						ServerPlayer entityPlayerVictim = ((CraftPlayer)player).getHandle();
+						//Object entityPlayerVictim = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(player));
+						ServerPlayer entityPlayer = ((CraftPlayer)p).getHandle();
+						//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(p));
 						
-						Object deathMessage = reflectionUtils.chatComponentConstructor.newInstance(MessagesConfig.getInstance().getStringValue(p.getLocale(), "prefix"));
-						deathMessage = reflectionUtils.iChatBaseComponentAddSiblingMethod.invoke(deathMessage, reflectionUtils.combatTrackerGetDeathMessageMethod.invoke(reflectionUtils.entityPlayerGetCombatTrackerMethod.invoke(entityPlayerVictim)));
+						MutableComponent deathMessage =  Component.literal(MessagesConfig.getInstance().getStringValue(p.getLocale(), "prefix"));
+						//Object deathMessage = reflectionUtils.chatComponentConstructor.newInstance(MessagesConfig.getInstance().getStringValue(p.getLocale(), "prefix"));
+						deathMessage.append(entityPlayerVictim.getCombatTracker().getDeathMessage());
+						//deathMessage = reflectionUtils.iChatBaseComponentAddSiblingMethod.invoke(deathMessage, reflectionUtils.combatTrackerGetDeathMessageMethod.invoke(reflectionUtils.entityPlayerGetCombatTrackerMethod.invoke(entityPlayerVictim)));
 						
 						if(isFinalKill)
-							deathMessage = reflectionUtils.iChatBaseComponentAddSiblingMethod.invoke(deathMessage, reflectionUtils.chatComponentConstructor.newInstance(" �cFINAL KILL!"));
+							deathMessage = deathMessage.append(Component.literal("§cFINAL KILL!"));
+							//deathMessage = reflectionUtils.iChatBaseComponentAddSiblingMethod.invoke(deathMessage, reflectionUtils.chatComponentConstructor.newInstance("§cFINAL KILL!"));
 						
-						reflectionUtils.entityPlayerSendMessageMethod.invoke(entityPlayer, deathMessage);
-					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+						entityPlayer.sendSystemMessage(deathMessage);
+						//reflectionUtils.entityPlayerSendMessageMethod.invoke(entityPlayer, deathMessage);
+					} catch (IllegalArgumentException e) {
 						e.printStackTrace();
 					}
 				}
@@ -1048,7 +1065,7 @@ public class GameLogic implements Listener {
 			if (event.getTo().getY() < 0) {
 				// Check if the player is a game player
 				if (game.containsPlayer(player.getUniqueId()))
-					PlayerUtils.damagePlayer(player, "OUT_OF_WORLD", 999);
+					PlayerUtils.damagePlayer(player, ((CraftWorld)player.getWorld()).getHandle().getLevel().damageSources().fellOutOfWorld(), 999);
 				else
 					player.teleport(getSpectatorSpawn());
 			}

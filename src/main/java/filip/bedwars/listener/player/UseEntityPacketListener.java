@@ -1,10 +1,9 @@
 package filip.bedwars.listener.player;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+
+import net.minecraft.network.protocol.game.ServerboundInteractPacket;
+import net.minecraft.network.protocol.game.ServerboundInteractPacket.ActionType;
 
 public abstract class UseEntityPacketListener implements IPacketListener {
 
@@ -19,17 +18,19 @@ public abstract class UseEntityPacketListener implements IPacketListener {
 		if (!packet.getClass().getSimpleName().equals("PacketPlayInUseEntity"))
 			return;
 		
-		String versionStr = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+		//String versionStr = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
 		try {
-			Class<?> packetPlayInUseEntityClass = Class.forName("net.minecraft.server." + versionStr + ".PacketPlayInUseEntity");
-			Method getEntityIdMethod = packetPlayInUseEntityClass.getMethod("getEntityId");
-			Method bMethod = packetPlayInUseEntityClass.getMethod("b");
-			int entityId = (int) getEntityIdMethod.invoke(packet);
-			Object action = bMethod.invoke(packet);
+			int entityId = ((ServerboundInteractPacket)packet).getEntityId();
+			//Class<?> packetPlayInUseEntityClass = Class.forName("net.minecraft.server." + versionStr + ".PacketPlayInUseEntity");
+			//Method getEntityIdMethod = packetPlayInUseEntityClass.getMethod("getEntityId");
+			//Method bMethod = packetPlayInUseEntityClass.getMethod("b");
+			//int entityId = (int) getEntityIdMethod.invoke(packet);
+			ActionType action = ((ServerboundInteractPacket)packet).getActionType();
+			//Object action = bMethod.invoke(packet);
 			
 			if (entityId == this.entityId)
 				onUse(((Enum<?>)action).toString(), player);
-		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (SecurityException | IllegalArgumentException e) {
 			e.printStackTrace();
 		}
 	}

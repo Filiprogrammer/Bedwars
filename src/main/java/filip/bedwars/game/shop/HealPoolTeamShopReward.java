@@ -22,10 +22,10 @@ public class HealPoolTeamShopReward extends TeamShopReward {
 		
 		int i;
 		for (i = 0; i < level; ++i)
-			lore.append("§l§a[]");
+			lore.append("Â§lÂ§a[]");
 		
 		for (; i < maxLevel; ++i)
-			lore.append("§l§7[]");
+			lore.append("Â§lÂ§7[]");
 		
 		@SuppressWarnings("serial")
 		ItemBuilder itemBuilder = new ItemBuilder().setLore(new ArrayList<String>() {{ add(lore.toString()); }});
@@ -34,12 +34,12 @@ public class HealPoolTeamShopReward extends TeamShopReward {
 		if (level >= maxLevel) {
 			return itemBuilder
 					.setMaterial(Material.ENCHANTED_GOLDEN_APPLE)
-					.setName("§rHeal Pool is maxed out")
+					.setName("Â§rHeal Pool is maxed out")
 					.build();
 		} else {
 			return itemBuilder
 					.setMaterial(Material.GOLDEN_APPLE)
-					.setName("§rBuy Heal Pool Level " + (team.upgrades.get(type) + 1))
+					.setName("Â§rBuy Heal Pool Level " + (team.upgrades.get(type) + 1))
 					.build();
 		}
 	}

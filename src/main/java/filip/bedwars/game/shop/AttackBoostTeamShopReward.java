@@ -22,10 +22,10 @@ public class AttackBoostTeamShopReward extends TeamShopReward {
 		
 		int i;
 		for (i = 0; i < level; ++i)
-			lore.append("§l§a[]");
+			lore.append("Â§lÂ§a[]");
 		
 		for (; i < maxLevel; ++i)
-			lore.append("§l§7[]");
+			lore.append("Â§lÂ§7[]");
 		
 		@SuppressWarnings("serial")
 		ItemBuilder itemBuilder = new ItemBuilder().setLore(new ArrayList<String>() {{ add(lore.toString()); }});
@@ -34,12 +34,12 @@ public class AttackBoostTeamShopReward extends TeamShopReward {
 		if (level >= maxLevel) {
 			return itemBuilder
 					.setMaterial(Material.DIAMOND_SWORD)
-					.setName("§rAttack Boost is maxed out")
+					.setName("Â§rAttack Boost is maxed out")
 					.build();
 		} else {
 			return itemBuilder
 					.setMaterial(Material.GOLDEN_SWORD)
-					.setName("§rBuy Attack Boost Level " + (team.upgrades.get(type) + 1))
+					.setName("Â§rBuy Attack Boost Level " + (team.upgrades.get(type) + 1))
 					.build();
 		}
 	}

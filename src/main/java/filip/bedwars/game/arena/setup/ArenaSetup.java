@@ -311,7 +311,7 @@ public class ArenaSetup implements Listener {
 							return;
 						}
 						
-						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "setup-set").replace("%type%", "§3Bed"));
+						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "setup-set").replace("%type%", "Â§3Bed"));
 						SoundPlayer.playSound("arena-setup", player);
 					} else {
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "bed-set-error"));
@@ -479,15 +479,15 @@ public class ArenaSetup implements Listener {
 	}
 	
 	private void createSetupItems() {
-		spawnerItem = new ItemBuilder().setName("§rSpawner").setMaterial(Material.SPAWNER).build();
+		spawnerItem = new ItemBuilder().setName("Â§rSpawner").setMaterial(Material.SPAWNER).build();
 		itemShopItem = new ItemBuilder().setName(MainConfig.getInstance().getItemShopName()).setMaterial(Material.EMERALD_BLOCK).build();
 		teamShopItem = new ItemBuilder().setName(MainConfig.getInstance().getTeamShopName()).setMaterial(Material.DIAMOND_BLOCK).build();
 		spawnItem = new ItemBuilder().setName(MainConfig.getInstance().getBaseSpawnPointName()).setMaterial(Material.BEACON).build();
-		bedItem = new ItemBuilder().setName("§rBed").setMaterial(Material.WHITE_BED).build();
-		spectatorSpawnItem = new ItemBuilder().setName("§rSpectator Spawn").setMaterial(Material.ENDER_PEARL).build();
-		createBaseItem = new ItemBuilder().setName("§rCreate Base").setMaterial(Material.WHITE_WOOL).build();
-		cancelSetupItem = new ItemBuilder().setName("§r§cCancel Setup").setMaterial(Material.BARRIER).build();
-		finishSetupItem = new ItemBuilder().setName("§r§aFinish Setup").setMaterial(Material.GREEN_DYE).build();
+		bedItem = new ItemBuilder().setName("Â§rBed").setMaterial(Material.WHITE_BED).build();
+		spectatorSpawnItem = new ItemBuilder().setName("Â§rSpectator Spawn").setMaterial(Material.ENDER_PEARL).build();
+		createBaseItem = new ItemBuilder().setName("Â§rCreate Base").setMaterial(Material.WHITE_WOOL).build();
+		cancelSetupItem = new ItemBuilder().setName("Â§rÂ§cCancel Setup").setMaterial(Material.BARRIER).build();
+		finishSetupItem = new ItemBuilder().setName("Â§rÂ§aFinish Setup").setMaterial(Material.GREEN_DYE).build();
 	}
 	
 	private void giveSetupItems() {

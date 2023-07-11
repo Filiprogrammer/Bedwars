@@ -28,9 +28,9 @@ public class TrapTeamShopReward extends TeamShopReward {
 		ItemMeta itemMeta = displayItem.getItemMeta();
 		
 		if (team.getTraps().stream().anyMatch(trap -> trap.getName().equals(this.trap.getName())))
-			itemMeta.setDisplayName("§7Already bought " + trap.getName());
+			itemMeta.setDisplayName("Â§7Already bought " + trap.getName());
 		else
-			itemMeta.setDisplayName("§aBuy " + trap.getName());
+			itemMeta.setDisplayName("Â§aBuy " + trap.getName());
 		
 		displayItem.setItemMeta(itemMeta);
 		return displayItem;

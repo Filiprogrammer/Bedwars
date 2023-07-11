@@ -22,9 +22,9 @@ public class MainConfig extends SingleConfig {
 	private int gameLobbyCountdown;
 	private String gameWorldPrefix = "bw_game_";
 	private boolean hunger = false;
-	private String itemShopName = "ง2Item Shop";
-	private String teamShopName = "ง1Team Shop";
-	private String baseSpawnPointName = "งdSpawn-Point";
+	private String itemShopName = "ยง2Item Shop";
+	private String teamShopName = "ยง1Team Shop";
+	private String baseSpawnPointName = "ยงdSpawn-Point";
 	private String[] joinSignLines = new String[4];
 	private boolean dropOnlySpawnerResourcesOnDeath = true;
 	private boolean attackCooldown = false;
@@ -130,13 +130,13 @@ public class MainConfig extends SingleConfig {
 		config.set("language", language);
 		config.set("game-lobby-countdown", gameLobbyCountdown);
 		config.set("game-world-prefix", gameWorldPrefix);
-		config.set("item-shop-name", itemShopName.replace('ง', '&'));
-		config.set("team-shop-name", teamShopName.replace('ง', '&'));
-		config.set("base-spawn-point-name", baseSpawnPointName.replace('ง', '&'));
-		config.set("join-sign-line-one", joinSignLines[0].replace('ง', '&'));
-		config.set("join-sign-line-two", joinSignLines[1].replace('ง', '&'));
-		config.set("join-sign-line-three", joinSignLines[2].replace('ง', '&'));
-		config.set("join-sign-line-four", joinSignLines[3].replace('ง', '&'));
+		config.set("item-shop-name", itemShopName.replace('ยง', '&'));
+		config.set("team-shop-name", teamShopName.replace('ยง', '&'));
+		config.set("base-spawn-point-name", baseSpawnPointName.replace('ยง', '&'));
+		config.set("join-sign-line-one", joinSignLines[0].replace('ยง', '&'));
+		config.set("join-sign-line-two", joinSignLines[1].replace('ยง', '&'));
+		config.set("join-sign-line-three", joinSignLines[2].replace('ยง', '&'));
+		config.set("join-sign-line-four", joinSignLines[3].replace('ยง', '&'));
 		config.set("lobby-bossbar", lobbyBossbar);
 		config.set("lobby-bossbar-color", lobbyBossbarColor.toString());
 		config.set("hunger", hunger);
@@ -188,13 +188,13 @@ public class MainConfig extends SingleConfig {
 		language = config.getString("language", "en_us");
 		gameLobbyCountdown = config.getInt("game-lobby-countdown", 60);
 		gameWorldPrefix = config.getString("game-world-prefix", "bw_game_").replace("/", "").replace("\\", "");
-		itemShopName = config.getString("item-shop-name", "&2Item Shop").replace('&', 'ง');
-		teamShopName = config.getString("team-shop-name", "&1Team Shop").replace('&', 'ง');
-		baseSpawnPointName = config.getString("base-spawn-point-name", "&dSpawn-Point").replace('&', 'ง');
-		joinSignLines[0] = config.getString("join-sign-line-one", "&1[BedWars]").replace('&', 'ง');
-		joinSignLines[1] = config.getString("join-sign-line-two", "&5%arenaname%").replace('&', 'ง');
-		joinSignLines[2] = config.getString("join-sign-line-three", "").replace('&', 'ง');
-		joinSignLines[3] = config.getString("join-sign-line-four", "&1<Join Arena>").replace('&', 'ง');
+		itemShopName = config.getString("item-shop-name", "&2Item Shop").replace('&', 'ยง');
+		teamShopName = config.getString("team-shop-name", "&1Team Shop").replace('&', 'ยง');
+		baseSpawnPointName = config.getString("base-spawn-point-name", "&dSpawn-Point").replace('&', 'ยง');
+		joinSignLines[0] = config.getString("join-sign-line-one", "&1[BedWars]").replace('&', 'ยง');
+		joinSignLines[1] = config.getString("join-sign-line-two", "&5%arenaname%").replace('&', 'ยง');
+		joinSignLines[2] = config.getString("join-sign-line-three", "").replace('&', 'ยง');
+		joinSignLines[3] = config.getString("join-sign-line-four", "&1<Join Arena>").replace('&', 'ยง');
 		lobbyBossbar = config.getBoolean("lobby-bossbar", true);
 		respawnDelay = config.getInt("respawn-delay", 5);
 		bedwarsChat = config.getBoolean("bedwars-chat", true);
@@ -218,17 +218,17 @@ public class MainConfig extends SingleConfig {
 		
 		if (itemShopName.length() > 16) {
 			MessageSender.sendWarning("item-shop-name must not be longer than 16 characters. Check your config.yml!");
-			itemShopName = "ง2Item Shop";
+			itemShopName = "ยง2Item Shop";
 		}
 		
 		if (teamShopName.length() > 16) {
 			MessageSender.sendWarning("team-shop-name must not be longer than 16 characters. Check your config.yml!");
-			teamShopName = "ง1Team Shop";
+			teamShopName = "ยง1Team Shop";
 		}
 		
 		if (baseSpawnPointName.length() > 16) {
 			MessageSender.sendWarning("base-spawn-point-name must not be longer than 16 characters. Check your config.yml!");
-			baseSpawnPointName = "งdSpawn-Point";
+			baseSpawnPointName = "ยงdSpawn-Point";
 		}
 		
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");

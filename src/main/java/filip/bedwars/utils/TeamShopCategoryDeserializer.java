@@ -26,7 +26,7 @@ public class TeamShopCategoryDeserializer {
 	public static ShopCategory deserializeCategory(Object serializedCategory) {
 		Map<String, Object> mapOfElements = (Map<String, Object>) serializedCategory;
 		
-		String categoryName = ((String) mapOfElements.get("name")).replace('&', '§');
+		String categoryName = ((String) mapOfElements.get("name")).replace('&', 'Â§');
 		
 		if (categoryName == null) {
 			MessageSender.sendWarning("A Shop Category does not have a name");
@@ -36,7 +36,7 @@ public class TeamShopCategoryDeserializer {
 		Material categoryMaterial = Material.valueOf((String) mapOfElements.get("material"));
 		
 		if (categoryMaterial == null) {
-			MessageSender.sendWarning("§eThe Shop Category §6\"" + categoryName + "\" §edoes not have a valid material");
+			MessageSender.sendWarning("Â§eThe Shop Category Â§6\"" + categoryName + "\" Â§edoes not have a valid material");
 			return null;
 		}
 		
@@ -48,14 +48,14 @@ public class TeamShopCategoryDeserializer {
 			TeamUpgradeType type = null;
 			
 			if (typeObject == null) {
-				MessageSender.sendWarning("team upgrade type of an entry in the team shop category §6\"" + categoryName + "\" §e was not specified");
+				MessageSender.sendWarning("team upgrade type of an entry in the team shop category Â§6\"" + categoryName + "\" Â§e was not specified");
 			} else if (!(typeObject instanceof String)) {
-				MessageSender.sendWarning("team upgrade type of an entry in the team shop category §6\"" + categoryName + "\" §e has an invalid value");
+				MessageSender.sendWarning("team upgrade type of an entry in the team shop category Â§6\"" + categoryName + "\" Â§e has an invalid value");
 			} else {
 				try {
 					type = TeamUpgradeType.valueOf((String) typeObject);
 				} catch (IllegalArgumentException e) {
-					MessageSender.sendWarning("team upgrade type of an item in the team shop category §6\"" + categoryName + "\" §e has an invalid value");
+					MessageSender.sendWarning("team upgrade type of an item in the team shop category Â§6\"" + categoryName + "\" Â§e has an invalid value");
 				}
 			}
 			
@@ -66,9 +66,9 @@ public class TeamShopCategoryDeserializer {
 			int maxlevel = 1;
 			
 			if (maxlevelObject == null)
-				MessageSender.sendWarning("maxlevel of an entry in the team shop category §6\"" + categoryName + "\" §e was not specified");
+				MessageSender.sendWarning("maxlevel of an entry in the team shop category Â§6\"" + categoryName + "\" Â§e was not specified");
 			else if (!(maxlevelObject instanceof Integer))
-				MessageSender.sendWarning("maxlevel of an entry in the team shop category §6\"" + categoryName + "\" §e has an invalid value");
+				MessageSender.sendWarning("maxlevel of an entry in the team shop category Â§6\"" + categoryName + "\" Â§e has an invalid value");
 			else
 				maxlevel = (int) maxlevelObject;
 			
@@ -76,9 +76,9 @@ public class TeamShopCategoryDeserializer {
 			int[] priceCounts = null;
 			
 			if (priceCountsObject == null)
-				MessageSender.sendWarning("priceCounts of an entry in the team shop category §6\"" + categoryName + "\" §e was not specified");
+				MessageSender.sendWarning("priceCounts of an entry in the team shop category Â§6\"" + categoryName + "\" Â§e was not specified");
 			else if (!(priceCountsObject instanceof List<?>))
-				MessageSender.sendWarning("priceCounts of an entry in the team shop category §6\"" + categoryName + "\" §e has an invalid value");
+				MessageSender.sendWarning("priceCounts of an entry in the team shop category Â§6\"" + categoryName + "\" Â§e has an invalid value");
 			else
 				priceCounts = ((List<Integer>) priceCountsObject).stream().mapToInt(i->i).toArray();
 			
@@ -86,9 +86,9 @@ public class TeamShopCategoryDeserializer {
 			Material[] priceMaterials = null;
 			
 			if (priceMaterialsObject == null)
-				MessageSender.sendWarning("priceMaterials of an entry in the team shop category §6\"" + categoryName + "\" §e was not specified");
+				MessageSender.sendWarning("priceMaterials of an entry in the team shop category Â§6\"" + categoryName + "\" Â§e was not specified");
 			else if (!(priceMaterialsObject instanceof List<?>))
-				MessageSender.sendWarning("priceMaterials of an entry in the team shop category §6\"" + categoryName + "\" §e has an invalid value");
+				MessageSender.sendWarning("priceMaterials of an entry in the team shop category Â§6\"" + categoryName + "\" Â§e has an invalid value");
 			else {
 				List<String> priceMaterialsStrings = (List<String>) priceMaterialsObject;
 				priceMaterials = new Material[priceMaterialsStrings.size()];
@@ -123,7 +123,7 @@ public class TeamShopCategoryDeserializer {
 				String displayName = null;
 				
 				if (displayNameObject instanceof String)
-					displayName = ((String) displayNameObject).replace('&', '§');
+					displayName = ((String) displayNameObject).replace('&', 'Â§');
 				
 				Object materialObject = serializedShopEntry.get("material");
 				Material material = null;

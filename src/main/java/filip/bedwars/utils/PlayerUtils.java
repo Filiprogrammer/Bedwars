@@ -1,29 +1,37 @@
 package filip.bedwars.utils;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
 import filip.bedwars.BedwarsPlugin;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.damagesource.DamageSource;
 
 public class PlayerUtils {
 
 	public static void hidePlayerEntity(Player toHide, Player viewer) {
 		try {
-			// int toHideEntityId = ((CraftPlayer) toHide).getHandle().getId();
-			Object toHideCraftPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerClass.cast(toHide);
-			Object toHideEntityPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(toHideCraftPlayer);
-			int toHideEntityId = (int) BedwarsPlugin.getInstance().reflectionUtils.entityGetIdMethod.invoke(toHideEntityPlayer);
+			int toHideEntityId = ((CraftPlayer) toHide).getHandle().getId();
+			//Object toHideCraftPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerClass.cast(toHide);
+			//Object toHideEntityPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(toHideCraftPlayer);
+			//int toHideEntityId = (int) BedwarsPlugin.getInstance().reflectionUtils.entityGetIdMethod.invoke(toHideEntityPlayer);
 			
 			// viewerConnection.sendPacket(new PacketPlayOutEntityDestroy(toHideEntityId));
-			Object packetPlayOutEntityDestroy = BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutEntityDestroyConstructor.newInstance(new int[] {toHideEntityId});
+			ClientboundRemoveEntitiesPacket packetPlayOutEntityDestroy = new ClientboundRemoveEntitiesPacket(toHideEntityId);
+			//Object packetPlayOutEntityDestroy = BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutEntityDestroyConstructor.newInstance(new int[] {toHideEntityId});
 			sendPacket(viewer, packetPlayOutEntityDestroy);
-		} catch (SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (SecurityException | IllegalArgumentException e) {
 			e.printStackTrace();
 		}
 	}
@@ -31,39 +39,44 @@ public class PlayerUtils {
 	public static void showPlayerEntity(Player toHide, Player viewer) {
 		try {
 			// EntityPlayer toHideEntityPlayer = ((CraftPlayer) toHide).getHandle();
-			Object toHideCraftPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerClass.cast(toHide);
-			Object toHideEntityPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(toHideCraftPlayer);
+			//Object toHideCraftPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerClass.cast(toHide);
+			//Object toHideEntityPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(toHideCraftPlayer);
+			ServerPlayer toHideEntityPlayer = ((CraftPlayer) toHide).getHandle();
 			
 			// viewerConnection.sendPacket(new PacketPlayOutNamedEntitySpawn(toHideEntityPlayer));
-			Object packetPlayOutNamedEntitySpawn = BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutNamedEntitySpawnConstructor.newInstance(toHideEntityPlayer);
+			ClientboundAddEntityPacket packetPlayOutNamedEntitySpawn = new ClientboundAddEntityPacket(toHideEntityPlayer);
+			//Object packetPlayOutNamedEntitySpawn = BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutNamedEntitySpawnConstructor.newInstance(toHideEntityPlayer);
 			sendPacket(viewer, packetPlayOutNamedEntitySpawn);
-		} catch (SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (SecurityException | IllegalArgumentException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public static void hidePlayer(Player toHide, Player viewer) {
 		try {
-			Object entityPlayerArray = java.lang.reflect.Array.newInstance(BedwarsPlugin.getInstance().reflectionUtils.entityPlayerClass, 1);
+			/*Object entityPlayerArray = java.lang.reflect.Array.newInstance(BedwarsPlugin.getInstance().reflectionUtils.entityPlayerClass, 1);
 			java.lang.reflect.Array.set(entityPlayerArray, 0, BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(BedwarsPlugin.getInstance().reflectionUtils.craftPlayerClass.cast(toHide)));
 			Object packetPlayOutPlayerInfo = BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutPlayerInfoConstructor.newInstance(
 					Enum.valueOf((Class<Enum>)BedwarsPlugin.getInstance().reflectionUtils.enumPlayerInfoActionClass, "REMOVE_PLAYER"),
-					entityPlayerArray);
+					entityPlayerArray);*/
+			ClientboundPlayerInfoRemovePacket packetPlayOutPlayerInfo = new ClientboundPlayerInfoRemovePacket(List.of(toHide.getUniqueId()));
 			
 			sendPacket(viewer, packetPlayOutPlayerInfo);
-		} catch (SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (SecurityException | IllegalArgumentException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public static void damagePlayer(Player player, String cause, float amount) {
+	public static void damagePlayer(Player player, DamageSource cause, float amount) {
 		try {
-			Field damageSourceField = BedwarsPlugin.getInstance().reflectionUtils.damageSourceClass.getField(cause);
-			
-			Object craftPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerClass.cast(player);
-			Object entityPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(craftPlayer);
-			BedwarsPlugin.getInstance().reflectionUtils.damageSourceDamageEntityMethod.invoke(entityPlayer, damageSourceField.get(null), amount);
-		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchFieldException e) {
+			//Field damageSourceField = BedwarsPlugin.getInstance().reflectionUtils.damageSourceClass.getField(cause);
+
+			ServerPlayer entityPlayer = ((CraftPlayer)player).getHandle();
+			//Object craftPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerClass.cast(player);
+			//Object entityPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(craftPlayer);
+			entityPlayer.hurt(cause, amount);
+			//BedwarsPlugin.getInstance().reflectionUtils.damageSourceDamageEntityMethod.invoke(entityPlayer, damageSourceField.get(null), amount);
+		} catch (SecurityException | IllegalArgumentException e) {
 			e.printStackTrace();
 		}
 	}
@@ -95,12 +108,16 @@ public class PlayerUtils {
 			player.removePotionEffect(potionEffect.getType());
 	}
 	
-	private static void sendPacket(Player player, Object packet) {
+	private static void sendPacket(Player player, net.minecraft.network.protocol.Packet<?> packet) {
 	    try {
-	    	Object handle = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(player);
-	    	Object playerConnection = BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(handle);
-	    	BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
-	    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			ServerPlayer handle = ((CraftPlayer)player).getHandle();
+	    	//Object handle = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(player);
+			ServerGamePacketListenerImpl playerConnection = handle.connection;
+	    	//Object playerConnection = BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(handle);
+			
+			playerConnection.send(packet);
+	    	//BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
+	    } catch (IllegalArgumentException e) {
 	        e.printStackTrace();
 	    }
 	}

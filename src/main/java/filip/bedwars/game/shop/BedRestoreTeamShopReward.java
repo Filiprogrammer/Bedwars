@@ -25,12 +25,12 @@ public class BedRestoreTeamShopReward extends TeamShopReward {
 		if (team.hasBed()) {
 			return new ItemBuilder()
 					.setMaterial(Material.LIGHT_GRAY_BED)
-					.setName("§rYou still have a bed")
+					.setName("Â§rYou still have a bed")
 					.build();
 		} else {
 			return new ItemBuilder()
 					.setMaterial(TeamColorConverter.convertTeamColorToBedMaterial(team.getBase().getTeamColor()))
-					.setName("§rRestore bed")
+					.setName("Â§rRestore bed")
 					.build();
 		}
 	}

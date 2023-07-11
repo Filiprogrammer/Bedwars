@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import io.netty.channel.Channel;
@@ -15,6 +16,9 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
+import net.minecraft.network.Connection;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public class PacketReader {
 	
@@ -43,24 +47,29 @@ public class PacketReader {
         };
 		
         try {
-			String versionStr = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-			Class<?> craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + versionStr + ".entity.CraftPlayer");
-			Method getHandleMethod = craftPlayerClass.getMethod("getHandle");
-			Class<?> entityPlayerClass = Class.forName("net.minecraft.server." + versionStr + ".EntityPlayer");
-			Field playerConnectionField = entityPlayerClass.getField("playerConnection");
-			Class<?> playerConnectionClass = Class.forName("net.minecraft.server." + versionStr + ".PlayerConnection");
-			Field networkManagerField = playerConnectionClass.getField("networkManager");
-			Class<?> networkManagerClass = Class.forName("net.minecraft.server." + versionStr + ".NetworkManager");
-			Field channelField = networkManagerClass.getField("channel");
+			//String versionStr = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+			//Class<?> craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + versionStr + ".entity.CraftPlayer");
+			//Method getHandleMethod = craftPlayerClass.getMethod("getHandle");
+			//Class<?> entityPlayerClass = Class.forName("net.minecraft.server." + versionStr + ".EntityPlayer");
+			//Field playerConnectionField = entityPlayerClass.getField("playerConnection");
+			//Class<?> playerConnectionClass = Class.forName("net.minecraft.server." + versionStr + ".PlayerConnection");
+			//Field networkManagerField = playerConnectionClass.getField("networkManager");
+			//Class<?> networkManagerClass = Class.forName("net.minecraft.server." + versionStr + ".NetworkManager");
+			//Field channelField = networkManagerClass.getField("channel");
 			
-			Object cPlayer = craftPlayerClass.cast(player);
-			Object entityPlayer = getHandleMethod.invoke(cPlayer);
-			Object playerConnection = playerConnectionField.get(entityPlayer);
-			Object networkManager = networkManagerField.get(playerConnection);
-			channelPipeline = ((Channel) channelField.get(networkManager)).pipeline();
+			CraftPlayer cPlayer = (CraftPlayer)player;
+			//Object cPlayer = craftPlayerClass.cast(player);
+			ServerPlayer entityPlayer = cPlayer.getHandle();
+			//Object entityPlayer = getHandleMethod.invoke(cPlayer);
+			ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
+			//Object playerConnection = playerConnectionField.get(entityPlayer);
+			Connection networkManager = playerConnection.connection;
+			//Object networkManager = networkManagerField.get(playerConnection);
+			channelPipeline = networkManager.channel.pipeline();
+			//channelPipeline = ((Channel) channelField.get(networkManager)).pipeline();
 			uninject(); // Avoid duplicate handler
 			channelPipeline.addBefore("packet_handler", "bedwars_handler_" + player.getName(), channelDuplexHandler);
-		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchFieldException | SecurityException | NoSuchMethodException e) {
+		} catch (IllegalArgumentException | SecurityException e) {
 			e.printStackTrace();
 		}
 	}

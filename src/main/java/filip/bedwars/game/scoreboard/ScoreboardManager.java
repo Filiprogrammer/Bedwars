@@ -61,7 +61,7 @@ public class ScoreboardManager {
 			nextGameStateName = nextGameState.getName();
 		
 		objective.getScore(nextGameStateName).setScore(lineCount--);
-		objective.getScore("งa" +
+		objective.getScore("ยงa" +
 				(gameLogic.getGameState().getCountdown().getSecondsLeft() / 60) +
 				":" +
 				String.format("%02d", gameLogic.getGameState().getCountdown().getSecondsLeft() % 60))
@@ -70,7 +70,7 @@ public class ScoreboardManager {
 		
 		for (Team team : game.getTeams()) {
 			org.bukkit.scoreboard.Team scoreboardTeam = scoreboard.registerNewTeam("" + team.getId());
-			scoreboardTeam.setPrefix(TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale()) + " ง7|งr ");
+			scoreboardTeam.setPrefix(TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale()) + "ยง7|ยงr ");
 			
 			for (GamePlayer gp : team.getMembers())
 				scoreboardTeam.addEntry(gp.getPlayer().getName());

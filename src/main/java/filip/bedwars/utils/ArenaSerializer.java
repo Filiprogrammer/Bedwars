@@ -45,7 +45,7 @@ public class ArenaSerializer {
 					put("z", loc.getBlockZ());
 				}});
 				put("itemMaterial", spawner.getItemStack().getType().toString());
-				put("itemName", spawner.getItemStack().getItemMeta().getDisplayName().replace('ง', '&'));
+				put("itemName", spawner.getItemStack().getItemMeta().getDisplayName().replace('ยง', '&'));
 			}};
 			spawnerList.add(spawnerInfo);
 		}

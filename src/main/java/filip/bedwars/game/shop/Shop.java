@@ -112,7 +112,7 @@ public class Shop {
             if (categories.length > i) {
             	ItemStack categoryItem = new ItemBuilder()
                         .setMaterial(categories[i].getMaterial())
-                        .setName("§r§l".concat(categories[i].getName()))
+                        .setName("Â§rÂ§l".concat(categories[i].getName()))
                         .build();
             	
             	inv.setItem(i, categoryItem);

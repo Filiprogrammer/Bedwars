@@ -69,7 +69,7 @@ public class MessagesConfig extends MultipleConfig {
 			Set<String> keys = config.getKeys(false);
 			
 			for (String key : keys) {
-				String msg = config.getString(key).replace('&', 'ง');
+				String msg = config.getString(key).replace('&', 'ยง');
 				String msgOut = msg;
 		        Matcher matcher = Pattern.compile("\\\\u\\d{1,4}").matcher(msg);
 				

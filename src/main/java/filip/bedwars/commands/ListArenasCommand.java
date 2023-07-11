@@ -34,9 +34,9 @@ public class ListArenasCommand implements ICommand {
 		
 		for (int i = 0; i < ArenaConfig.getInstance().getArenaCount(); ++i) {
 			StringBuilder sb = new StringBuilder();
-			sb.append("งd[");
+			sb.append("ยงd[");
 			sb.append(i + 1);
-			sb.append("]: ง9");
+			sb.append("]: ยง9");
 			sb.append(ArenaConfig.getInstance().getArena(i).getMapName());
 			MessageSender.sendMessage(sender, sb.toString());
 		}

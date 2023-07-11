@@ -287,7 +287,7 @@ public class Lobby {
 		usables.add(usable);
 		player.getInventory().setItem(8, usable.getItemStack());
 		
-		usable = new UsableItem(new ItemBuilder().setMaterial(Material.BOOK).setName("§rTutorial").build(), player) {
+		usable = new UsableItem(new ItemBuilder().setMaterial(Material.BOOK).setName("Â§rTutorial").build(), player) {
 			@Override
 			public void use(PlayerInteractEvent event) {
 				if (event.getPlayer() == player) {

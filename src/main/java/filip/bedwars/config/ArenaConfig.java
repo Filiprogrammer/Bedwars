@@ -121,55 +121,55 @@ public class ArenaConfig extends SingleConfig {
 		
 		if(mapName == null) {
 			ret = false;
-			MessageSender.sendWarning("§eOne arena could not be loaded! The arena does not have a name! Please delete the arena from the config and set it up with the ingame-commands again!");
+			MessageSender.sendWarning("Â§eOne arena could not be loaded! The arena does not have a name! Please delete the arena from the config and set it up with the ingame-commands again!");
 			mapName = "arena-name-not-found";
 		}
 		
 		if(arena.getBases().size() < 2) {
 			ret = false;
-			MessageSender.sendWarning("§eArena §6\"" + mapName + "\" §ecould not be loaded! There must be at least 2 bases! Please delete the arena from the config and set it up with the ingame-commands again!");
+			MessageSender.sendWarning("Â§eArena Â§6\"" + mapName + "\" Â§ecould not be loaded! There must be at least 2 bases! Please delete the arena from the config and set it up with the ingame-commands again!");
 		}
 		
 		if(arena.getMinPlayersToStart() < 2) {
 			ret = false;
-			MessageSender.sendWarning("§eArena §6\"" + mapName + "\" §ecould not be loaded! The minimum start players count must be at least 2! Please delete the arena from the config and set it up with the ingame-commands again!");
+			MessageSender.sendWarning("Â§eArena Â§6\"" + mapName + "\" Â§ecould not be loaded! The minimum start players count must be at least 2! Please delete the arena from the config and set it up with the ingame-commands again!");
 		}
 		
 		if(arena.getPlayersPerTeam() < 1) {
 			ret = false;
-			MessageSender.sendWarning("§eArena §6\"" + mapName + "\" §ecould not be loaded! The players per team count must be at least 1! Please delete the arena from the config and set it up with the ingame-commands again!");
+			MessageSender.sendWarning("Â§eArena Â§6\"" + mapName + "\" Â§ecould not be loaded! The players per team count must be at least 1! Please delete the arena from the config and set it up with the ingame-commands again!");
 		}
 		
 		if(!Bukkit.getWorlds().contains(arena.getWorld())) {
 			ret = false;
-			MessageSender.sendWarning("§eArena §6\"" + mapName + "\" §ecould not be loaded! The world could not be found on the server! Please delete the arena from the config and set it up with the ingame-commands again!");
+			MessageSender.sendWarning("Â§eArena Â§6\"" + mapName + "\" Â§ecould not be loaded! The world could not be found on the server! Please delete the arena from the config and set it up with the ingame-commands again!");
 		}
 		
 		for(Base base : arena.getBases()) {
 			if(base.getTeamColor() == null) {
 				ret = false;
-				MessageSender.sendWarning("§eArena §6\"" + mapName + "\" §ecould not be loaded! In one base the team color is null! Please delete the arena from the config and set it up with the ingame-commands again!");
+				MessageSender.sendWarning("Â§eArena Â§6\"" + mapName + "\" Â§ecould not be loaded! In one base the team color is null! Please delete the arena from the config and set it up with the ingame-commands again!");
 				continue;
 			}
 			
 			if(base.getBedTop(null) == null) {
 				ret = false;
-				MessageSender.sendWarning("§eArena §6\"" + mapName + "\" §ecould not be loaded! In base §6" + base.getTeamColor().toString() + "§e the bed top was null! Please delete the arena from the config and set it up with the ingame-commands again!");
+				MessageSender.sendWarning("Â§eArena Â§6\"" + mapName + "\" Â§ecould not be loaded! In base Â§6" + base.getTeamColor().toString() + "Â§e the bed top was null! Please delete the arena from the config and set it up with the ingame-commands again!");
 			}
 			
 			if(base.getBedBottom(null) == null) {
 				ret = false;
-				MessageSender.sendWarning("§eArena §6\"" + mapName + "\" §ecould not be loaded! In base §6" + base.getTeamColor().toString() + "§e the bed bottom was null! Please delete the arena from the config and set it up with the ingame-commands again!");
+				MessageSender.sendWarning("Â§eArena Â§6\"" + mapName + "\" Â§ecould not be loaded! In base Â§6" + base.getTeamColor().toString() + "Â§e the bed bottom was null! Please delete the arena from the config and set it up with the ingame-commands again!");
 			}
 			
 			if(base.getItemShop(null) == null) {
 				ret = false;
-				MessageSender.sendWarning("§eArena §6\"" + mapName + "\" §ecould not be loaded! In base §6" + base.getTeamColor().toString() + "§e the item shop was null! Please delete the arena from the config and set it up with the ingame-commands again!");
+				MessageSender.sendWarning("Â§eArena Â§6\"" + mapName + "\" Â§ecould not be loaded! In base Â§6" + base.getTeamColor().toString() + "Â§e the item shop was null! Please delete the arena from the config and set it up with the ingame-commands again!");
 			}
 			
 			if(base.getSpawn(null) == null) {
 				ret = false;
-				MessageSender.sendWarning("§eArena §6\"" + mapName + "\" §ecould not be loaded! In base §6" + base.getTeamColor().toString() + "§e the spawn point was null! Please delete the arena from the config and set it up with the ingame-commands again!");
+				MessageSender.sendWarning("Â§eArena Â§6\"" + mapName + "\" Â§ecould not be loaded! In base Â§6" + base.getTeamColor().toString() + "Â§e the spawn point was null! Please delete the arena from the config and set it up with the ingame-commands again!");
 			}
 		}
 		

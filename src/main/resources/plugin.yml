@@ -1,8 +1,8 @@
 name: Bedwars
-version: 1.0
+version: 1.1
 author: Filiprogrammer
 main: filip.bedwars.BedwarsPlugin
-api-version: 1.13
+api-version: 1.20
 softdepend: [Multiverse-Core]
 commands:
   bw:

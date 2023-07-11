@@ -27,7 +27,7 @@ public class MessageSender {
 			locale = MainConfig.getInstance().getLanguage();
 		
 		if(msg == null) 
-			msg = "§cA message was not found! Please check your messages.yml for §d\"" + locale + "\" §cor contact the server administrator!";
+			msg = "Â§cA message was not found! Please check your messages.yml for Â§d\"" + locale + "\" Â§cor contact the server administrator!";
 		
 		sendTo.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg));
 	}
@@ -62,7 +62,7 @@ public class MessageSender {
 			String locale = player.getLocale();
 			
 			if(msg == null) 
-				msg = "§cA message was not found! Please check your messages.yml for §d\"" + locale + "\" §cor contact the server administrator!";
+				msg = "Â§cA message was not found! Please check your messages.yml for Â§d\"" + locale + "\" Â§cor contact the server administrator!";
 			
 			player.sendMessage((MessagesConfig.getInstance().getStringValue(locale, "prefix") + msg));
 		}
@@ -90,9 +90,9 @@ public class MessageSender {
 	 */
 	public static void sendWarning(String msg) {
 		if(msg == null) 
-			msg = "§cAn error occured! The warning you should receive was null! I really don't know what happened, this definitely should NOT happen!";
+			msg = "Â§cAn error occured! The warning you should receive was null! I really don't know what happened, this definitely should NOT happen!";
 		
-		Bukkit.getConsoleSender().sendMessage("§6[WARNING]: §e" + msg);
+		Bukkit.getConsoleSender().sendMessage("Â§6[WARNING]: Â§e" + msg);
 	}
 	
 }

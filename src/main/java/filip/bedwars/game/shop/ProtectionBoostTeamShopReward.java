@@ -22,10 +22,10 @@ public class ProtectionBoostTeamShopReward extends TeamShopReward {
 		
 		int i;
 		for (i = 0; i < level; ++i)
-			lore.append("§l§a[]");
+			lore.append("Â§lÂ§a[]");
 		
 		for (; i < maxLevel; ++i)
-			lore.append("§l§7[]");
+			lore.append("Â§lÂ§7[]");
 		
 		@SuppressWarnings("serial")
 		ItemBuilder itemBuilder = new ItemBuilder().setLore(new ArrayList<String>() {{ add(lore.toString()); }});
@@ -34,12 +34,12 @@ public class ProtectionBoostTeamShopReward extends TeamShopReward {
 		if (level >= maxLevel) {
 			return itemBuilder
 					.setMaterial(Material.DIAMOND_CHESTPLATE)
-					.setName("§rProtection Boost is maxed out")
+					.setName("Â§rProtection Boost is maxed out")
 					.build();
 		} else {
 			return itemBuilder
 					.setMaterial(Material.GOLDEN_CHESTPLATE)
-					.setName("§rBuy Protection Boost Level " + (team.upgrades.get(type) + 1))
+					.setName("Â§rBuy Protection Boost Level " + (team.upgrades.get(type) + 1))
 					.build();
 		}
 	}

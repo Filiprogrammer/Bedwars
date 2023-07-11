@@ -49,7 +49,7 @@ public class SpawnerConfig extends SingleConfig{
 			for (Object serializedSpawner : serializedSpawners) {
 				Map<String, Object> mapOfElements = (Map<String, Object>) serializedSpawner;
 				
-				String spawnerName = ((String) mapOfElements.get("name")).replace('&', '§');
+				String spawnerName = ((String) mapOfElements.get("name")).replace('&', 'Â§');
 				
 				if(spawnerName == null) {
 					MessageSender.sendWarning("One Spawner could not be loaded! The Spawner-name is invalid! Please check your spawner.yml!");
@@ -59,7 +59,7 @@ public class SpawnerConfig extends SingleConfig{
 				Material spawnerMaterial = Material.valueOf((String) mapOfElements.get("material"));
 				
 				if(spawnerMaterial == null) {
-					MessageSender.sendWarning("§6" + spawnerName + "-Spawner §ecould not be loaded! Spawner-Material is invalid! Please check your spawner.yml!");
+					MessageSender.sendWarning("Â§6" + spawnerName + "-Spawner Â§ecould not be loaded! Spawner-Material is invalid! Please check your spawner.yml!");
 					continue;
 				}
 				
@@ -68,7 +68,7 @@ public class SpawnerConfig extends SingleConfig{
 				try {
 					spawnerDefaultTicksPerSpawn = (int) mapOfElements.get("defaultTicksPerSpawn");
 				} catch(Exception e) {
-					MessageSender.sendWarning("§6" + spawnerName + "-Spawner §ecould not be loaded! defaultTicksPerSpawn is invalid! Please check your spawner.yml!");
+					MessageSender.sendWarning("Â§6" + spawnerName + "-Spawner Â§ecould not be loaded! defaultTicksPerSpawn is invalid! Please check your spawner.yml!");
 					continue;
 				}
 				
