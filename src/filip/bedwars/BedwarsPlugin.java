@@ -1,8 +1,10 @@
 package filip.bedwars;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -90,6 +92,19 @@ public class BedwarsPlugin extends JavaPlugin {
 		commands.add(new LeaveCommand());
 		commands.add(new SkipCountdownCommand());
 		helpCommand = new HelpCommand();
+		
+		try {
+ 			Class<?> tagsBlockClass = Class.forName("net.minecraft.server." + getServerVersion() + ".TagsBlock");
+ 			Field DRAGON_IMMUNEField = tagsBlockClass.getField("DRAGON_IMMUNE");
+ 			DRAGON_IMMUNEField.setAccessible(true);
+			Field modifiers = Field.class.getDeclaredField("modifiers");
+			modifiers.setAccessible(true);
+			modifiers.setInt(DRAGON_IMMUNEField, DRAGON_IMMUNEField.getModifiers() & ~java.lang.reflect.Modifier.FINAL);
+			Field witherImmuneField = Class.forName("net.minecraft.server." + getServerVersion() + ".TagsBlock").getField("WITHER_IMMUNE");
+ 			DRAGON_IMMUNEField.set(null, witherImmuneField.get(null));
+ 		} catch (Exception e) {
+ 			e.printStackTrace();
+ 		}
 	}
 	
 	@Override

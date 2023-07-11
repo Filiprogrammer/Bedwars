@@ -19,6 +19,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -32,6 +33,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -1172,6 +1174,21 @@ public class GameLogic implements Listener {
     public void onPlayerTeleport(PlayerTeleportEvent event) {
 		if (event.getPlayer().getWorld().getName().equals(gameWorld.getWorld().getName()) && event.getCause().equals(TeleportCause.SPECTATE))
 			event.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onBlockPhysics(BlockPhysicsEvent event) {
+		if (event.getBlock().getWorld().getName().equals(gameWorld.getWorld().getName())) {
+			if (event.getBlock().hasMetadata("bedwars_placed"))
+				return;
+			
+			if (event.getChangedType() != Material.AIR) {
+				Material material = event.getBlock().getType();
+				
+				if (Tag.SMALL_FLOWERS.getValues().contains(material) || Tag.SAPLINGS.getValues().contains(material))
+					event.setCancelled(true);
+			}
+		}
 	}
 	
 	@EventHandler
