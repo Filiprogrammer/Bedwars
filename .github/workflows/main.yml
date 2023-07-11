@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  build:
+    name: Build Bedwars Plugin for Paper 1.20
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Java Development Kit
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - name: Gradle build
+        run: ./gradlew build
+      - name: Archive artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: bedwars.jar
+          path: build/libs/bedwars-*.jar
