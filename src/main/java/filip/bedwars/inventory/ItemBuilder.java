@@ -155,7 +155,7 @@ public class ItemBuilder {
     public ItemBuilder spacer() {
         this.material = Material.GRAY_STAINED_GLASS_PANE;
         this.amount = 1;
-        this.name = "§r";
+        this.name = "Â§r";
         return this;
     }
     
