@@ -112,7 +112,7 @@ public class VillagerNPC {
 				//Object playerConnection = reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
 				playerConnection.send(packet);
 				//reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
-				playerConnection.send(new ClientboundSetEntityDataPacket(entity.getId(), entity.getEntityData().packDirty()));
+				playerConnection.send(new ClientboundSetEntityDataPacket(entity.getId(), entity.getEntityData().getNonDefaultValues()));
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			}

@@ -138,7 +138,7 @@ public class ArmorStandItemNPC {
 				//Object playerConnection = playerConnectionField.get(entityPlayer);
 				playerConnection.send(new ClientboundAddEntityPacket(entity));
 				//sendPacketMethod.invoke(playerConnection, packetPlayOutSpawnEntityConstructor.newInstance(entity));
-				playerConnection.send(new ClientboundSetEntityDataPacket(entity.getId(), entity.getEntityData().packDirty()));
+				playerConnection.send(new ClientboundSetEntityDataPacket(entity.getId(), entity.getEntityData().getNonDefaultValues()));
 				//sendPacketMethod.invoke(playerConnection, packetPlayOutEntityMetadataConstructor.newInstance(getIdMethod.invoke(entity), getDataWatcherMethod.invoke(entity), true));
 				List<Pair<net.minecraft.world.entity.EquipmentSlot, net.minecraft.world.item.ItemStack>> list = Lists.newArrayList();
 				list.add(Pair.of(net.minecraft.world.entity.EquipmentSlot.HEAD, CraftItemStack.asNMSCopy(new ItemStack(material))));
