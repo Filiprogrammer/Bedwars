@@ -1062,7 +1062,7 @@ public class GameLogic implements Listener {
 		
 		// Check if the player is in the game world
 		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
-			if (event.getTo().getY() < 0) {
+			if (event.getTo().getY() < player.getWorld().getMinHeight()) {
 				// Check if the player is a game player
 				if (game.containsPlayer(player.getUniqueId()))
 					PlayerUtils.damagePlayer(player, ((CraftWorld)player.getWorld()).getHandle().getLevel().damageSources().fellOutOfWorld(), 999);

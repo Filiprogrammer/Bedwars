@@ -1,6 +1,7 @@
 package filip.bedwars.game.lobby;
 
 import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -45,8 +46,10 @@ public class LobbyListener implements Listener {
 	
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event) {
-		if (event.getTo().getWorld().getName().equals(MainConfig.getInstance().getGameLobby().getWorld().getName())) {
-			if (event.getTo().getY() < 0)
+		World world = event.getTo().getWorld();
+
+		if (world.getName().equals(MainConfig.getInstance().getGameLobby().getWorld().getName())) {
+			if (event.getTo().getY() < world.getMinHeight())
 				event.setTo(MainConfig.getInstance().getGameLobby());
 		}
 	}
