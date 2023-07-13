@@ -809,28 +809,31 @@ public class GameLogic implements Listener {
 			}
 		}
 		
-		String serverVersion = BedwarsPlugin.getInstance().getServerVersion();
+		//String serverVersion = BedwarsPlugin.getInstance().getServerVersion();
 		try {
-			Class<?> craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".inventory.CraftItemStack");
-			Method asNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
-			Class<?> nmsItemStackClass = Class.forName("net.minecraft.server." + serverVersion + ".ItemStack");
-			Method hasTagMethod = nmsItemStackClass.getMethod("hasTag");
-			Method getTagMethod = nmsItemStackClass.getMethod("getTag");
-			Class<?> nbtTagCompoundClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagCompound");
-			Method hasKeyMethod = nbtTagCompoundClass.getMethod("hasKey", String.class);
+			//Class<?> craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".inventory.CraftItemStack");
+			//Method asNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
+			//Class<?> nmsItemStackClass = Class.forName("net.minecraft.server." + serverVersion + ".ItemStack");
+			//Method hasTagMethod = nmsItemStackClass.getMethod("hasTag");
+			//Method getTagMethod = nmsItemStackClass.getMethod("getTag");
+			//Class<?> nbtTagCompoundClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagCompound");
+			//Method hasKeyMethod = nbtTagCompoundClass.getMethod("hasKey", String.class);
 			
-			Object nmsItemStack = asNMSCopyMethod.invoke(null, event.getItemInHand());
+			net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(event.getItemInHand());
+			//Object nmsItemStack = asNMSCopyMethod.invoke(null, event.getItemInHand());
 			
-			boolean hasTag = (boolean) hasTagMethod.invoke(nmsItemStack);
+			boolean hasTag = nmsItemStack.hasTag();
+			//boolean hasTag = (boolean) hasTagMethod.invoke(nmsItemStack);
 			boolean hasKey = false;
 			if (hasTag)
-				hasKey = (boolean) hasKeyMethod.invoke(getTagMethod.invoke(nmsItemStack), "bedwars-blast-proof");
+				hasKey = nmsItemStack.getTag().contains("bedwars-blast-proof");
+				//hasKey = (boolean) hasKeyMethod.invoke(getTagMethod.invoke(nmsItemStack), "bedwars-blast-proof");
 			
 			if (hasTag && hasKey)
 				block.setMetadata("bedwars_blast_proof", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
 			else
 				block.removeMetadata("bedwars_blast_proof", BedwarsPlugin.getInstance());
-		} catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+		} catch (IllegalArgumentException | SecurityException e) {
 			e.printStackTrace();
 		}
 		
