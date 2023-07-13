@@ -164,7 +164,7 @@ public class PlayerNPC {
 				//sendPacketMethod.invoke(connection, packetPlayOutEntityHeadRotationConstructor.newInstance(entity, headYaw));
 				
 				Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), () -> {
-					connection.send(new ClientboundPlayerInfoRemovePacket(List.of(entityPlayer.getUUID())));
+					connection.send(new ClientboundPlayerInfoRemovePacket(List.of(entity.getUUID())));
 					/*try {
 						sendPacketMethod.invoke(connection, packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)enumPlayerInfoActionClass, "REMOVE_PLAYER"), entityPlayerArray));
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
