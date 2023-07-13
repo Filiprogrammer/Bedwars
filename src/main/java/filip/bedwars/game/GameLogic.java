@@ -262,7 +262,7 @@ public class GameLogic implements Listener {
 					Field entityIdField = null;
 
 					for (Field f : ClientboundRotateHeadPacket.class.getDeclaredFields()) {
-						if (f.getType() == Integer.class) {
+						if (f.getType() == int.class) {
 							entityIdField = f;
 							break;
 						}
