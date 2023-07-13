@@ -112,6 +112,12 @@ import filip.bedwars.world.GameWorld;
 import filip.bedwars.world.GameWorldManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
+import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket;
 import net.minecraft.server.level.ServerPlayer;
 
 public class GameLogic implements Listener {
@@ -212,11 +218,77 @@ public class GameLogic implements Listener {
 		
 		packetListener = new IPacketListener() {
 			public boolean writePacket(Object packet, Player player) {
-				if (packet.getClass().getSimpleName().equals("PacketPlayOutNamedEntitySpawn")
+				if (packet instanceof ClientboundAddEntityPacket) {
+					int a = ((ClientboundAddEntityPacket)packet).getId();
+
+					for (Player p : gameWorld.getWorld().getPlayers())
+						if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
+							return false;
+
+					return true;
+				}
+
+				if (packet instanceof ClientboundSetEntityDataPacket) {
+					int a = ((ClientboundSetEntityDataPacket)packet).id();
+
+					for (Player p : gameWorld.getWorld().getPlayers())
+						if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
+							return false;
+
+					return true;
+				}
+
+				if (packet instanceof ClientboundUpdateAttributesPacket) {
+					int a = ((ClientboundUpdateAttributesPacket)packet).getEntityId();
+
+					for (Player p : gameWorld.getWorld().getPlayers())
+						if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
+							return false;
+
+					return true;
+				}
+
+				if (packet instanceof ClientboundSetEquipmentPacket) {
+					int a = ((ClientboundSetEquipmentPacket)packet).getEntity();
+
+					for (Player p : gameWorld.getWorld().getPlayers())
+						if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
+							return false;
+
+					return true;
+				}
+
+				if (packet instanceof ClientboundRotateHeadPacket) {
+					Field entityIdField = null;
+
+					for (Field f : ClientboundRotateHeadPacket.class.getDeclaredFields()) {
+						if (f.getType() == Integer.class) {
+							entityIdField = f;
+							break;
+						}
+					}
+
+					int a = -1;
+					try {
+						entityIdField.setAccessible(true);
+						a = entityIdField.getInt(packet);
+					} catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
+						e.printStackTrace();
+					}
+
+					for (Player p : gameWorld.getWorld().getPlayers())
+						if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
+							return false;
+
+					return true;
+				}
+
+				/*if (packet.getClass().getSimpleName().equals("PacketPlayOutNamedEntitySpawn")
 				 || packet.getClass().getSimpleName().equals("PacketPlayOutEntityMetadata")
 				 || packet.getClass().getSimpleName().equals("PacketPlayOutUpdateAttributes")
 				 || packet.getClass().getSimpleName().equals("PacketPlayOutEntityEquipment")
 				 || packet.getClass().getSimpleName().equals("PacketPlayOutEntityHeadRotation")) {
+					
 					int a = -1;
 					try {
 						Field aField = packet.getClass().getDeclaredField("a");
@@ -231,9 +303,20 @@ public class GameLogic implements Listener {
 							return false;
 					
 					return true;
-				}
+				}*/
 				
-				if (packet.getClass().getSimpleName().equals("PacketPlayOutPlayerInfo")) {
+				if (packet instanceof ClientboundPlayerInfoUpdatePacket) {
+					ClientboundPlayerInfoUpdatePacket playerInfoUpdatePacket = (ClientboundPlayerInfoUpdatePacket)packet;
+					List<ClientboundPlayerInfoUpdatePacket.Entry> b = playerInfoUpdatePacket.entries();
+					
+					for (ClientboundPlayerInfoUpdatePacket.Entry playerInfoData : b)
+						if (game.containsPlayer(playerInfoData.profileId()))
+							return true;
+
+					return false;
+				}
+
+				/*if (packet.getClass().getSimpleName().equals("PacketPlayOutPlayerInfo")) {
 					try {
 						Field aField = packet.getClass().getDeclaredField("a");
 						aField.setAccessible(true);
@@ -262,7 +345,7 @@ public class GameLogic implements Listener {
 					}
 					
 					return false;
-				}
+				}*/
 				
 				return true;
 			}
