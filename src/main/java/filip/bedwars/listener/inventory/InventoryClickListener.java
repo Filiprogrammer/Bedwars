@@ -35,7 +35,7 @@ public class InventoryClickListener implements Listener {
 	}
 	
 	@EventHandler
-	private void onDrag (InventoryDragEvent event) {
+	private void onDrag(InventoryDragEvent event) {
 		Player player = (Player) event.getWhoClicked();
 
 		if (event.getInventory() != null) {

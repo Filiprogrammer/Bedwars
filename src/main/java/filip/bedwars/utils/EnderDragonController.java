@@ -12,9 +12,9 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -70,6 +70,10 @@ public class EnderDragonController {
 	}
 	
 	public boolean removeTargetEntity(Entity entity) {
+		if (entity.getEntityId() == currentTargetEntity.getEntityId()) {
+			currentTargetEntity = null;
+		}
+
 		return targetEntities.remove(entity);
 	}
 	
@@ -105,6 +109,7 @@ public class EnderDragonController {
 		bukkitRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
+				// TODO: This does not seem ideal. The dragon will alternate between targets, which might be problematic when the different targets are far apart.
 				if (random.nextInt(200) == 0) {
 					// Choose a random target
 					if (targetEntities.size() == 0)
@@ -145,6 +150,8 @@ public class EnderDragonController {
 					e.printStackTrace();
 				}*/
 				updateLocation();
+				// TODO: Check for Endstone or Obsidian blocks colliding with the dragons' hitbox and destroy these blocks.
+				// We only want to do this for Endstone and Obsidian, since the other blocks are destroyed by the dragon anyway and play nice breaking sounds.
 			}
 		};
 		

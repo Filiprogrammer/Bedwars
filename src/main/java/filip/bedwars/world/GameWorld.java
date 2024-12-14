@@ -85,6 +85,7 @@ public class GameWorld {
 			e.printStackTrace();
 		}
         
+		// TODO: Do we really need to copy the "session.lock" file?
         // Copy the "session.lock" file to the game world
         try {
 			Files.copy(sourceSessionLock, targetSessionLock, StandardCopyOption.REPLACE_EXISTING);
@@ -129,6 +130,7 @@ public class GameWorld {
 	
 	public void unloadWorld() {
 		String gameWorldName = world.getName();
+		world.removePluginChunkTickets(BedwarsPlugin.getInstance());
 		Bukkit.unloadWorld(world, false);
 		String worldContainerPath = BedwarsPlugin.getInstance().getServer().getWorldContainer().getAbsolutePath();
 		Path gameWorldDirectory = Paths.get(worldContainerPath + File.separator + gameWorldName);

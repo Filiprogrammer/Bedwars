@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+// TODO: Shouldn't this be in filip.bedwars.listener.world ?
 public class WorldInitListener implements Listener {
 	
 	private List<WorldInitHandler> handlers = new ArrayList<WorldInitHandler>();

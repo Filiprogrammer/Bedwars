@@ -81,6 +81,7 @@ public class Game implements Listener {
 		}
 		
 		isStarting = true;
+		// TODO: Pre-load the world during the countdown and load chunks around player spawn points using plugin chunk tickets
 		GameWorld gameWorld = GameWorldManager.getInstance().claimGameWorld(arena.getWorld());
 		lobby = null;
 		gameLogic = new GameLogic(this, arena, gameWorld);

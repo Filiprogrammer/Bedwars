@@ -22,6 +22,7 @@ public class GameJoinSign {
 			sign.setLine(1, MainConfig.getInstance().getJoinSignLine(1).replace("%arenaname%", mapName));
 			sign.setLine(2, MainConfig.getInstance().getJoinSignLine(2).replace("%arenaname%", mapName));
 			sign.setLine(3, MainConfig.getInstance().getJoinSignLine(3).replace("%arenaname%", mapName));
+			sign.setGlowingText(true);
 			sign.update();
 		}
 	}

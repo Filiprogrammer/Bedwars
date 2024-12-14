@@ -1,7 +1,7 @@
 plugins {
   `java-library`
-  id("io.papermc.paperweight.userdev") version "1.5.5"
-  id("xyz.jpenilla.run-paper") version "2.1.0" // Adds runServer and runMojangMappedServer tasks for testing
+  id("io.papermc.paperweight.userdev") version "1.7.7"
+  id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
 group = "filip.bedwars"
@@ -14,16 +14,13 @@ java {
 }
 
 repositories {
-  maven {
-    url = uri("https://repo.onarandombox.com/content/groups/public/")
-  }
+  mavenCentral()
+  maven("https://repo.onarandombox.com/content/groups/public/")
 }
 
 dependencies {
-  paperweight.paperDevBundle("1.20.1-R0.1-SNAPSHOT")
-  // paperweight.foliaDevBundle("1.20.1-R0.1-SNAPSHOT")
-  // paperweight.devBundle("com.example.paperfork", "1.20.1-R0.1-SNAPSHOT")
-  compileOnly("com.onarandombox.multiversecore:Multiverse-Core:4.0.0")
+  paperweight.paperDevBundle("1.19.3-R0.1-SNAPSHOT")
+  compileOnly("com.onarandombox.multiversecore:multiverse-core:4.3.2")
 }
 
 tasks {
@@ -55,12 +52,10 @@ tasks {
       expand(props)
     }
   }
-
-  /*
-  reobfJar {
-    // This is an example of how you might change the output location for reobfJar. It's recommended not to do this
-    // for a variety of reasons, however it's asked frequently enough that an example of how to do it is included here.
-    outputJar.set(layout.buildDirectory.file("libs/PaperweightTestPlugin-${project.version}.jar"))
+  runServer {
+    minecraftVersion("1.17.1")
+    downloadPlugins {
+      github("Multiverse", "Multiverse-Core", "4.3.14", "multiverse-core-4.3.14.jar")
+    }
   }
-   */
 }
