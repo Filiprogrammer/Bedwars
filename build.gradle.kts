@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-  paperweight.paperDevBundle("1.19.3-R0.1-SNAPSHOT")
+  paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT")
   compileOnly("com.onarandombox.multiversecore:multiverse-core:4.3.2")
 }
 
@@ -45,7 +45,7 @@ tasks {
       "name" to project.name,
       "version" to project.version,
       "description" to project.description,
-      "apiVersion" to "1.20"
+      "api-version" to "1.17"
     )
     inputs.properties(props)
     filesMatching("plugin.yml") {

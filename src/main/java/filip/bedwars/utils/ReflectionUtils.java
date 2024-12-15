@@ -1,45 +1,52 @@
 package filip.bedwars.utils;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.bukkit.Server;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import filip.bedwars.BedwarsPlugin;
+import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 
 public class ReflectionUtils {
 
-	public Class<?> craftWorldClass;
-	public Class<?> craftPlayerClass;
-	public Class<?> dragonControllerPhaseClass;
-	public Class<?> dragonControllerStrafeClass;
-	public Class<?> dragonControllerChargeClass;
-	public Class<?> dragonControllerManagerClass;
-	public Class<?> entityEnderDragonClass;
-	public Class<?> entityLivingClass;
-	public Class<?> entityPlayerClass;
-	public Class<?> entityClass;
-	public Class<?> entityTypesClass;
-	public Class<?> packetClass;
-	public Class<?> packetPlayOutEntityDestroyClass;
-	public Class<?> packetPlayOutEntityTeleportClass;
+	public final Class<?> craftWorldClass;
+	public final Class<?> craftPlayerClass;
+	public final Class<?> craftServerClass;
+	public final Class<?> dragonControllerPhaseClass;
+	public final Class<?> dragonControllerStrafeClass;
+	public final Class<?> dragonControllerChargeClass;
+	public final Class<?> dragonControllerManagerClass;
+	public final Class<?> entityEnderDragonClass;
+	public final Class<?> entityLivingClass;
+	public final Class<?> entityPlayerClass;
+	public final Class<?> entityClass;
+	public final Class<?> entityTypesClass;
+	public final Class<?> packetClass;
+	public final Class<?> packetPlayOutEntityDestroyClass;
+	public final Class<?> packetPlayOutEntityTeleportClass;
 	//public Class<?> packetPlayOutSpawnEntityLivingClass;
-	public Class<?> playerConnectionClass;
-	public Class<?> vec3DClass;
-	public Class<?> worldClass;
+	public final Class<?> playerConnectionClass;
+	public final Class<?> vec3DClass;
+	public final Class<?> worldClass;
 	//public Class<?> itemStackClass;
 	//public Class<?> nbtTagCompoundClass;
-	public Class<?> craftItemStackClass;
+	public final Class<?> craftItemStackClass;
 	//public Class<?> nbtTagIntClass;
 	//public Class<?> nbtBaseClass;
-	public Class<?> entityVillagerClass;
-	public Class<?> iChatBaseComponentClass;
+	public final Class<?> entityVillagerClass;
+	public final Class<?> iChatBaseComponentClass;
 	//public Class<?> chatComponentTextClass;
-	public Class<?> villagerDataClass;
-	public Class<?> villagerTypeClass;
-	public Class<?> villagerProfessionClass;
-	public Class<?> entityHumanClass;
+	public final Class<?> villagerDataClass;
+	public final Class<?> villagerTypeClass;
+	public final Class<?> villagerProfessionClass;
+	public final Class<?> entityHumanClass;
 	//public Class<?> packetPlayOutPlayerInfoClass;
 	//public Class<?> enumPlayerInfoActionClass;
 	//public Class<?> packetPlayOutNamedEntitySpawnClass;
@@ -49,17 +56,18 @@ public class ReflectionUtils {
 	//public Method entitySetLocationMethod;
 	//public Method entityGetIdMethod;
 	//public Method entityGetWorldMethod;
-	public Method craftWorldGetHandleMethod;
-	public Method craftWorldGetNameMethod;
-	public Method craftPlayerGetHandleMethod;
-	public Method worldGetWorldMethod;
+	public final Method craftWorldGetHandleMethod;
+	public final Method craftWorldGetNameMethod;
+	public final Method craftPlayerGetHandleMethod;
+	public final Method craftServerGetServerMethod;
+	public final Method worldGetWorldMethod;
 	//public Method playerConnectionSendPacketMethod;
 	//public Method entityEnderDragonGetDragonControllerManagerMethod;
 	public Method dragonControllerManagerSetControllerPhaseMethod;
 	public Method dragonControllerManagerBMethod;
-	public Method dragonControllerStrafeAMethod;
-	public Method dragonControllerChargeAMethod;
-	public Method craftItemStackAsNMSCopyMethod;
+	public final Method dragonControllerStrafeAMethod;
+	public final Method dragonControllerChargeAMethod;
+	public final Method craftItemStackAsNMSCopyMethod;
 	//public Method craftItemStackAsBukkitCopyMethod;
 	//public Method itemStackGetOrCreateTagMethod;
 	//public Method nbtTagCompoundSetMethod;
@@ -89,133 +97,149 @@ public class ReflectionUtils {
 	//public Constructor<?> packetPlayOutSpawnEntityLivingConstructor;
 	//public Constructor<?> packetPlayOutEntityDestroyConstructor;
 	public Constructor<?> entityEnderDragonConstructor;
-	public Constructor<?> packetPlayOutEntityTeleportConstructor;
-	public Constructor<?> vec3DConstructor;
+	public final Constructor<?> packetPlayOutEntityTeleportConstructor;
+	public final Constructor<?> vec3DConstructor;
 	//public Constructor<?> nbtTagIntConstructor;
 	public Constructor<?> entityVillagerConstructor;
 	//public Constructor<?> chatComponentConstructor;
-	public Constructor<?> villagerDataConstructor;
+	public final Constructor<?> villagerDataConstructor;
 	//public Constructor<?> packetPlayOutPlayerInfoConstructor;
 	//public Constructor<?> packetPlayOutNamedEntitySpawnConstructor;
-	
-	public ReflectionUtils() {
+
+	public ReflectionUtils() throws ClassNotFoundException, NoSuchMethodException, SecurityException {
 		String serverVersion = BedwarsPlugin.getInstance().getServerVersion();
-		try {
-			craftWorldClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".CraftWorld");
-			craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".entity.CraftPlayer");
-			dragonControllerPhaseClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerPhase");
-			dragonControllerStrafeClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerStrafe");
-			dragonControllerChargeClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerCharge");
-			dragonControllerManagerClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager");
-			entityEnderDragonClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon");
-			entityLivingClass = Class.forName("net.minecraft.world.entity.EntityLiving");
-			entityPlayerClass = Class.forName("net.minecraft.server.level.EntityPlayer");
-			entityClass = Class.forName("net.minecraft.world.entity.Entity");
-			entityTypesClass = Class.forName("net.minecraft.world.entity.EntityTypes");
-			packetClass = Class.forName("net.minecraft.network.protocol.Packet");
-			packetPlayOutEntityDestroyClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy");
-			packetPlayOutEntityTeleportClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport");
-			//packetPlayOutSpawnEntityLivingClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving");
-			playerConnectionClass = Class.forName("net.minecraft.server.network.PlayerConnection");
-			vec3DClass = Class.forName("net.minecraft.world.phys.Vec3D");
-			worldClass = Class.forName("net.minecraft.world.level.World");
-			entityVillagerClass = Class.forName("net.minecraft.world.entity.npc.EntityVillager");
-			iChatBaseComponentClass = Class.forName("net.minecraft.network.chat.IChatBaseComponent");
-			//chatComponentTextClass = Class.forName("net.minecraft.server." + serverVersion + ".ChatComponentText");
-			villagerDataClass = Class.forName("net.minecraft.world.entity.npc.VillagerData");
-			villagerTypeClass = Class.forName("net.minecraft.world.entity.npc.VillagerType");
-			villagerProfessionClass = Class.forName("net.minecraft.world.entity.npc.VillagerProfession");
-			entityHumanClass = Class.forName("net.minecraft.world.entity.player.EntityHuman");
-			//packetPlayOutPlayerInfoClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutPlayerInfo");
-			//enumPlayerInfoActionClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
-			//packetPlayOutNamedEntitySpawnClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutNamedEntitySpawn");
-			//damageSourceClass = Class.forName("net.minecraft.server." + serverVersion + ".DamageSource");
-			//combatTrackerClass = Class.forName("net.minecraft.server." + serverVersion + ".CombatTracker");
-			//entityEnderDragonTickMethod = entityEnderDragonClass.getMethod("tick");
-			//entitySetLocationMethod = entityClass.getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
-			//entityGetIdMethod = entityClass.getMethod("getId");
-			//entityGetWorldMethod = entityClass.getMethod("getWorld");
-			craftWorldGetHandleMethod = craftWorldClass.getMethod("getHandle");
-			craftWorldGetNameMethod = craftWorldClass.getMethod("getName");
-			craftPlayerGetHandleMethod = craftPlayerClass.getMethod("getHandle");
-			worldGetWorldMethod = worldClass.getMethod("getWorld");
-			//playerConnectionSendPacketMethod = playerConnectionClass.getMethod("sendPacket", packetClass);
-			//entityEnderDragonGetDragonControllerManagerMethod = entityEnderDragonClass.getMethod("getDragonControllerManager");
-			for (Method method : dragonControllerManagerClass.getMethods()) {
-				if (method.getName().equals("setControllerPhase")) {
-					dragonControllerManagerSetControllerPhaseMethod = method;
-					break;
-				}
+		craftWorldClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".CraftWorld");
+		craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".entity.CraftPlayer");
+		craftServerClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".CraftServer");
+		dragonControllerPhaseClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerPhase");
+		dragonControllerStrafeClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerStrafe");
+		dragonControllerChargeClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerCharge");
+		dragonControllerManagerClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager");
+		entityEnderDragonClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon");
+		entityLivingClass = Class.forName("net.minecraft.world.entity.EntityLiving");
+		entityPlayerClass = Class.forName("net.minecraft.server.level.EntityPlayer");
+		entityClass = Class.forName("net.minecraft.world.entity.Entity");
+		entityTypesClass = Class.forName("net.minecraft.world.entity.EntityTypes");
+		packetClass = Class.forName("net.minecraft.network.protocol.Packet");
+		packetPlayOutEntityDestroyClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy");
+		packetPlayOutEntityTeleportClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport");
+		//packetPlayOutSpawnEntityLivingClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving");
+		playerConnectionClass = Class.forName("net.minecraft.server.network.PlayerConnection");
+		vec3DClass = Class.forName("net.minecraft.world.phys.Vec3D");
+		worldClass = Class.forName("net.minecraft.world.level.World");
+		entityVillagerClass = Class.forName("net.minecraft.world.entity.npc.EntityVillager");
+		iChatBaseComponentClass = Class.forName("net.minecraft.network.chat.IChatBaseComponent");
+		//chatComponentTextClass = Class.forName("net.minecraft.server." + serverVersion + ".ChatComponentText");
+		villagerDataClass = Class.forName("net.minecraft.world.entity.npc.VillagerData");
+		villagerTypeClass = Class.forName("net.minecraft.world.entity.npc.VillagerType");
+		villagerProfessionClass = Class.forName("net.minecraft.world.entity.npc.VillagerProfession");
+		entityHumanClass = Class.forName("net.minecraft.world.entity.player.EntityHuman");
+		//packetPlayOutPlayerInfoClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutPlayerInfo");
+		//enumPlayerInfoActionClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
+		//packetPlayOutNamedEntitySpawnClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutNamedEntitySpawn");
+		//damageSourceClass = Class.forName("net.minecraft.server." + serverVersion + ".DamageSource");
+		//combatTrackerClass = Class.forName("net.minecraft.server." + serverVersion + ".CombatTracker");
+		//entityEnderDragonTickMethod = entityEnderDragonClass.getMethod("tick");
+		//entitySetLocationMethod = entityClass.getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
+		//entityGetIdMethod = entityClass.getMethod("getId");
+		//entityGetWorldMethod = entityClass.getMethod("getWorld");
+		craftWorldGetHandleMethod = craftWorldClass.getMethod("getHandle");
+		craftWorldGetNameMethod = craftWorldClass.getMethod("getName");
+		craftPlayerGetHandleMethod = craftPlayerClass.getMethod("getHandle");
+		craftServerGetServerMethod = craftServerClass.getMethod("getServer");
+		worldGetWorldMethod = worldClass.getMethod("getWorld");
+		//playerConnectionSendPacketMethod = playerConnectionClass.getMethod("sendPacket", packetClass);
+		//entityEnderDragonGetDragonControllerManagerMethod = entityEnderDragonClass.getMethod("getDragonControllerManager");
+		for (Method method : dragonControllerManagerClass.getMethods()) {
+			if (method.getName().equals("setControllerPhase")) {
+				dragonControllerManagerSetControllerPhaseMethod = method;
+				break;
 			}
-			for (Method method : dragonControllerManagerClass.getMethods()) {
-				if (method.getName().equals("b")) {
-					dragonControllerManagerBMethod = method;
-					break;
-				}
-			}
-			dragonControllerStrafeAMethod = dragonControllerStrafeClass.getMethod("a", entityLivingClass);
-			dragonControllerChargeAMethod = dragonControllerChargeClass.getMethod("a", vec3DClass);
-			//entitySetCustomNameMethod = entityClass.getMethod("setCustomName", iChatBaseComponentClass);
-			//entitySetCustomNameVisibleMethod = entityClass.getMethod("setCustomNameVisible", boolean.class);
-			//entityVillagerSetVillagerDataMethod = entityVillagerClass.getMethod("setVillagerData", villagerDataClass);
-			//damageSourceDamageEntityMethod = entityPlayerClass.getMethod("damageEntity", damageSourceClass, float.class);
-			//iChatBaseComponentAddSiblingMethod = iChatBaseComponentClass.getMethod("addSibling", iChatBaseComponentClass);
-			//entityPlayerGetCombatTrackerMethod = entityPlayerClass.getMethod("getCombatTracker");
-			//entityPlayerSendMessageMethod = entityPlayerClass.getMethod("sendMessage", iChatBaseComponentClass);
-			//combatTrackerGetDeathMessageMethod = combatTrackerClass.getMethod("getDeathMessage");
-			//entityPlayerPlayerConnectionField = entityPlayerClass.getField("playerConnection");
-			//entityTypesEnderDragonField = entityTypesClass.getField("ENDER_DRAGON");
-			//entityLocXField = entityClass.getDeclaredField("xo");
-			//entityLocXField.setAccessible(true);
-			//entityLocYField = entityClass.getDeclaredField("yo");
-			//entityLocYField.setAccessible(true);
-			//entityLocZField = entityClass.getDeclaredField("zo");
-			//entityLocZField.setAccessible(true);
-			//dragonControllerPhaseStrafePlayerField = dragonControllerPhaseClass.getField("STRAFE_PLAYER");
-			//dragonControllerPhaseHoldingPatternField = dragonControllerPhaseClass.getField("HOLDING_PATTERN");
-			//dragonControllerPhaseChargingPlayerField = dragonControllerPhaseClass.getField("CHARGING_PLAYER");
-			//dragonControllerPhaseLandingField = dragonControllerPhaseClass.getField("LANDING");
-			//dragonControllerPhaseLandingApproachField = dragonControllerPhaseClass.getField("LANDING_APPROACH");
-			//entityTypesVillagerField = entityTypesClass.getField("VILLAGER");
-			//packetPlayOutSpawnEntityLivingConstructor = packetPlayOutSpawnEntityLivingClass.getConstructor(entityLivingClass);
-			//packetPlayOutEntityDestroyConstructor = packetPlayOutEntityDestroyClass.getConstructor(new int[0].getClass());
-			for (Constructor<?> constructor : entityEnderDragonClass.getConstructors()) {
-				if (constructor.getParameterCount() == 2) {
-					entityEnderDragonConstructor = constructor;
-					break;
-				}
-			}
-			packetPlayOutEntityTeleportConstructor = packetPlayOutEntityTeleportClass.getConstructor(entityClass);
-			vec3DConstructor = vec3DClass.getConstructor(double.class, double.class, double.class);
-			//itemStackClass = Class.forName("net.minecraft.server." + serverVersion + ".ItemStack");
-			//nbtTagCompoundClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagCompound");
-			craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".inventory.CraftItemStack");
-			craftItemStackAsNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
-			//craftItemStackAsBukkitCopyMethod = craftItemStackClass.getMethod("asBukkitCopy", itemStackClass);
-			//itemStackGetOrCreateTagMethod = itemStackClass.getMethod("getOrCreateTag");
-			//nbtTagIntClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagInt");
-			//nbtBaseClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTBase");
-			//nbtTagIntConstructor = nbtTagIntClass.getDeclaredConstructor(int.class);
-			//nbtTagIntConstructor.setAccessible(true);
-			//nbtTagCompoundSetMethod = nbtTagCompoundClass.getMethod("set", String.class, nbtBaseClass);
-			//nbtTagCompoundHasKeyMethod = nbtTagCompoundClass.getMethod("hasKey", String.class);
-			//itemStackSetTagMethod = itemStackClass.getMethod("setTag", nbtTagCompoundClass);
-			//itemStackHasTagMethod = itemStackClass.getMethod("hasTag");
-			//itemStackGetTagMethod = itemStackClass.getMethod("getTag");
-			entityVillagerConstructor = null;
-			for (Constructor<?> constructor : entityVillagerClass.getConstructors()) {
-				if (constructor.getParameterCount() == 2) {
-					entityVillagerConstructor = constructor;
-					break;
-				}
-			}
-			//chatComponentConstructor = chatComponentTextClass.getConstructor(String.class);
-			villagerDataConstructor = villagerDataClass.getConstructor(villagerTypeClass, villagerProfessionClass, int.class);
-			//packetPlayOutPlayerInfoConstructor = packetPlayOutPlayerInfoClass.getConstructor(enumPlayerInfoActionClass, java.lang.reflect.Array.newInstance(entityPlayerClass, 0).getClass());
-			//packetPlayOutNamedEntitySpawnConstructor = packetPlayOutNamedEntitySpawnClass.getConstructor(entityHumanClass);
-		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
 		}
+		for (Method method : dragonControllerManagerClass.getMethods()) {
+			if (method.getName().equals("b")) {
+				dragonControllerManagerBMethod = method;
+				break;
+			}
+		}
+		dragonControllerStrafeAMethod = dragonControllerStrafeClass.getMethod("a", entityLivingClass);
+		dragonControllerChargeAMethod = dragonControllerChargeClass.getMethod("a", vec3DClass);
+		//entitySetCustomNameMethod = entityClass.getMethod("setCustomName", iChatBaseComponentClass);
+		//entitySetCustomNameVisibleMethod = entityClass.getMethod("setCustomNameVisible", boolean.class);
+		//entityVillagerSetVillagerDataMethod = entityVillagerClass.getMethod("setVillagerData", villagerDataClass);
+		//damageSourceDamageEntityMethod = entityPlayerClass.getMethod("damageEntity", damageSourceClass, float.class);
+		//iChatBaseComponentAddSiblingMethod = iChatBaseComponentClass.getMethod("addSibling", iChatBaseComponentClass);
+		//entityPlayerGetCombatTrackerMethod = entityPlayerClass.getMethod("getCombatTracker");
+		//entityPlayerSendMessageMethod = entityPlayerClass.getMethod("sendMessage", iChatBaseComponentClass);
+		//combatTrackerGetDeathMessageMethod = combatTrackerClass.getMethod("getDeathMessage");
+		//entityPlayerPlayerConnectionField = entityPlayerClass.getField("playerConnection");
+		//entityTypesEnderDragonField = entityTypesClass.getField("ENDER_DRAGON");
+		//entityLocXField = entityClass.getDeclaredField("xo");
+		//entityLocXField.setAccessible(true);
+		//entityLocYField = entityClass.getDeclaredField("yo");
+		//entityLocYField.setAccessible(true);
+		//entityLocZField = entityClass.getDeclaredField("zo");
+		//entityLocZField.setAccessible(true);
+		//dragonControllerPhaseStrafePlayerField = dragonControllerPhaseClass.getField("STRAFE_PLAYER");
+		//dragonControllerPhaseHoldingPatternField = dragonControllerPhaseClass.getField("HOLDING_PATTERN");
+		//dragonControllerPhaseChargingPlayerField = dragonControllerPhaseClass.getField("CHARGING_PLAYER");
+		//dragonControllerPhaseLandingField = dragonControllerPhaseClass.getField("LANDING");
+		//dragonControllerPhaseLandingApproachField = dragonControllerPhaseClass.getField("LANDING_APPROACH");
+		//entityTypesVillagerField = entityTypesClass.getField("VILLAGER");
+		//packetPlayOutSpawnEntityLivingConstructor = packetPlayOutSpawnEntityLivingClass.getConstructor(entityLivingClass);
+		//packetPlayOutEntityDestroyConstructor = packetPlayOutEntityDestroyClass.getConstructor(new int[0].getClass());
+		for (Constructor<?> constructor : entityEnderDragonClass.getConstructors()) {
+			if (constructor.getParameterCount() == 2) {
+				entityEnderDragonConstructor = constructor;
+				break;
+			}
+		}
+		packetPlayOutEntityTeleportConstructor = packetPlayOutEntityTeleportClass.getConstructor(entityClass);
+		vec3DConstructor = vec3DClass.getConstructor(double.class, double.class, double.class);
+		//itemStackClass = Class.forName("net.minecraft.server." + serverVersion + ".ItemStack");
+		//nbtTagCompoundClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagCompound");
+		craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".inventory.CraftItemStack");
+		craftItemStackAsNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
+		//craftItemStackAsBukkitCopyMethod = craftItemStackClass.getMethod("asBukkitCopy", itemStackClass);
+		//itemStackGetOrCreateTagMethod = itemStackClass.getMethod("getOrCreateTag");
+		//nbtTagIntClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagInt");
+		//nbtBaseClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTBase");
+		//nbtTagIntConstructor = nbtTagIntClass.getDeclaredConstructor(int.class);
+		//nbtTagIntConstructor.setAccessible(true);
+		//nbtTagCompoundSetMethod = nbtTagCompoundClass.getMethod("set", String.class, nbtBaseClass);
+		//nbtTagCompoundHasKeyMethod = nbtTagCompoundClass.getMethod("hasKey", String.class);
+		//itemStackSetTagMethod = itemStackClass.getMethod("setTag", nbtTagCompoundClass);
+		//itemStackHasTagMethod = itemStackClass.getMethod("hasTag");
+		//itemStackGetTagMethod = itemStackClass.getMethod("getTag");
+		entityVillagerConstructor = null;
+		for (Constructor<?> constructor : entityVillagerClass.getConstructors()) {
+			if (constructor.getParameterCount() == 2) {
+				entityVillagerConstructor = constructor;
+				break;
+			}
+		}
+		//chatComponentConstructor = chatComponentTextClass.getConstructor(String.class);
+		villagerDataConstructor = villagerDataClass.getConstructor(villagerTypeClass, villagerProfessionClass, int.class);
+		//packetPlayOutPlayerInfoConstructor = packetPlayOutPlayerInfoClass.getConstructor(enumPlayerInfoActionClass, java.lang.reflect.Array.newInstance(entityPlayerClass, 0).getClass());
+		//packetPlayOutNamedEntitySpawnConstructor = packetPlayOutNamedEntitySpawnClass.getConstructor(entityHumanClass);
 	}
-	
+
+	public ServerPlayer playerToNMSPlayer(Player player) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		// return ((CraftPlayer)player).getHandle();
+		Object craftPlayer = craftPlayerClass.cast(player);
+		return (ServerPlayer)craftPlayerGetHandleMethod.invoke(craftPlayer);
+	}
+
+	public ServerLevel worldToNMSWorld(World world) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		// return ((CraftWorld)world).getHandle();
+		Object craftWorld = craftWorldClass.cast(world);
+		return (ServerLevel)craftWorldGetHandleMethod.invoke(craftWorld);
+	}
+
+	public DedicatedServer serverToNMSServer(Server server) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		// return ((CraftServer)server).getServer();
+		Object craftServer = craftServerClass.cast(server);
+		return (DedicatedServer)craftServerGetServerMethod.invoke(craftServer);
+	}
+
 }

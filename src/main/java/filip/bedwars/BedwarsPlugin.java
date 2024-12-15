@@ -1,10 +1,8 @@
 package filip.bedwars;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -61,16 +59,21 @@ public class BedwarsPlugin extends JavaPlugin {
 	private List<ArenaSetup> arenaSetups = new ArrayList<ArenaSetup>();
 	private List<PacketReader> packetReaders = new ArrayList<PacketReader>();
 	private WorldInitListener worldInitListener;
-	
+
 	public ReflectionUtils reflectionUtils;
-	
+
 	@Override
 	public void onEnable() {
 		plugin = this;
-		reflectionUtils = new ReflectionUtils();
-		
+		try {
+			reflectionUtils = new ReflectionUtils();
+		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+			getServer().getPluginManager().disablePlugin(this);
+		}
+
 		mv = (MultiverseCore) getServer().getPluginManager().getPlugin("Multiverse-Core");
-		
+
 		new PlayerInteractListener(this);
 		new BlockPlaceListener(this);
 		new InventoryClickListener(this);
@@ -339,14 +342,14 @@ public class BedwarsPlugin extends JavaPlugin {
     public boolean removeWorldInitHandler(WorldInitHandler handler) {
     	return worldInitListener.removeHandler(handler);
     }
-    
+
     public MultiverseCore getMultiverse() {
     	return mv;
     }
     
     public String getServerVersion() {
     	if (serverVersion == null)
-    		serverVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+    		serverVersion = getServer().getClass().getPackage().getName().split("\\.")[3];
     	
     	return serverVersion;
     }

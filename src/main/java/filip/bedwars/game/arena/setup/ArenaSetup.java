@@ -1,9 +1,7 @@
 package filip.bedwars.game.arena.setup;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -21,6 +19,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+
+import com.destroystokyo.paper.event.player.PlayerUseUnknownEntityEvent;
+
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -42,8 +43,6 @@ import filip.bedwars.inventory.IUsable;
 import filip.bedwars.inventory.ItemBuilder;
 import filip.bedwars.inventory.PlacableItem;
 import filip.bedwars.inventory.UsableItem;
-import filip.bedwars.listener.player.IPacketListener;
-import filip.bedwars.listener.player.UseEntityPacketListener;
 import filip.bedwars.utils.ArmorStandItemNPC;
 import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.PlayerNPC;
@@ -72,8 +71,8 @@ public class ArenaSetup implements Listener {
 	private VillagerNPC itemShopNPC;
 	private VillagerNPC teamShopNPC;
 	private PlayerNPC spawnNPC;
-	private Map<ArmorStandItemNPC, IPacketListener> spawnerNPCs = new HashMap<ArmorStandItemNPC, IPacketListener>();
-	
+	private List<ArmorStandItemNPC> spawnerNPCs = new ArrayList<ArmorStandItemNPC>();
+
 	public ArenaSetup(@NotNull String mapName, int minPlayersToStart, int playersPerTeam, @NotNull Player setuper) {
 		spawnerBuilder = new SpawnerBuilder();
 		baseBuilder = new BaseBuilder();
@@ -577,47 +576,44 @@ public class ArenaSetup implements Listener {
 	
 	private void spawnSpawnerNPC(Location loc, Material material, String itemName) {
 		ArmorStandItemNPC npc = new ArmorStandItemNPC(new Location(loc.getWorld(), loc.getBlockX() + 0.5, loc.getBlockY() - 0.4, loc.getBlockZ() + 0.5), itemName + " - Spawner", material, setuper);
-		int index = spawnerNPCs.size();
-		
-		UseEntityPacketListener listener = new UseEntityPacketListener(npc.getEntityId()) {
-			@Override
-			public void onUse(String action, Player player) {
-				if (!action.equals("ATTACK"))
-					return;
-				
-				if (!player.getUniqueId().equals(setuper.getUniqueId()))
-					return;
-				
-				arenaBuilder.removeSpawner(index);
-				MessageSender.sendMessage(setuper, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "spawner-removed"));
-				SoundPlayer.playSound("success", setuper);
-				
-				// Delay Spawner despawn because otherwise the client throws an exception for some reason
-				Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), () -> despawnSpawnerNPC(npc), 1L);
-			}
-		};
-		
-		BedwarsPlugin.getInstance().addPacketListener(setuper, listener);
-		spawnerNPCs.put(npc, listener);
+		spawnerNPCs.add(npc);
 	}
-	
+
 	private void despawnSpawnerNPC(ArmorStandItemNPC npc) {
-		IPacketListener packetListener = spawnerNPCs.get(npc);
-		BedwarsPlugin.getInstance().removePacketListener(setuper, packetListener);
 		npc.despawn(setuper);
 		spawnerNPCs.remove(npc);
 	}
-	
+
 	private void despawnAllSpawnerNPCs() {
-		for (ArmorStandItemNPC npc : spawnerNPCs.keySet()) {
-			IPacketListener packetListener = spawnerNPCs.get(npc);
-			BedwarsPlugin.getInstance().removePacketListener(setuper, packetListener);
+		for (ArmorStandItemNPC npc : spawnerNPCs)
 			npc.despawn(setuper);
-		}
-		
-		spawnerNPCs = new HashMap<ArmorStandItemNPC, IPacketListener>();
+
+		spawnerNPCs.clear();
 	}
-	
+
+	@EventHandler
+	public void onPlayerUseUnknownEntity(PlayerUseUnknownEntityEvent event) {
+		if (!event.getPlayer().getUniqueId().equals(setuper.getUniqueId()))
+			return;
+
+		if (!event.isAttack())
+			return;
+
+		for (int i = 0; i < spawnerNPCs.size(); ++i) {
+			ArmorStandItemNPC npc = spawnerNPCs.get(i);
+
+			if (npc.getEntityId() == event.getEntityId()) {
+				arenaBuilder.removeSpawner(i);
+				MessageSender.sendMessage(setuper, MessagesConfig.getInstance().getStringValue(setuper.getLocale(), "spawner-removed"));
+				SoundPlayer.playSound("success", setuper);
+
+				// Delay Spawner despawn because otherwise the client throws an exception for some reason
+				Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), () -> despawnSpawnerNPC(npc), 1L);
+				break;
+			}
+		}
+	}
+
 	@EventHandler
 	public void onPlayerDropItem(PlayerDropItemEvent event) {
 		if (event.getPlayer().getUniqueId().equals(setuper.getUniqueId())) {

@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,8 +23,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Bed;
-import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -76,6 +73,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import com.destroystokyo.paper.Title;
+import com.destroystokyo.paper.event.player.PlayerUseUnknownEntityEvent;
 import com.mojang.authlib.GameProfile;
 
 import filip.bedwars.BedwarsPlugin;
@@ -100,7 +98,6 @@ import filip.bedwars.game.state.GameStateSetting;
 import filip.bedwars.inventory.ClickableInventory;
 import filip.bedwars.inventory.IClickable;
 import filip.bedwars.listener.player.IPacketListener;
-import filip.bedwars.listener.player.UseEntityPacketListener;
 import filip.bedwars.utils.EnderDragonController;
 import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.PlayerUtils;
@@ -130,8 +127,6 @@ public class GameLogic implements Listener {
 	private BukkitRunnable gameTicker;
 	private List<VillagerNPC> itemShopNPCs = new ArrayList<VillagerNPC>();
 	private List<VillagerNPC> teamShopNPCs = new ArrayList<VillagerNPC>();
-	private List<UseEntityPacketListener> itemShopNPCListeners = new ArrayList<UseEntityPacketListener>();
-	private List<UseEntityPacketListener> teamShopNPCListeners = new ArrayList<UseEntityPacketListener>();
 	private List<IClickable> itemShopClickables = new ArrayList<IClickable>();
 	private List<IClickable> teamShopClickables = new ArrayList<IClickable>();
 	private Map<UUID, Integer> selectedItemShopCategory = new HashMap<UUID, Integer>();
@@ -382,53 +377,11 @@ public class GameLogic implements Listener {
 			// Setup item shop NPC
 			VillagerNPC itemShopNPC = new VillagerNPC(base.getItemShop(gameWorld.getWorld()).clone().add(0.5, 0, 0.5), "DESERT", "ARMORER", MainConfig.getInstance().getItemShopName(), players);
 			itemShopNPCs.add(itemShopNPC);
-			
-			UseEntityPacketListener itemShopNPCListener = new UseEntityPacketListener(itemShopNPC.getEntityId()) {
-				@Override
-				public void onUse(String action, Player player) {
-					if (action.equals("INTERACT")) {
-						// Call that on the main thread
-						Bukkit.getScheduler().callSyncMethod(BedwarsPlugin.getInstance(), new Callable<Void>() {
-							@Override
-							public Void call() throws Exception {
-								player.openInventory(ItemShopConfig.getInstance().getShop().getCategoryListInventory());
-								return null;
-							}
-						});
-					}
-				}
-			};
-			
-			itemShopNPCListeners.add(itemShopNPCListener);
-			
-			for (GamePlayer gamePlayer : syncPlayersList)
-				BedwarsPlugin.getInstance().addPacketListener(gamePlayer.getPlayer(), itemShopNPCListener);
-			
+
 			// Setup team shop NPC, if it is not null
 			if (base.getTeamShop(gameWorld.getWorld()) != null) {
 				VillagerNPC teamShopNPC = new VillagerNPC(base.getTeamShop(gameWorld.getWorld()).clone().add(0.5, 0, 0.5), "SNOW", "CLERIC", MainConfig.getInstance().getTeamShopName(), players);
 				teamShopNPCs.add(teamShopNPC);
-				
-				UseEntityPacketListener teamShopNPCListener = new UseEntityPacketListener(teamShopNPC.getEntityId()) {
-					@Override
-					public void onUse(String action, Player player) {
-						if (action.equals("INTERACT")) {
-							// Call that on the main thread
-							Bukkit.getScheduler().callSyncMethod(BedwarsPlugin.getInstance(), new Callable<Void>() {
-								@Override
-								public Void call() throws Exception {
-									player.openInventory(TeamShopConfig.getInstance().getShop().getCategoryListInventory());
-									return null;
-								}
-							});
-						}
-					}
-				};
-				
-				teamShopNPCListeners.add(teamShopNPCListener);
-				
-				for (Player player : players)
-					BedwarsPlugin.getInstance().addPacketListener(player, teamShopNPCListener);
 			}
 		}
 		
@@ -634,6 +587,31 @@ public class GameLogic implements Listener {
 		}
 	}
 	
+	@EventHandler
+	public void onPlayerUseUnknownEntity(PlayerUseUnknownEntityEvent event) {
+		Player player = event.getPlayer();
+
+		// Check if the player is part of this game
+		if (!game.containsPlayer(player.getUniqueId()))
+			return;
+
+		if (!event.isAttack()) {
+			for (VillagerNPC npc : itemShopNPCs) {
+				if (npc.getEntityId() == event.getEntityId()) {
+					player.openInventory(ItemShopConfig.getInstance().getShop().getCategoryListInventory());
+					break;
+				}
+			}
+
+			for (VillagerNPC npc : teamShopNPCs) {
+				if (npc.getEntityId() == event.getEntityId()) {
+					player.openInventory(TeamShopConfig.getInstance().getShop().getCategoryListInventory());
+					break;
+				}
+			}
+		}
+	}
+
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
@@ -1106,12 +1084,14 @@ public class GameLogic implements Listener {
 				}
 				
 				for (Player p : gameWorld.getWorld().getPlayers()) {
-					//ReflectionUtils reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
-					
+					ReflectionUtils reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
+
 					try {
-						ServerPlayer entityPlayerVictim = ((CraftPlayer)player).getHandle();
+						ServerPlayer entityPlayerVictim = reflectionUtils.playerToNMSPlayer(player);
+						//ServerPlayer entityPlayerVictim = ((CraftPlayer)player).getHandle();
 						//Object entityPlayerVictim = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(player));
-						ServerPlayer entityPlayer = ((CraftPlayer)p).getHandle();
+						ServerPlayer entityPlayer = reflectionUtils.playerToNMSPlayer(p);
+						//ServerPlayer entityPlayer = ((CraftPlayer)p).getHandle();
 						//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(p));
 						
 						MutableComponent deathMessage =  Component.literal(MessagesConfig.getInstance().getStringValue(p.getLocale(), "prefix"));
@@ -1125,7 +1105,7 @@ public class GameLogic implements Listener {
 						
 						entityPlayer.sendSystemMessage(deathMessage);
 						//reflectionUtils.entityPlayerSendMessageMethod.invoke(entityPlayer, deathMessage);
-					} catch (IllegalArgumentException e) {
+					} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 						e.printStackTrace();
 					}
 				}
@@ -1151,7 +1131,7 @@ public class GameLogic implements Listener {
 			if (event.getTo().getY() < player.getWorld().getMinHeight()) {
 				// Check if the player is a game player
 				if (game.containsPlayer(player.getUniqueId()))
-					PlayerUtils.damagePlayer(player, ((CraftWorld)player.getWorld()).getHandle().getLevel().damageSources().fellOutOfWorld(), 999);
+					PlayerUtils.damagePlayerVoid(player, 999);
 				else
 					player.teleport(getSpectatorSpawn());
 			}
@@ -1335,26 +1315,20 @@ public class GameLogic implements Listener {
 	}
 	
 	private void removePlayerListeners(Player player) {
-		for (UseEntityPacketListener itemShopNPCListener : itemShopNPCListeners)
-			BedwarsPlugin.getInstance().removePacketListener(player, itemShopNPCListener);
-		
-		for (UseEntityPacketListener teamShopNPCListener : teamShopNPCListeners)
-			BedwarsPlugin.getInstance().removePacketListener(player, teamShopNPCListener);
-		
 		for (IClickable itemShopClickable : itemShopClickables) {
 			if (itemShopClickable.getPlayer().equals(player)) {
 				BedwarsPlugin.getInstance().removeClickable(itemShopClickable);
 				break;
 			}
 		}
-		
+
 		for (IClickable teamShopClickable : teamShopClickables) {
 			if (teamShopClickable.getPlayer().equals(player)) {
 				BedwarsPlugin.getInstance().removeClickable(teamShopClickable);
 				break;
 			}
 		}
-		
+
 		BedwarsPlugin.getInstance().removePacketListener(player, packetListener);
 	}
 	

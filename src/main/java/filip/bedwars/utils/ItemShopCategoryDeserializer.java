@@ -1,6 +1,5 @@
 package filip.bedwars.utils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,6 @@ import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.game.shop.ArmorItemShopReward;
 import filip.bedwars.game.shop.ColoredGlassItemShopReward;
 import filip.bedwars.game.shop.ColoredWoolItemShopReward;

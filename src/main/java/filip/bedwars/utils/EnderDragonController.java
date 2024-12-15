@@ -12,11 +12,7 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -163,7 +159,8 @@ public class EnderDragonController {
 	public void respawn(Player... viewers) {
 		try {
 			for (Player p : viewers) {
-				ServerPlayer entityPlayer = ((CraftPlayer) p).getHandle();
+				ServerPlayer entityPlayer = reflectionUtils.playerToNMSPlayer(p);
+				//ServerPlayer entityPlayer = ((CraftPlayer) p).getHandle();
 				//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(p));
 				// PacketPlayOutSpawnEntityLiving packet = new PacketPlayOutSpawnEntityLiving(dragon);
 				ClientboundAddEntityPacket packet = new ClientboundAddEntityPacket((net.minecraft.world.entity.Entity)dragon);
@@ -173,7 +170,7 @@ public class EnderDragonController {
 				playerConnection.send(packet);
 				//reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
 			}
-		} catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 	}
@@ -181,7 +178,8 @@ public class EnderDragonController {
 	public void despawn(Player... viewers) {
 		try {
 			for (Player p : viewers) {
-				ServerPlayer entityPlayer = ((CraftPlayer) p).getHandle();
+				ServerPlayer entityPlayer = reflectionUtils.playerToNMSPlayer(p);
+				//ServerPlayer entityPlayer = ((CraftPlayer) p).getHandle();
 				//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(p));
 				// PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(dragon.getId());
 				ClientboundRemoveEntitiesPacket packet = new ClientboundRemoveEntitiesPacket(dragon.getId());
@@ -191,7 +189,7 @@ public class EnderDragonController {
 				playerConnection.send(packet);
 				//reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
 			}
-		} catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 	}
@@ -207,14 +205,15 @@ public class EnderDragonController {
 		try {
 			// WorldServer worldServer = ((CraftWorld)loc.getWorld()).getHandle();
 			//Object worldServer = reflectionUtils.craftWorldGetHandleMethod.invoke(reflectionUtils.craftWorldClass.cast(loc.getWorld()));
-			ServerLevel worldServer = ((CraftWorld)loc.getWorld()).getHandle();
+			ServerLevel worldServer = reflectionUtils.worldToNMSWorld(loc.getWorld());
+			//ServerLevel worldServer = ((CraftWorld)loc.getWorld()).getHandle();
 			// dragon = new EntityEnderDragon(EntityTypes.ENDER_DRAGON, worldServer);
 			dragon = new EnderDragon(net.minecraft.world.entity.EntityType.ENDER_DRAGON, worldServer);
 			//dragon = reflectionUtils.entityEnderDragonConstructor.newInstance(reflectionUtils.entityTypesEnderDragonField.get(null), worldServer);
 			// dragon.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
 			dragon.moveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
 			//reflectionUtils.entitySetLocationMethod.invoke(dragon, loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
-		} catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 		respawn(viewers.keySet().toArray(new Player[0]));
@@ -226,8 +225,9 @@ public class EnderDragonController {
 		try {
 			while (iter.hasNext()) {
 				Player p = iter.next();
-				
-				CraftWorld craftWorld = dragon.level().getWorld();
+
+				Object craftWorld = dragon.level().getWorld();
+				//CraftWorld craftWorld = dragon.level().getWorld();
 				//Object craftWorld = reflectionUtils.worldGetWorldMethod.invoke(reflectionUtils.entityGetWorldMethod.invoke(dragon));
 				
 				if (!p.getWorld().getName().equals(reflectionUtils.craftWorldGetNameMethod.invoke(craftWorld))) {
@@ -249,8 +249,9 @@ public class EnderDragonController {
 						viewers.put(p, true);
 					}
 				}
-				
-				ServerPlayer entityPlayer = ((CraftPlayer) p).getHandle();
+
+				ServerPlayer entityPlayer = reflectionUtils.playerToNMSPlayer(p);
+				//ServerPlayer entityPlayer = ((CraftPlayer) p).getHandle();
 				//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(p));
 				// PacketPlayOutEntityTeleport packet = new PacketPlayOutEntityTeleport(dragon);
 				ClientboundTeleportEntityPacket packet = new ClientboundTeleportEntityPacket(dragon);

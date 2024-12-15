@@ -1,17 +1,13 @@
 package filip.bedwars.listener.player;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import io.netty.channel.Channel;
+import filip.bedwars.BedwarsPlugin;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
@@ -56,10 +52,11 @@ public class PacketReader {
 			//Field networkManagerField = playerConnectionClass.getField("networkManager");
 			//Class<?> networkManagerClass = Class.forName("net.minecraft.server." + versionStr + ".NetworkManager");
 			//Field channelField = networkManagerClass.getField("channel");
-			
-			CraftPlayer cPlayer = (CraftPlayer)player;
+
+			ServerPlayer entityPlayer = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(player);
+			//CraftPlayer cPlayer = (CraftPlayer)player;
 			//Object cPlayer = craftPlayerClass.cast(player);
-			ServerPlayer entityPlayer = cPlayer.getHandle();
+			//ServerPlayer entityPlayer = cPlayer.getHandle();
 			//Object entityPlayer = getHandleMethod.invoke(cPlayer);
 			ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
 			//Object playerConnection = playerConnectionField.get(entityPlayer);
@@ -69,7 +66,7 @@ public class PacketReader {
 			//channelPipeline = ((Channel) channelField.get(networkManager)).pipeline();
 			uninject(); // Avoid duplicate handler
 			channelPipeline.addBefore("packet_handler", "bedwars_handler_" + player.getName(), channelDuplexHandler);
-		} catch (IllegalArgumentException | SecurityException e) {
+		} catch (IllegalArgumentException | SecurityException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 	}
