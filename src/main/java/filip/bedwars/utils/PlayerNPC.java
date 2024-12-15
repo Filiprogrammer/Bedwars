@@ -1,9 +1,7 @@
 package filip.bedwars.utils;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,8 +13,8 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
 import filip.bedwars.BedwarsPlugin;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
-import net.minecraft.network.protocol.game.ClientboundAddPlayerPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
@@ -35,8 +33,7 @@ public class PlayerNPC {
 	public PlayerNPC(Location location, String customName, Player... viewers) {
 		spawn(location, customName, viewers);
 	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+
 	private void spawn(Location location, String customName, Player[] viewers) {
 		try {
 			ServerLevel nmsWorld = BedwarsPlugin.getInstance().reflectionUtils.worldToNMSWorld(location.getWorld());
@@ -55,7 +52,7 @@ public class PlayerNPC {
 			//entity = entityPlayerConstructor.newInstance(nmsServer, nmsWorld, gameprofile, playerInteractManagerConstructor.newInstance(nmsWorld));
 			entity.moveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 			//setLocationMethod.invoke(entity, location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
-		} catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
         
@@ -72,7 +69,22 @@ public class PlayerNPC {
 				//Object[] entityPlayerArray = (Object[]) java.lang.reflect.Array.newInstance(entityPlayerClass, 1);
 				//entityPlayerArray[0] = entity;
 				//sendPacketMethod.invoke(connection, packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)enumPlayerInfoActionClass, "ADD_PLAYER"), entityPlayerArray));
-				connection.send(new ClientboundAddPlayerPacket(entity));
+
+				String bukkitVersion = Bukkit.getBukkitVersion();
+
+				if (bukkitVersion.compareTo("1.20.2-R0.1-SNAPSHOT") >= 0) {
+					connection.send(new ClientboundAddEntityPacket(entity));
+				} else {
+					try {
+						Class<?> clientboundAddPlayerPacketClass = Class.forName("net.minecraft.network.protocol.game.ClientboundAddPlayerPacket");
+						Constructor<?> clientboundAddPlayerPacketConstructor = clientboundAddPlayerPacketClass.getConstructor(ServerPlayer.class);
+						Packet<?> addPlayerPacket = (Packet<?>) clientboundAddPlayerPacketConstructor.newInstance(entity);
+						connection.send(addPlayerPacket);
+					} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+						e.printStackTrace();
+					}
+				}
+
 				//sendPacketMethod.invoke(connection, packetPlayOutNamedEntitySpawnConstructor.newInstance(entity));
 				float var0 = (location.getYaw() * 256.0F / 360.0F);
 		        int var1 = (int)var0;
@@ -88,7 +100,7 @@ public class PlayerNPC {
 						e.printStackTrace();
 					}*/
 				}, 5L);
-			} catch (IllegalArgumentException e) {
+			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
 			}
         }

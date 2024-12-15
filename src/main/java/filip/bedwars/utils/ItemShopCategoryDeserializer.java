@@ -1,14 +1,15 @@
 package filip.bedwars.utils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.game.shop.ArmorItemShopReward;
 import filip.bedwars.game.shop.ColoredGlassItemShopReward;
 import filip.bedwars.game.shop.ColoredWoolItemShopReward;
@@ -99,7 +100,8 @@ public class ItemShopCategoryDeserializer {
 						
 						if (blastProofObject != null && blastProofObject instanceof Boolean && (Boolean)blastProofObject) {
 							try {
-								net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
+								net.minecraft.world.item.ItemStack nmsItemStack = (net.minecraft.world.item.ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, itemStack);
+								//net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
 								//Object nmsItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, itemStack);
 								CompoundTag nbtTagCompound = nmsItemStack.getOrCreateTag();
 								//Object nbtTagCompound = BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsItemStack);
@@ -107,9 +109,10 @@ public class ItemShopCategoryDeserializer {
 								//BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundSetMethod.invoke(nbtTagCompound, "bedwars-blast-proof", BedwarsPlugin.getInstance().reflectionUtils.nbtTagIntConstructor.newInstance(0));
 								nmsItemStack.setTag(nbtTagCompound);
 								//BedwarsPlugin.getInstance().reflectionUtils.itemStackSetTagMethod.invoke(nmsItemStack, nbtTagCompound);
-								itemStack = CraftItemStack.asBukkitCopy(nmsItemStack);
+								itemStack = (ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsBukkitCopyMethod.invoke(null, nmsItemStack);
+								//itemStack = CraftItemStack.asBukkitCopy(nmsItemStack);
 								//itemStack = (ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsBukkitCopyMethod.invoke(null, nmsItemStack);
-							} catch (IllegalArgumentException e) {
+							} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 								e.printStackTrace();
 							}
 						}
@@ -129,7 +132,8 @@ public class ItemShopCategoryDeserializer {
 								break;
 							case "FIREBALL":
 								try {
-									net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
+									net.minecraft.world.item.ItemStack nmsItemStack = (net.minecraft.world.item.ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, itemStack);
+									//net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(itemStack);
 									//Object nmsItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, itemStack);
 									CompoundTag nbtTagCompound = nmsItemStack.getOrCreateTag();
 									//Object nbtTagCompound = BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsItemStack);
@@ -138,7 +142,7 @@ public class ItemShopCategoryDeserializer {
 									nmsItemStack.setTag(nbtTagCompound);
 									//BedwarsPlugin.getInstance().reflectionUtils.itemStackSetTagMethod.invoke(nmsItemStack, nbtTagCompound);
 									rewards.add(new ItemShopReward(nmsItemStack.asBukkitCopy()));
-								} catch (IllegalArgumentException e) {
+								} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 									e.printStackTrace();
 								}
 								break;

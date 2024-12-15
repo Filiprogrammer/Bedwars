@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -23,7 +22,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Bed;
-import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
@@ -633,7 +631,8 @@ public class GameLogic implements Listener {
 		if (event.hasItem()) {
 			if (event.getAction() == org.bukkit.event.block.Action.RIGHT_CLICK_AIR || event.getAction() == org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK) {
 				try {
-					net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(event.getItem());
+					net.minecraft.world.item.ItemStack nmsItemStack = (net.minecraft.world.item.ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, event.getItem());
+					//net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(event.getItem());
 					//Object nmsItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, event.getItem());
 					boolean hasTag = nmsItemStack.hasTag();
 					//boolean hasTag = (boolean) BedwarsPlugin.getInstance().reflectionUtils.itemStackHasTagMethod.invoke(nmsItemStack);
@@ -645,7 +644,8 @@ public class GameLogic implements Listener {
 						boolean shouldLaunchFireball = false;
 						
 						if (event.getHand() == EquipmentSlot.HAND) {
-							net.minecraft.world.item.ItemStack nmsOffHandItemStack = CraftItemStack.asNMSCopy(player.getInventory().getItemInOffHand());
+							net.minecraft.world.item.ItemStack nmsOffHandItemStack = (net.minecraft.world.item.ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, player.getInventory().getItemInOffHand());
+							//net.minecraft.world.item.ItemStack nmsOffHandItemStack = CraftItemStack.asNMSCopy(player.getInventory().getItemInOffHand());
 							//Object nmsOffHandItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, player.getInventory().getItemInOffHand());
 
 							hasTag = nmsOffHandItemStack.hasTag();
@@ -669,7 +669,7 @@ public class GameLogic implements Listener {
 							SoundPlayer.playSound("fireball-shoot", player);
 						}
 					}
-				} catch (IllegalArgumentException | SecurityException e) {
+				} catch (IllegalArgumentException | SecurityException | IllegalAccessException | InvocationTargetException e) {
 					e.printStackTrace();
 				}
 			}
@@ -796,8 +796,9 @@ public class GameLogic implements Listener {
 			//Method getTagMethod = nmsItemStackClass.getMethod("getTag");
 			//Class<?> nbtTagCompoundClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagCompound");
 			//Method hasKeyMethod = nbtTagCompoundClass.getMethod("hasKey", String.class);
-			
-			net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(event.getItemInHand());
+
+			net.minecraft.world.item.ItemStack nmsItemStack = (net.minecraft.world.item.ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, event.getItemInHand());
+			//net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(event.getItemInHand());
 			//Object nmsItemStack = asNMSCopyMethod.invoke(null, event.getItemInHand());
 			
 			boolean hasTag = nmsItemStack.hasTag();
@@ -811,7 +812,7 @@ public class GameLogic implements Listener {
 				block.setMetadata("bedwars_blast_proof", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
 			else
 				block.removeMetadata("bedwars_blast_proof", BedwarsPlugin.getInstance());
-		} catch (IllegalArgumentException | SecurityException e) {
+		} catch (IllegalArgumentException | SecurityException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 		

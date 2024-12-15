@@ -68,7 +68,7 @@ public class ReflectionUtils {
 	public final Method dragonControllerStrafeAMethod;
 	public final Method dragonControllerChargeAMethod;
 	public final Method craftItemStackAsNMSCopyMethod;
-	//public Method craftItemStackAsBukkitCopyMethod;
+	public final Method craftItemStackAsBukkitCopyMethod;
 	//public Method itemStackGetOrCreateTagMethod;
 	//public Method nbtTagCompoundSetMethod;
 	//public Method nbtTagCompoundHasKeyMethod;
@@ -200,7 +200,7 @@ public class ReflectionUtils {
 		//nbtTagCompoundClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagCompound");
 		craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".inventory.CraftItemStack");
 		craftItemStackAsNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
-		//craftItemStackAsBukkitCopyMethod = craftItemStackClass.getMethod("asBukkitCopy", itemStackClass);
+		craftItemStackAsBukkitCopyMethod = craftItemStackClass.getMethod("asBukkitCopy", craftItemStackClass);
 		//itemStackGetOrCreateTagMethod = itemStackClass.getMethod("getOrCreateTag");
 		//nbtTagIntClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagInt");
 		//nbtBaseClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTBase");
