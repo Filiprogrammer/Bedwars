@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "filip.bedwars"
-version = "1.1"
+version = "1.2"
 description = "Highly customizable Bedwars plugin"
 
 java {
@@ -42,10 +42,9 @@ tasks {
   processResources {
     filteringCharset = Charsets.UTF_8.name() // We want UTF-8 for everything
     val props = mapOf(
-      "name" to project.name,
       "version" to project.version,
       "description" to project.description,
-      "api-version" to "1.17"
+      "apiVersion" to "1.17"
     )
     inputs.properties(props)
     filesMatching("plugin.yml") {

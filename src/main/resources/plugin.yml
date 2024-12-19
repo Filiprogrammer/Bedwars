@@ -1,5 +1,9 @@
+name: Bedwars
+version: $version
 author: Filiprogrammer
+description: $description
 main: filip.bedwars.BedwarsPlugin
+api-version: $apiVersion
 softdepend: [Multiverse-Core]
 commands:
   bw:
