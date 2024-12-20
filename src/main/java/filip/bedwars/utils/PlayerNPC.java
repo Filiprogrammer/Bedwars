@@ -35,6 +35,8 @@ public class PlayerNPC {
 	}
 
 	private void spawn(Location location, String customName, Player[] viewers) {
+		String bukkitVersion = Bukkit.getBukkitVersion();
+
 		try {
 			ServerLevel nmsWorld = BedwarsPlugin.getInstance().reflectionUtils.worldToNMSWorld(location.getWorld());
 			//CraftWorld craftWorld = (CraftWorld)location.getWorld();
@@ -48,38 +50,49 @@ public class PlayerNPC {
 			//Object nmsServer = getServerCraftServerMethod.invoke(craftServer);
 			GameProfile gameprofile = new GameProfile(UUID.randomUUID(), customName);
 			gameprofile.getProperties().put("textures", new Property("textures", "eyJ0aW1lc3RhbXAiOjE1NjE3NjI0MTIxMDksInByb2ZpbGVJZCI6IjA5NzJiZGQxNGI4NjQ5ZmI5ZWNjYTM1M2Y4NDkxYTUxIiwicHJvZmlsZU5hbWUiOiJNSEZfTGF2YVNsaW1lIiwic2lnbmF0dXJlUmVxdWlyZWQiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9kOTBkNjFlOGNlOTUxMWEwYTJiNWVhMjc0MmNiMWVmMzYxMzEzODBlZDQxMjllMWIxNjNjZThmZjAwMGRlOGVhIn19fQ==", "ltQQFsgURcn3q235uAc0NsZBuziCQtDrlKDwrAYf7n2isEyNHATncmvCxQf14K8PJJ+vw/vIecQsiqdj7xSw3sWGsWflSppuVqmA2K2S0mBUFdEByHVVVs8NyqIoZZZGgUDe2L/PjNm2hewdxZDUx3EvU7KoeqyoILEna75XWPrY/QR+T30wOLBxvqeJ1j6N4LcJlIFhPq8DUvB6Z5QKPpldMOrNlBxjVwbsalUfcPpsqGZf6PyCBp/HZIy1q0XWbY4li68Vux1txDQZXpDRrbfg6VLzzZuwcVdtny3EaXb0pI+NGFW8BbaaTaZBl8nxxhfT0aoX7KaGffa+ugF7pmKWTQV4zDNTaupa3+ZMXDF8scszw+qUnbJmxQf274Ulk36K/srU9pBPyVmsN28Te/x/N9XZggulzgSjUM4IkrwESVdl1xl90ATlh4GsCD/KojBc8HO5Tmjr7Dt6+FiZwMzsyKW+cv7tVq7SAjn0r86KwgICea8oTdk7rQGn2hdUNkzdcMet/Dv6UzPYGbrNkvEQEfpoikK74ZZONw1XCoAMPRN81DL3PnVa7xJ/zyFHqluA50vBUvsaj/LJwXAaO5dyBnx7hy8Fmd9EYqFyHZxpTIeoiyIx0sbBSH3LH9OxbFn2uPOe6hxoO5vfNwEq9ryLy4hNq/vr/sYWzomvPGQ="));
-	        entity = new ServerPlayer(nmsServer, nmsWorld, gameprofile, ClientInformation.createDefault());
+
+			if (bukkitVersion.compareTo("1.20.2-R0.1-SNAPSHOT") >= 0) {
+				entity = new ServerPlayer(nmsServer, nmsWorld, gameprofile, ClientInformation.createDefault());
+			} else {
+				entity = (ServerPlayer)BedwarsPlugin.getInstance().reflectionUtils.serverPlayerConstructor.newInstance(nmsServer, nmsWorld, gameprofile);
+			}
+
 			//entity = entityPlayerConstructor.newInstance(nmsServer, nmsWorld, gameprofile, playerInteractManagerConstructor.newInstance(nmsWorld));
-			entity.moveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+			//entity.moveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+			BedwarsPlugin.getInstance().reflectionUtils.entitySetLocationMethod.invoke(entity, location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 			//setLocationMethod.invoke(entity, location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
-		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
 			e.printStackTrace();
 		}
         
-        for(Player p : viewers){
+        for (Player p : viewers) {
         	try {
 				ServerPlayer entityPlayer = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(p);
 				//CraftPlayer craftPlayer = (CraftPlayer)p;
         		//Object craftPlayer = craftPlayerClass.cast(p);
 				//ServerPlayer entityPlayer = craftPlayer.getHandle();
 				//Object entityPlayer = getHandleCraftPlayerMethod.invoke(craftPlayer);
-				ServerGamePacketListenerImpl connection = entityPlayer.connection;
+				//ServerGamePacketListenerImpl connection = entityPlayer.connection;
+				ServerGamePacketListenerImpl connection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
 				//Object connection = playerConnectionField.get(entityPlayer);
-				connection.send(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, entity));
+				if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
+					connection.send(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, entity));
+				} else {
+					Object playerInfoPacket = BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)BedwarsPlugin.getInstance().reflectionUtils.enumPlayerInfoActionClass, "ADD_PLAYER"), new ServerPlayer[]{entity});
+					BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, playerInfoPacket);
+				}
 				//Object[] entityPlayerArray = (Object[]) java.lang.reflect.Array.newInstance(entityPlayerClass, 1);
 				//entityPlayerArray[0] = entity;
 				//sendPacketMethod.invoke(connection, packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)enumPlayerInfoActionClass, "ADD_PLAYER"), entityPlayerArray));
-
-				String bukkitVersion = Bukkit.getBukkitVersion();
 
 				if (bukkitVersion.compareTo("1.20.2-R0.1-SNAPSHOT") >= 0) {
 					connection.send(new ClientboundAddEntityPacket(entity));
 				} else {
 					try {
-						Class<?> clientboundAddPlayerPacketClass = Class.forName("net.minecraft.network.protocol.game.ClientboundAddPlayerPacket");
-						Constructor<?> clientboundAddPlayerPacketConstructor = clientboundAddPlayerPacketClass.getConstructor(ServerPlayer.class);
+						Class<?> clientboundAddPlayerPacketClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn");
+						Constructor<?> clientboundAddPlayerPacketConstructor = clientboundAddPlayerPacketClass.getConstructor(net.minecraft.world.entity.player.Player.class);
 						Packet<?> addPlayerPacket = (Packet<?>) clientboundAddPlayerPacketConstructor.newInstance(entity);
-						connection.send(addPlayerPacket);
+						BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, addPlayerPacket);
 					} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
 						e.printStackTrace();
 					}
@@ -89,18 +102,28 @@ public class PlayerNPC {
 				float var0 = (location.getYaw() * 256.0F / 360.0F);
 		        int var1 = (int)var0;
 		        byte headYaw = (byte)((var0 < var1) ? (var1 - 1) : var1);
-				connection.send(new ClientboundRotateHeadPacket(entity, headYaw));
+				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, new ClientboundRotateHeadPacket(entity, headYaw));
 				//sendPacketMethod.invoke(connection, packetPlayOutEntityHeadRotationConstructor.newInstance(entity, headYaw));
-				
+
 				Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), () -> {
-					connection.send(new ClientboundPlayerInfoRemovePacket(List.of(entity.getUUID())));
+					if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
+						connection.send(new ClientboundPlayerInfoRemovePacket(List.of(entity.getUUID())));
+					} else {
+						try {
+							Object playerInfoPacket = BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)BedwarsPlugin.getInstance().reflectionUtils.enumPlayerInfoActionClass, "REMOVE_PLAYER"), new ServerPlayer[]{entity});
+							BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, playerInfoPacket);
+						} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+							e.printStackTrace();
+						}
+					}
+					
 					/*try {
 						sendPacketMethod.invoke(connection, packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)enumPlayerInfoActionClass, "REMOVE_PLAYER"), entityPlayerArray));
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
 						e.printStackTrace();
 					}*/
 				}, 5L);
-			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
 				e.printStackTrace();
 			}
         }
@@ -109,21 +132,25 @@ public class PlayerNPC {
 	public void teleport(double x, double y, double z, float yaw, float pitch, Player... viewers) {
 		for (Player p : viewers) {
 			try {
-				entity.moveTo(x, y, z, yaw, pitch);
+				//entity.moveTo(x, y, z, yaw, pitch);
+				BedwarsPlugin.getInstance().reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, yaw, pitch);
 				//setLocationMethod.invoke(entity, x, y, z, yaw, pitch);
 				ServerPlayer entityPlayer = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(p);
 				//CraftPlayer craftPlayer = (CraftPlayer)p;
 				//Object craftPlayer = craftPlayerClass.cast(p);
 				//ServerPlayer entityPlayer = craftPlayer.getHandle();
 				//Object entityPlayer = getHandleCraftPlayerMethod.invoke(craftPlayer);
-				ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
+				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
+				//ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
 				//Object playerConnection = playerConnectionField.get(entityPlayer);
-				playerConnection.send(new ClientboundTeleportEntityPacket(entity));
+				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, new ClientboundTeleportEntityPacket(entity));
+				//playerConnection.send(new ClientboundTeleportEntityPacket(entity));
 				//sendPacketMethod.invoke(playerConnection, packetPlayOutEntityTeleportConstructor.newInstance(entity));
 				float var0 = (yaw * 256.0F / 360.0F);
 		        int var1 = (int)var0;
 		        byte headYaw = (byte)((var0 < var1) ? (var1 - 1) : var1);
-				playerConnection.send(new ClientboundRotateHeadPacket(entity, headYaw));
+				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, new ClientboundRotateHeadPacket(entity, headYaw));
+				//playerConnection.send(new ClientboundRotateHeadPacket(entity, headYaw));
 				//sendPacketMethod.invoke(playerConnection, packetPlayOutEntityHeadRotationConstructor.newInstance(entity, headYaw));
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
@@ -139,9 +166,17 @@ public class PlayerNPC {
 				//Object craftPlayer = craftPlayerClass.cast(p);
 				//ServerPlayer entityPlayer = craftPlayer.getHandle();
 				//Object entityPlayer = getHandleCraftPlayerMethod.invoke(craftPlayer);
-				ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
+				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
+				//ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
 				//Object playerConnection = playerConnectionField.get(entityPlayer);
-				playerConnection.send(new ClientboundRemoveEntitiesPacket(entity.getId()));
+
+				// .hashCode() does the same thing as .getId()
+				// We do not use .getId() because the method name is obfuscated on some nms version.
+				int entityId = entity.hashCode();
+
+				ClientboundRemoveEntitiesPacket removeEntitiesPacket = new ClientboundRemoveEntitiesPacket(entityId);
+				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, removeEntitiesPacket);
+				//playerConnection.send(new ClientboundRemoveEntitiesPacket(entity.getId()));
 				//sendPacketMethod.invoke(playerConnection, packetPlayOutEntityDestroyConstructor.newInstance(new int[] {(int) getIdMethod.invoke(entity)}));
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();

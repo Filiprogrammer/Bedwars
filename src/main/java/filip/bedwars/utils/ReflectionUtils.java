@@ -1,6 +1,7 @@
 package filip.bedwars.utils;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -13,6 +14,7 @@ import filip.bedwars.BedwarsPlugin;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public class ReflectionUtils {
 
@@ -47,13 +49,13 @@ public class ReflectionUtils {
 	public final Class<?> villagerTypeClass;
 	public final Class<?> villagerProfessionClass;
 	public final Class<?> entityHumanClass;
-	//public Class<?> packetPlayOutPlayerInfoClass;
-	//public Class<?> enumPlayerInfoActionClass;
+	public final Class<?> packetPlayOutPlayerInfoClass;
+	public final Class<?> enumPlayerInfoActionClass;
 	//public Class<?> packetPlayOutNamedEntitySpawnClass;
 	//public Class<?> damageSourceClass;
 	//public Class<?> combatTrackerClass;
 	//public Method entityEnderDragonTickMethod;
-	//public Method entitySetLocationMethod;
+	public Method entitySetLocationMethod;
 	//public Method entityGetIdMethod;
 	//public Method entityGetWorldMethod;
 	public final Method craftWorldGetHandleMethod;
@@ -61,7 +63,7 @@ public class ReflectionUtils {
 	public final Method craftPlayerGetHandleMethod;
 	public final Method craftServerGetServerMethod;
 	public final Method worldGetWorldMethod;
-	//public Method playerConnectionSendPacketMethod;
+	public Method playerConnectionSendPacketMethod;
 	//public Method entityEnderDragonGetDragonControllerManagerMethod;
 	public Method dragonControllerManagerSetControllerPhaseMethod;
 	public Method dragonControllerManagerBMethod;
@@ -83,7 +85,7 @@ public class ReflectionUtils {
 	//public Method entityPlayerGetCombatTrackerMethod;
 	//public Method entityPlayerSendMessageMethod;
 	//public Method combatTrackerGetDeathMessageMethod;
-	//public Field entityPlayerPlayerConnectionField;
+	public Field entityPlayerPlayerConnectionField;
 	//public Field entityTypesEnderDragonField;
 	//public Field entityLocXField;
 	//public Field entityLocYField;
@@ -103,8 +105,10 @@ public class ReflectionUtils {
 	public Constructor<?> entityVillagerConstructor;
 	//public Constructor<?> chatComponentConstructor;
 	public final Constructor<?> villagerDataConstructor;
-	//public Constructor<?> packetPlayOutPlayerInfoConstructor;
+	public Constructor<?> packetPlayOutPlayerInfoConstructor;
 	//public Constructor<?> packetPlayOutNamedEntitySpawnConstructor;
+
+	public final Constructor<?> serverPlayerConstructor;
 
 	public ReflectionUtils() throws ClassNotFoundException, NoSuchMethodException, SecurityException {
 		String serverVersion = BedwarsPlugin.getInstance().getServerVersion();
@@ -134,20 +138,42 @@ public class ReflectionUtils {
 		villagerTypeClass = Class.forName("net.minecraft.world.entity.npc.VillagerType");
 		villagerProfessionClass = Class.forName("net.minecraft.world.entity.npc.VillagerProfession");
 		entityHumanClass = Class.forName("net.minecraft.world.entity.player.EntityHuman");
-		//packetPlayOutPlayerInfoClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutPlayerInfo");
-		//enumPlayerInfoActionClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
+		packetPlayOutPlayerInfoClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo");
+		enumPlayerInfoActionClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
 		//packetPlayOutNamedEntitySpawnClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutNamedEntitySpawn");
 		//damageSourceClass = Class.forName("net.minecraft.server." + serverVersion + ".DamageSource");
 		//combatTrackerClass = Class.forName("net.minecraft.server." + serverVersion + ".CombatTracker");
 		//entityEnderDragonTickMethod = entityEnderDragonClass.getMethod("tick");
+
+		for (Method method : entityClass.getMethods()) {
+			if (method.getParameterCount() != 5)
+				continue;
+
+			Class<?>[] paramTypes = method.getParameterTypes();
+			if (paramTypes[0] == double.class && paramTypes[1] == double.class && paramTypes[2] == double.class && paramTypes[3] == float.class && paramTypes[4] == float.class) {
+				entitySetLocationMethod = method;
+				break;
+			}
+		}
 		//entitySetLocationMethod = entityClass.getMethod("setLocation", double.class, double.class, double.class, float.class, float.class);
+
 		//entityGetIdMethod = entityClass.getMethod("getId");
+		// Alternative: .hashCode() (also just returns the id)
+		// 1.17.1: .getId()
+		// 1.19 & 1.19.1: .ae()
+
 		//entityGetWorldMethod = entityClass.getMethod("getWorld");
 		craftWorldGetHandleMethod = craftWorldClass.getMethod("getHandle");
 		craftWorldGetNameMethod = craftWorldClass.getMethod("getName");
 		craftPlayerGetHandleMethod = craftPlayerClass.getMethod("getHandle");
 		craftServerGetServerMethod = craftServerClass.getMethod("getServer");
 		worldGetWorldMethod = worldClass.getMethod("getWorld");
+		for (Method method : playerConnectionClass.getMethods()) {
+			if (method.getParameterCount() == 1 && method.getParameterTypes()[0] == packetClass) {
+				playerConnectionSendPacketMethod = method;
+				break;
+			}
+		}
 		//playerConnectionSendPacketMethod = playerConnectionClass.getMethod("sendPacket", packetClass);
 		//entityEnderDragonGetDragonControllerManagerMethod = entityEnderDragonClass.getMethod("getDragonControllerManager");
 		for (Method method : dragonControllerManagerClass.getMethods()) {
@@ -172,7 +198,15 @@ public class ReflectionUtils {
 		//entityPlayerGetCombatTrackerMethod = entityPlayerClass.getMethod("getCombatTracker");
 		//entityPlayerSendMessageMethod = entityPlayerClass.getMethod("sendMessage", iChatBaseComponentClass);
 		//combatTrackerGetDeathMessageMethod = combatTrackerClass.getMethod("getDeathMessage");
+
+		for (Field field : entityPlayerClass.getFields()) {
+			if (field.getType() == ServerGamePacketListenerImpl.class) {
+				entityPlayerPlayerConnectionField = field;
+				break;
+			}
+		}
 		//entityPlayerPlayerConnectionField = entityPlayerClass.getField("playerConnection");
+
 		//entityTypesEnderDragonField = entityTypesClass.getField("ENDER_DRAGON");
 		//entityLocXField = entityClass.getDeclaredField("xo");
 		//entityLocXField.setAccessible(true);
@@ -200,7 +234,7 @@ public class ReflectionUtils {
 		//nbtTagCompoundClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagCompound");
 		craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".inventory.CraftItemStack");
 		craftItemStackAsNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
-		craftItemStackAsBukkitCopyMethod = craftItemStackClass.getMethod("asBukkitCopy", craftItemStackClass);
+		craftItemStackAsBukkitCopyMethod = craftItemStackClass.getMethod("asBukkitCopy", net.minecraft.world.item.ItemStack.class);
 		//itemStackGetOrCreateTagMethod = itemStackClass.getMethod("getOrCreateTag");
 		//nbtTagIntClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagInt");
 		//nbtBaseClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTBase");
@@ -220,8 +254,10 @@ public class ReflectionUtils {
 		}
 		//chatComponentConstructor = chatComponentTextClass.getConstructor(String.class);
 		villagerDataConstructor = villagerDataClass.getConstructor(villagerTypeClass, villagerProfessionClass, int.class);
-		//packetPlayOutPlayerInfoConstructor = packetPlayOutPlayerInfoClass.getConstructor(enumPlayerInfoActionClass, java.lang.reflect.Array.newInstance(entityPlayerClass, 0).getClass());
+		packetPlayOutPlayerInfoConstructor = packetPlayOutPlayerInfoClass.getConstructor(enumPlayerInfoActionClass, java.lang.reflect.Array.newInstance(entityPlayerClass, 0).getClass());
 		//packetPlayOutNamedEntitySpawnConstructor = packetPlayOutNamedEntitySpawnClass.getConstructor(entityHumanClass);
+
+		serverPlayerConstructor = ServerPlayer.class.getConstructors()[0];
 	}
 
 	public ServerPlayer playerToNMSPlayer(Player player) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
