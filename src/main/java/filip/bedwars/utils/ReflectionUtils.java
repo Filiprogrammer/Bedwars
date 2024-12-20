@@ -4,17 +4,25 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.util.List;
 
+import javax.annotation.Nullable;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import filip.bedwars.BedwarsPlugin;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.entity.npc.VillagerDataHolder;
 
 public class ReflectionUtils {
 
@@ -43,9 +51,9 @@ public class ReflectionUtils {
 	//public Class<?> nbtTagIntClass;
 	//public Class<?> nbtBaseClass;
 	public final Class<?> entityVillagerClass;
-	public final Class<?> iChatBaseComponentClass;
+	//public final Class<?> iChatBaseComponentClass;
 	//public Class<?> chatComponentTextClass;
-	public final Class<?> villagerDataClass;
+	//public final Class<?> villagerDataClass;
 	public final Class<?> villagerTypeClass;
 	public final Class<?> villagerProfessionClass;
 	public final Class<?> entityHumanClass;
@@ -58,6 +66,7 @@ public class ReflectionUtils {
 	public Method entitySetLocationMethod;
 	//public Method entityGetIdMethod;
 	//public Method entityGetWorldMethod;
+	public Method entityGetEntityDataMethod;
 	public final Method craftWorldGetHandleMethod;
 	public final Method craftWorldGetNameMethod;
 	public final Method craftPlayerGetHandleMethod;
@@ -77,9 +86,9 @@ public class ReflectionUtils {
 	//public Method itemStackSetTagMethod;
 	//public Method itemStackHasTagMethod;
 	//public Method itemStackGetTagMethod;
-	//public Method entitySetCustomNameMethod;
-	//public Method entitySetCustomNameVisibleMethod;
-	//public Method entityVillagerSetVillagerDataMethod;
+	public Method entitySetCustomNameMethod;
+	public final Method entitySetCustomNameVisibleMethod;
+	public Method entityVillagerSetVillagerDataMethod;
 	//public Method damageSourceDamageEntityMethod;
 	//public Method iChatBaseComponentAddSiblingMethod;
 	//public Method entityPlayerGetCombatTrackerMethod;
@@ -95,7 +104,7 @@ public class ReflectionUtils {
 	//public Field dragonControllerPhaseChargingPlayerField;
 	//public Field dragonControllerPhaseLandingField;
 	//public Field dragonControllerPhaseLandingApproachField;
-	//public Field entityTypesVillagerField;
+	public Field entityTypesVillagerField;
 	//public Constructor<?> packetPlayOutSpawnEntityLivingConstructor;
 	//public Constructor<?> packetPlayOutEntityDestroyConstructor;
 	public Constructor<?> entityEnderDragonConstructor;
@@ -104,13 +113,16 @@ public class ReflectionUtils {
 	//public Constructor<?> nbtTagIntConstructor;
 	public Constructor<?> entityVillagerConstructor;
 	//public Constructor<?> chatComponentConstructor;
-	public final Constructor<?> villagerDataConstructor;
+	//public final Constructor<?> villagerDataConstructor;
 	public Constructor<?> packetPlayOutPlayerInfoConstructor;
 	//public Constructor<?> packetPlayOutNamedEntitySpawnConstructor;
 
 	public final Constructor<?> serverPlayerConstructor;
+	public Method componentNullToEmptyMethod;
+	public Method synchedEntityDataPackMethod;
 
 	public ReflectionUtils() throws ClassNotFoundException, NoSuchMethodException, SecurityException {
+		String bukkitVersion = Bukkit.getBukkitVersion();
 		String serverVersion = BedwarsPlugin.getInstance().getServerVersion();
 		craftWorldClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".CraftWorld");
 		craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".entity.CraftPlayer");
@@ -132,9 +144,9 @@ public class ReflectionUtils {
 		vec3DClass = Class.forName("net.minecraft.world.phys.Vec3D");
 		worldClass = Class.forName("net.minecraft.world.level.World");
 		entityVillagerClass = Class.forName("net.minecraft.world.entity.npc.EntityVillager");
-		iChatBaseComponentClass = Class.forName("net.minecraft.network.chat.IChatBaseComponent");
+		//iChatBaseComponentClass = Class.forName("net.minecraft.network.chat.IChatBaseComponent");
 		//chatComponentTextClass = Class.forName("net.minecraft.server." + serverVersion + ".ChatComponentText");
-		villagerDataClass = Class.forName("net.minecraft.world.entity.npc.VillagerData");
+		//villagerDataClass = Class.forName("net.minecraft.world.entity.npc.VillagerData");
 		villagerTypeClass = Class.forName("net.minecraft.world.entity.npc.VillagerType");
 		villagerProfessionClass = Class.forName("net.minecraft.world.entity.npc.VillagerProfession");
 		entityHumanClass = Class.forName("net.minecraft.world.entity.player.EntityHuman");
@@ -163,6 +175,14 @@ public class ReflectionUtils {
 		// 1.19 & 1.19.1: .ae()
 
 		//entityGetWorldMethod = entityClass.getMethod("getWorld");
+
+		for (Method method : entityClass.getMethods()) {
+			if (method.getParameterCount() == 0 && method.getReturnType() == SynchedEntityData.class) {
+				entityGetEntityDataMethod = method;
+				break;
+			}
+		}
+
 		craftWorldGetHandleMethod = craftWorldClass.getMethod("getHandle");
 		craftWorldGetNameMethod = craftWorldClass.getMethod("getName");
 		craftPlayerGetHandleMethod = craftPlayerClass.getMethod("getHandle");
@@ -191,8 +211,33 @@ public class ReflectionUtils {
 		dragonControllerStrafeAMethod = dragonControllerStrafeClass.getMethod("a", entityLivingClass);
 		dragonControllerChargeAMethod = dragonControllerChargeClass.getMethod("a", vec3DClass);
 		//entitySetCustomNameMethod = entityClass.getMethod("setCustomName", iChatBaseComponentClass);
-		//entitySetCustomNameVisibleMethod = entityClass.getMethod("setCustomNameVisible", boolean.class);
+		for (Method method : entityClass.getMethods()) {
+			if (method.getParameterCount() != 1)
+				continue;
+
+			if (method.getParameterTypes()[0] != net.minecraft.network.chat.Component.class)
+				continue;
+
+			if (method.getParameterAnnotations()[0][0].annotationType() == Nullable.class) {
+				entitySetCustomNameMethod = method;
+				break;
+			}
+		}
+		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0) {
+			entitySetCustomNameVisibleMethod = entityClass.getMethod("setCustomNameVisible", boolean.class);
+		} else {
+			entitySetCustomNameVisibleMethod = entityClass.getMethod("n", boolean.class);
+		}
 		//entityVillagerSetVillagerDataMethod = entityVillagerClass.getMethod("setVillagerData", villagerDataClass);
+		for (Method method : VillagerDataHolder.class.getMethods()) {
+			if (method.getParameterCount() != 1)
+				continue;
+
+			if (method.getParameterTypes()[0] == net.minecraft.world.entity.npc.VillagerData.class) {
+				entityVillagerSetVillagerDataMethod = method;
+				break;
+			}
+		}
 		//damageSourceDamageEntityMethod = entityPlayerClass.getMethod("damageEntity", damageSourceClass, float.class);
 		//iChatBaseComponentAddSiblingMethod = iChatBaseComponentClass.getMethod("addSibling", iChatBaseComponentClass);
 		//entityPlayerGetCombatTrackerMethod = entityPlayerClass.getMethod("getCombatTracker");
@@ -219,7 +264,23 @@ public class ReflectionUtils {
 		//dragonControllerPhaseChargingPlayerField = dragonControllerPhaseClass.getField("CHARGING_PLAYER");
 		//dragonControllerPhaseLandingField = dragonControllerPhaseClass.getField("LANDING");
 		//dragonControllerPhaseLandingApproachField = dragonControllerPhaseClass.getField("LANDING_APPROACH");
-		//entityTypesVillagerField = entityTypesClass.getField("VILLAGER");
+
+		for (Field field : entityTypesClass.getFields()) {
+			int modifiers = field.getModifiers();
+
+			if (!Modifier.isStatic(modifiers) || !Modifier.isFinal(modifiers))
+				continue;
+
+			if (field.getType() != net.minecraft.world.entity.EntityType.class)
+				continue;
+
+			ParameterizedType parameterizedType = (ParameterizedType)field.getGenericType();
+			if (parameterizedType.getActualTypeArguments()[0] == net.minecraft.world.entity.npc.Villager.class) {
+				entityTypesVillagerField = field;
+				break;
+			}
+		}
+
 		//packetPlayOutSpawnEntityLivingConstructor = packetPlayOutSpawnEntityLivingClass.getConstructor(entityLivingClass);
 		//packetPlayOutEntityDestroyConstructor = packetPlayOutEntityDestroyClass.getConstructor(new int[0].getClass());
 		for (Constructor<?> constructor : entityEnderDragonClass.getConstructors()) {
@@ -253,11 +314,37 @@ public class ReflectionUtils {
 			}
 		}
 		//chatComponentConstructor = chatComponentTextClass.getConstructor(String.class);
-		villagerDataConstructor = villagerDataClass.getConstructor(villagerTypeClass, villagerProfessionClass, int.class);
+		//villagerDataConstructor = villagerDataClass.getConstructor(villagerTypeClass, villagerProfessionClass, int.class);
 		packetPlayOutPlayerInfoConstructor = packetPlayOutPlayerInfoClass.getConstructor(enumPlayerInfoActionClass, java.lang.reflect.Array.newInstance(entityPlayerClass, 0).getClass());
 		//packetPlayOutNamedEntitySpawnConstructor = packetPlayOutNamedEntitySpawnClass.getConstructor(entityHumanClass);
 
 		serverPlayerConstructor = ServerPlayer.class.getConstructors()[0];
+
+		for (Method method : net.minecraft.network.chat.Component.class.getMethods()) {
+			if (method.getParameterCount() != 1)
+				continue;
+
+			if (method.getReturnType() != net.minecraft.network.chat.Component.class)
+				continue;
+
+			if (!Modifier.isStatic(method.getModifiers()))
+				continue;
+
+			if (method.getParameterTypes()[0] != String.class)
+				continue;
+
+			if (method.getParameterAnnotations()[0][0].annotationType() == Nullable.class) {
+				componentNullToEmptyMethod = method;
+				break;
+			}
+		}
+
+		for (Method method : SynchedEntityData.class.getMethods()) {
+			if (method.getParameterCount() == 0 && method.getReturnType() == List.class) {
+				synchedEntityDataPackMethod = method;
+				break;
+			}
+		}
 	}
 
 	public ServerPlayer playerToNMSPlayer(Player player) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
