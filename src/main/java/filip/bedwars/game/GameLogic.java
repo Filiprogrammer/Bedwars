@@ -105,6 +105,7 @@ import filip.bedwars.utils.TeamColorConverter;
 import filip.bedwars.utils.VillagerNPC;
 import filip.bedwars.world.GameWorld;
 import filip.bedwars.world.GameWorldManager;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
@@ -212,41 +213,57 @@ public class GameLogic implements Listener {
 		packetListener = new IPacketListener() {
 			public boolean writePacket(Object packet, Player player) {
 				if (packet instanceof ClientboundAddEntityPacket) {
-					int a = ((ClientboundAddEntityPacket)packet).getId();
+					try {
+						int a = (int)BedwarsPlugin.getInstance().reflectionUtils.clientboundAddEntityPacketGetIdMethod.invoke(packet);
 
-					for (Player p : gameWorld.getWorld().getPlayers())
-						if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
-							return false;
+						for (Player p : gameWorld.getWorld().getPlayers())
+							if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
+								return false;
+					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+						e.printStackTrace();
+					}
 
 					return true;
 				}
 
 				if (packet instanceof ClientboundSetEntityDataPacket) {
-					int a = ((ClientboundSetEntityDataPacket)packet).id();
+					try {
+						int a = (int)BedwarsPlugin.getInstance().reflectionUtils.clientboundSetEntityDataPacketIdMethod.invoke(packet);
 
-					for (Player p : gameWorld.getWorld().getPlayers())
-						if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
-							return false;
+						for (Player p : gameWorld.getWorld().getPlayers())
+							if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
+								return false;
+					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+						e.printStackTrace();
+					}
 
 					return true;
 				}
 
 				if (packet instanceof ClientboundUpdateAttributesPacket) {
-					int a = ((ClientboundUpdateAttributesPacket)packet).getEntityId();
+					try {
+						int a = (int)BedwarsPlugin.getInstance().reflectionUtils.clientboundUpdateAttributesPacketGetEntityIdMethod.invoke(packet);
 
-					for (Player p : gameWorld.getWorld().getPlayers())
-						if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
-							return false;
+						for (Player p : gameWorld.getWorld().getPlayers())
+							if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
+								return false;
+					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+						e.printStackTrace();
+					}
 
 					return true;
 				}
 
 				if (packet instanceof ClientboundSetEquipmentPacket) {
-					int a = ((ClientboundSetEquipmentPacket)packet).getEntity();
+					try {
+						int a = (int)BedwarsPlugin.getInstance().reflectionUtils.clientboundSetEquipmentPacketGetEntityIdMethod.invoke(packet);
 
-					for (Player p : gameWorld.getWorld().getPlayers())
-						if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
-							return false;
+						for (Player p : gameWorld.getWorld().getPlayers())
+							if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
+								return false;
+					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+						e.printStackTrace();
+					}
 
 					return true;
 				}
@@ -297,16 +314,37 @@ public class GameLogic implements Listener {
 					
 					return true;
 				}*/
-				
-				if (packet instanceof ClientboundPlayerInfoUpdatePacket) {
-					ClientboundPlayerInfoUpdatePacket playerInfoUpdatePacket = (ClientboundPlayerInfoUpdatePacket)packet;
-					List<ClientboundPlayerInfoUpdatePacket.Entry> b = playerInfoUpdatePacket.entries();
-					
-					for (ClientboundPlayerInfoUpdatePacket.Entry playerInfoData : b)
-						if (game.containsPlayer(playerInfoData.profileId()))
-							return true;
 
-					return false;
+				String bukkitVersion = Bukkit.getBukkitVersion();
+
+				if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
+					if (packet instanceof ClientboundPlayerInfoUpdatePacket) {
+						ClientboundPlayerInfoUpdatePacket playerInfoUpdatePacket = (ClientboundPlayerInfoUpdatePacket)packet;
+						List<ClientboundPlayerInfoUpdatePacket.Entry> b = playerInfoUpdatePacket.entries();
+
+						for (ClientboundPlayerInfoUpdatePacket.Entry playerInfoData : b)
+							if (game.containsPlayer(playerInfoData.profileId()))
+								return true;
+
+						return false;
+					}
+				} else {
+					if (BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutPlayerInfoClass.isInstance(packet)) {
+						try {
+							List<?> b = (List<?>)BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutPlayerInfoEntriesMethod.invoke(packet);
+
+							for (Object playerInfoData : b) {
+								GameProfile gameProfile = (GameProfile)BedwarsPlugin.getInstance().reflectionUtils.playerInfoDataGetGameProfileMethod.invoke(playerInfoData);
+
+								if (game.containsPlayer(gameProfile.getId()))
+									return true;
+							}
+						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+							e.printStackTrace();
+						}
+
+						return false;
+					}
 				}
 
 				/*if (packet.getClass().getSimpleName().equals("PacketPlayOutPlayerInfo")) {
@@ -634,11 +672,14 @@ public class GameLogic implements Listener {
 					net.minecraft.world.item.ItemStack nmsItemStack = (net.minecraft.world.item.ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, event.getItem());
 					//net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(event.getItem());
 					//Object nmsItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, event.getItem());
-					boolean hasTag = nmsItemStack.hasTag();
-					//boolean hasTag = (boolean) BedwarsPlugin.getInstance().reflectionUtils.itemStackHasTagMethod.invoke(nmsItemStack);
+					//boolean hasTag = nmsItemStack.hasTag();
+					boolean hasTag = (boolean) BedwarsPlugin.getInstance().reflectionUtils.itemStackHasTagMethod.invoke(nmsItemStack);
 					boolean hasKey = false;
-					if (hasTag)
-						hasKey = nmsItemStack.getTag().contains("bedwars-fireball");
+					if (hasTag) {
+						CompoundTag nbtTagCompound = (CompoundTag)BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsItemStack);
+						hasKey = (boolean)BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundHasKeyMethod.invoke(nbtTagCompound, "bedwars-fireball");
+						//hasKey = nmsItemStack.getTag().contains("bedwars-fireball");
+					}
 
 					if (hasTag && hasKey) {
 						boolean shouldLaunchFireball = false;
@@ -648,8 +689,8 @@ public class GameLogic implements Listener {
 							//net.minecraft.world.item.ItemStack nmsOffHandItemStack = CraftItemStack.asNMSCopy(player.getInventory().getItemInOffHand());
 							//Object nmsOffHandItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, player.getInventory().getItemInOffHand());
 
-							hasTag = nmsOffHandItemStack.hasTag();
-							//hasTag = (boolean) BedwarsPlugin.getInstance().reflectionUtils.itemStackHasTagMethod.invoke(nmsOffHandItemStack);
+							//hasTag = nmsOffHandItemStack.hasTag();
+							hasTag = (boolean) BedwarsPlugin.getInstance().reflectionUtils.itemStackHasTagMethod.invoke(nmsOffHandItemStack);
 							if (hasTag)
 								hasKey = nmsOffHandItemStack.getTag().contains("bedwars-fireball");
 								//hasKey = (boolean) BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundHasKeyMethod.invoke(nmsOffHandItemStack.getTag(), "bedwars-fireball");
@@ -801,13 +842,16 @@ public class GameLogic implements Listener {
 			//net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(event.getItemInHand());
 			//Object nmsItemStack = asNMSCopyMethod.invoke(null, event.getItemInHand());
 			
-			boolean hasTag = nmsItemStack.hasTag();
-			//boolean hasTag = (boolean) hasTagMethod.invoke(nmsItemStack);
+			//boolean hasTag = nmsItemStack.hasTag();
+			boolean hasTag = (boolean) BedwarsPlugin.getInstance().reflectionUtils.itemStackHasTagMethod.invoke(nmsItemStack);
 			boolean hasKey = false;
-			if (hasTag)
-				hasKey = nmsItemStack.getTag().contains("bedwars-blast-proof");
+			if (hasTag) {
+				CompoundTag nbtTagCompound = (CompoundTag)BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsItemStack);
+				hasKey = (boolean)BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundHasKeyMethod.invoke(nbtTagCompound, "bedwars-blast-proof");
+				//hasKey = nmsItemStack.getTag().contains("bedwars-blast-proof");
 				//hasKey = (boolean) hasKeyMethod.invoke(getTagMethod.invoke(nmsItemStack), "bedwars-blast-proof");
-			
+			}
+
 			if (hasTag && hasKey)
 				block.setMetadata("bedwars_blast_proof", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
 			else
@@ -1095,16 +1139,25 @@ public class GameLogic implements Listener {
 						//ServerPlayer entityPlayer = ((CraftPlayer)p).getHandle();
 						//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(p));
 						
-						MutableComponent deathMessage =  Component.literal(MessagesConfig.getInstance().getStringValue(p.getLocale(), "prefix"));
+						MutableComponent deathMessage = (MutableComponent)BedwarsPlugin.getInstance().reflectionUtils.componentNullToEmptyMethod.invoke(null, MessagesConfig.getInstance().getStringValue(p.getLocale(), "prefix"));
+						//MutableComponent deathMessage =  Component.literal(MessagesConfig.getInstance().getStringValue(p.getLocale(), "prefix"));
 						//Object deathMessage = reflectionUtils.chatComponentConstructor.newInstance(MessagesConfig.getInstance().getStringValue(p.getLocale(), "prefix"));
-						deathMessage.append(entityPlayerVictim.getCombatTracker().getDeathMessage());
+						Object combatTracker = BedwarsPlugin.getInstance().reflectionUtils.entityLivingGetCombatTrackerMethod.invoke(entityPlayerVictim);
+						Object component = BedwarsPlugin.getInstance().reflectionUtils.combatTrackerGetDeathMessageMethod.invoke(combatTracker);
+						BedwarsPlugin.getInstance().reflectionUtils.mutableComponentAppendMethod.invoke(deathMessage, component);
+						//deathMessage.append(entityPlayerVictim.getCombatTracker().getDeathMessage());
 						//deathMessage = reflectionUtils.iChatBaseComponentAddSiblingMethod.invoke(deathMessage, reflectionUtils.combatTrackerGetDeathMessageMethod.invoke(reflectionUtils.entityPlayerGetCombatTrackerMethod.invoke(entityPlayerVictim)));
 						
-						if(isFinalKill)
-							deathMessage = deathMessage.append(Component.literal("§cFINAL KILL!"));
+						if(isFinalKill) {
+							Component finalKillComponent = (Component)BedwarsPlugin.getInstance().reflectionUtils.componentNullToEmptyMethod.invoke(null, MessagesConfig.getInstance().getStringValue(player.getLocale(), "final-kill"));
+							//deathMessage.append(finalKillComponent);
+							BedwarsPlugin.getInstance().reflectionUtils.mutableComponentAppendMethod.invoke(deathMessage, finalKillComponent);
+							//deathMessage = deathMessage.append(Component.literal("§cFINAL KILL!"));
 							//deathMessage = reflectionUtils.iChatBaseComponentAddSiblingMethod.invoke(deathMessage, reflectionUtils.chatComponentConstructor.newInstance("§cFINAL KILL!"));
-						
-						entityPlayer.sendSystemMessage(deathMessage);
+						}
+
+						//entityPlayer.sendSystemMessage(deathMessage);
+						BedwarsPlugin.getInstance().reflectionUtils.nmsPlayerSendSystemMessage(entityPlayer, deathMessage);
 						//reflectionUtils.entityPlayerSendMessageMethod.invoke(entityPlayer, deathMessage);
 					} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 						e.printStackTrace();
@@ -1131,7 +1184,7 @@ public class GameLogic implements Listener {
 		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
 			if (event.getTo().getY() < player.getWorld().getMinHeight()) {
 				// Check if the player is a game player
-				if (game.containsPlayer(player.getUniqueId()))
+				if (game.containsPlayer(player.getUniqueId()) && player.getGameMode() != GameMode.SPECTATOR)
 					PlayerUtils.damagePlayerVoid(player, 999);
 				else
 					player.teleport(getSpectatorSpawn());

@@ -1,5 +1,6 @@
 package filip.bedwars.utils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -7,6 +8,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -16,12 +18,21 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.mojang.authlib.GameProfile;
+
 import filip.bedwars.BedwarsPlugin;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
+import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.damagesource.CombatTracker;
 import net.minecraft.world.entity.npc.VillagerDataHolder;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerType;
@@ -61,6 +72,7 @@ public class ReflectionUtils {
 	public final Class<?> entityHumanClass;
 	public final Class<?> packetPlayOutPlayerInfoClass;
 	public final Class<?> enumPlayerInfoActionClass;
+	public final Class<?> playerInfoDataClass;
 	//public Class<?> packetPlayOutNamedEntitySpawnClass;
 	//public Class<?> damageSourceClass;
 	//public Class<?> combatTrackerClass;
@@ -82,11 +94,11 @@ public class ReflectionUtils {
 	public final Method dragonControllerChargeAMethod;
 	public final Method craftItemStackAsNMSCopyMethod;
 	public final Method craftItemStackAsBukkitCopyMethod;
-	//public Method itemStackGetOrCreateTagMethod;
+	public Method itemStackGetOrCreateTagMethod;
 	//public Method nbtTagCompoundSetMethod;
-	//public Method nbtTagCompoundHasKeyMethod;
-	//public Method itemStackSetTagMethod;
-	//public Method itemStackHasTagMethod;
+	public final Method nbtTagCompoundHasKeyMethod;
+	public Method itemStackSetTagMethod;
+	public final Method itemStackHasTagMethod;
 	//public Method itemStackGetTagMethod;
 	public Method entitySetCustomNameMethod;
 	public final Method entitySetCustomNameVisibleMethod;
@@ -97,7 +109,7 @@ public class ReflectionUtils {
 	//public Method iChatBaseComponentAddSiblingMethod;
 	//public Method entityPlayerGetCombatTrackerMethod;
 	//public Method entityPlayerSendMessageMethod;
-	//public Method combatTrackerGetDeathMessageMethod;
+	public Method combatTrackerGetDeathMessageMethod;
 	public Field entityPlayerPlayerConnectionField;
 	//public Field entityTypesEnderDragonField;
 	//public Field entityLocXField;
@@ -124,6 +136,18 @@ public class ReflectionUtils {
 	public final Constructor<?> serverPlayerConstructor;
 	public Method componentNullToEmptyMethod;
 	public Method synchedEntityDataPackMethod;
+	public Field playerConnectionConnectionField;
+	public Field connectionChannelField;
+	public Method compoundTagPutIntMethod;
+	public Method packetPlayOutPlayerInfoEntriesMethod;
+	public Method playerInfoDataGetGameProfileMethod;
+	public Method clientboundUpdateAttributesPacketGetEntityIdMethod;
+	public Method clientboundSetEquipmentPacketGetEntityIdMethod;
+	public Method clientboundSetEntityDataPacketIdMethod;
+	public Method clientboundAddEntityPacketGetIdMethod;
+	public Method mutableComponentAppendMethod;
+	public Method entityLivingGetCombatTrackerMethod;
+	public final Method serverPlayerSendSystemMessageMethod;
 
 	public ReflectionUtils() throws ClassNotFoundException, NoSuchMethodException, SecurityException {
 		String bukkitVersion = Bukkit.getBukkitVersion();
@@ -156,6 +180,7 @@ public class ReflectionUtils {
 		entityHumanClass = Class.forName("net.minecraft.world.entity.player.EntityHuman");
 		packetPlayOutPlayerInfoClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo");
 		enumPlayerInfoActionClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
+		playerInfoDataClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData");
 		//packetPlayOutNamedEntitySpawnClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutNamedEntitySpawn");
 		//damageSourceClass = Class.forName("net.minecraft.server." + serverVersion + ".DamageSource");
 		//combatTrackerClass = Class.forName("net.minecraft.server." + serverVersion + ".CombatTracker");
@@ -263,6 +288,12 @@ public class ReflectionUtils {
 		//entityPlayerGetCombatTrackerMethod = entityPlayerClass.getMethod("getCombatTracker");
 		//entityPlayerSendMessageMethod = entityPlayerClass.getMethod("sendMessage", iChatBaseComponentClass);
 		//combatTrackerGetDeathMessageMethod = combatTrackerClass.getMethod("getDeathMessage");
+		for (Method method : CombatTracker.class.getMethods()) {
+			if (method.getParameterCount() == 0 && method.getReturnType() == Component.class) {
+				combatTrackerGetDeathMessageMethod = method;
+				break;
+			}
+		}
 
 		for (Field field : entityPlayerClass.getFields()) {
 			if (field.getType() == ServerGamePacketListenerImpl.class) {
@@ -316,15 +347,65 @@ public class ReflectionUtils {
 		craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".inventory.CraftItemStack");
 		craftItemStackAsNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
 		craftItemStackAsBukkitCopyMethod = craftItemStackClass.getMethod("asBukkitCopy", net.minecraft.world.item.ItemStack.class);
-		//itemStackGetOrCreateTagMethod = itemStackClass.getMethod("getOrCreateTag");
+
+		for (Method method : net.minecraft.world.item.ItemStack.class.getMethods()) {
+			if (method.getReturnType() != net.minecraft.nbt.CompoundTag.class)
+				continue;
+
+			if (method.getParameterCount() != 0)
+				continue;
+
+			if (method.getAnnotationsByType(Nullable.class).length == 0) {
+				itemStackGetOrCreateTagMethod = method;
+				break;
+			}
+		}
+
 		//nbtTagIntClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagInt");
 		//nbtBaseClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTBase");
 		//nbtTagIntConstructor = nbtTagIntClass.getDeclaredConstructor(int.class);
 		//nbtTagIntConstructor.setAccessible(true);
 		//nbtTagCompoundSetMethod = nbtTagCompoundClass.getMethod("set", String.class, nbtBaseClass);
-		//nbtTagCompoundHasKeyMethod = nbtTagCompoundClass.getMethod("hasKey", String.class);
+
+		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0) {
+			nbtTagCompoundHasKeyMethod = net.minecraft.nbt.CompoundTag.class.getMethod("hasKey", String.class);
+		} else {
+			nbtTagCompoundHasKeyMethod = net.minecraft.nbt.CompoundTag.class.getMethod("e", String.class);
+		}
+
 		//itemStackSetTagMethod = itemStackClass.getMethod("setTag", nbtTagCompoundClass);
-		//itemStackHasTagMethod = itemStackClass.getMethod("hasTag");
+		for (Method method : net.minecraft.world.item.ItemStack.class.getMethods()) {
+			if (!method.getReturnType().equals(Void.TYPE))
+				continue;
+
+			if (method.getParameterCount() != 1)
+				continue;
+
+			if (method.getParameterTypes()[0] != net.minecraft.nbt.CompoundTag.class)
+				continue;
+
+			Annotation[][] paramAnnotations = method.getParameterAnnotations();
+			if (paramAnnotations[0].length != 1)
+				continue;
+
+			if (paramAnnotations[0][0].annotationType() == Nullable.class) {
+				itemStackSetTagMethod = method;
+				break;
+			}
+		}
+
+		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0) {
+			itemStackHasTagMethod = net.minecraft.world.item.ItemStack.class.getMethod("hasTag");
+		} else if (bukkitVersion.compareTo("1.18.1-R0.1-SNAPSHOT") <= 0) {
+			itemStackHasTagMethod = net.minecraft.world.item.ItemStack.class.getMethod("r");
+		} else if (bukkitVersion.compareTo("1.18.2-R0.1-SNAPSHOT") <= 0) {
+			itemStackHasTagMethod = net.minecraft.world.item.ItemStack.class.getMethod("s");
+		} else if (bukkitVersion.compareTo("1.19.4-R0.1-SNAPSHOT") <= 0) {
+			itemStackHasTagMethod = net.minecraft.world.item.ItemStack.class.getMethod("t");
+		} else {
+			itemStackHasTagMethod = net.minecraft.world.item.ItemStack.class.getMethod("u");
+		}
+
 		//itemStackGetTagMethod = itemStackClass.getMethod("getTag");
 		entityVillagerConstructor = null;
 		for (Constructor<?> constructor : entityVillagerClass.getConstructors()) {
@@ -336,6 +417,28 @@ public class ReflectionUtils {
 		//chatComponentConstructor = chatComponentTextClass.getConstructor(String.class);
 		//villagerDataConstructor = villagerDataClass.getConstructor(villagerTypeClass, villagerProfessionClass, int.class);
 		packetPlayOutPlayerInfoConstructor = packetPlayOutPlayerInfoClass.getConstructor(enumPlayerInfoActionClass, java.lang.reflect.Array.newInstance(entityPlayerClass, 0).getClass());
+
+		for (Method method : packetPlayOutPlayerInfoClass.getMethods()) {
+			if (method.getParameterCount() != 0)
+				continue;
+
+			if (method.getReturnType() != List.class)
+				continue;
+
+			ParameterizedType parameterizedType = (ParameterizedType)method.getGenericReturnType();
+			if (parameterizedType.getActualTypeArguments()[0] == playerInfoDataClass) {
+				packetPlayOutPlayerInfoEntriesMethod = method;
+				break;
+			}
+		}
+
+		for (Method method : playerInfoDataClass.getMethods()) {
+			if (method.getReturnType() == GameProfile.class) {
+				playerInfoDataGetGameProfileMethod = method;
+				break;
+			}
+		}
+
 		//packetPlayOutNamedEntitySpawnConstructor = packetPlayOutNamedEntitySpawnClass.getConstructor(entityHumanClass);
 
 		serverPlayerConstructor = ServerPlayer.class.getConstructors()[0];
@@ -364,6 +467,95 @@ public class ReflectionUtils {
 				synchedEntityDataPackMethod = method;
 				break;
 			}
+		}
+
+		for (Field field : playerConnectionClass.getFields()) {
+			int modifiers = field.getModifiers();
+
+			if (!Modifier.isPublic(modifiers) || !Modifier.isFinal(modifiers))
+				continue;
+
+			if (field.getType() == net.minecraft.network.Connection.class) {
+				playerConnectionConnectionField = field;
+				break;
+			}
+		}
+
+		for (Field field : net.minecraft.network.Connection.class.getFields()) {
+			if (field.getType() == io.netty.channel.Channel.class && Modifier.isPublic(field.getModifiers())) {
+				connectionChannelField = field;
+				break;
+			}
+		}
+
+		for (Method method : net.minecraft.nbt.CompoundTag.class.getMethods()) {
+			if (!method.getReturnType().equals(Void.TYPE))
+				continue;
+
+			if (method.getParameterCount() != 2)
+				continue;
+
+			Class<?>[] parameterTypes = method.getParameterTypes();
+			if (parameterTypes[0] == String.class && parameterTypes[1] == int.class) {
+				compoundTagPutIntMethod = method;
+				break;
+			}
+		}
+
+		for (Method method : ClientboundUpdateAttributesPacket.class.getMethods()) {
+			if (method.getReturnType() == int.class && method.getParameterCount() == 0) {
+				clientboundUpdateAttributesPacketGetEntityIdMethod = method;
+				break;
+			}
+		}
+
+		for (Method method : ClientboundSetEquipmentPacket.class.getMethods()) {
+			if (method.getReturnType() == int.class && method.getParameterCount() == 0) {
+				clientboundSetEquipmentPacketGetEntityIdMethod = method;
+				break;
+			}
+		}
+
+		for (Method method : ClientboundSetEntityDataPacket.class.getMethods()) {
+			if (method.getReturnType() == int.class && method.getParameterCount() == 0) {
+				clientboundSetEntityDataPacketIdMethod = method;
+				break;
+			}
+		}
+
+		for (Method method : ClientboundAddEntityPacket.class.getMethods()) {
+			if (method.getReturnType() == int.class && method.getParameterCount() == 0) {
+				clientboundAddEntityPacketGetIdMethod = method;
+				break;
+			}
+		}
+
+		for (Method method : MutableComponent.class.getMethods()) {
+			if (method.getReturnType() != MutableComponent.class)
+				continue;
+
+			if (method.getParameterCount() != 1)
+				continue;
+
+			if (method.getParameterTypes()[0] == Component.class) {
+				mutableComponentAppendMethod = method;
+				break;
+			}
+		}
+
+		for (Method method : entityLivingClass.getMethods()) {
+			if (method.getReturnType() == CombatTracker.class && method.getParameterCount() == 0) {
+				entityLivingGetCombatTrackerMethod = method;
+				break;
+			}
+		}
+
+		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0) {
+			serverPlayerSendSystemMessageMethod = ServerPlayer.class.getMethod("sendMessage", Component.class, UUID.class);
+		} else if (bukkitVersion.compareTo("1.18.2-R0.1-SNAPSHOT") <= 0) {
+			serverPlayerSendSystemMessageMethod = ServerPlayer.class.getMethod("a", Component.class, UUID.class);
+		} else {
+			serverPlayerSendSystemMessageMethod = ServerPlayer.class.getMethod("a", Component.class);
 		}
 	}
 
@@ -427,6 +619,19 @@ public class ReflectionUtils {
 		}
 
 		return null;
+	}
+
+	public void nmsPlayerSendSystemMessage(ServerPlayer nmsPlayer, Component message) {
+		String bukkitVersion = Bukkit.getBukkitVersion();
+
+		try {
+			if (bukkitVersion.compareTo("1.18.2-R0.1-SNAPSHOT") <= 0)
+				serverPlayerSendSystemMessageMethod.invoke(nmsPlayer, message, new UUID(0, 0));
+			else
+				serverPlayerSendSystemMessageMethod.invoke(nmsPlayer, message);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

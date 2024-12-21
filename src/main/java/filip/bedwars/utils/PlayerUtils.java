@@ -2,6 +2,7 @@ package filip.bedwars.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -14,6 +15,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
 import filip.bedwars.BedwarsPlugin;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
@@ -24,7 +26,9 @@ public class PlayerUtils {
 
 	public static void hidePlayerEntity(Player toHide, Player viewer) {
 		try {
-			int toHideEntityId = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(toHide).getId();
+			// .hashCode() does the same thing as .getId()
+			// We do not use .getId() because the method name is obfuscated on some nms version.
+			int toHideEntityId = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(toHide).hashCode();
 			//Object toHideCraftPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerClass.cast(toHide);
 			//Object toHideEntityPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(toHideCraftPlayer);
 			//int toHideEntityId = (int) BedwarsPlugin.getInstance().reflectionUtils.entityGetIdMethod.invoke(toHideEntityPlayer);
@@ -55,16 +59,25 @@ public class PlayerUtils {
 	}
 	
 	public static void hidePlayer(Player toHide, Player viewer) {
+		String bukkitVersion = Bukkit.getBukkitVersion();
+
 		try {
 			/*Object entityPlayerArray = java.lang.reflect.Array.newInstance(BedwarsPlugin.getInstance().reflectionUtils.entityPlayerClass, 1);
 			java.lang.reflect.Array.set(entityPlayerArray, 0, BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(BedwarsPlugin.getInstance().reflectionUtils.craftPlayerClass.cast(toHide)));
 			Object packetPlayOutPlayerInfo = BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutPlayerInfoConstructor.newInstance(
 					Enum.valueOf((Class<Enum>)BedwarsPlugin.getInstance().reflectionUtils.enumPlayerInfoActionClass, "REMOVE_PLAYER"),
 					entityPlayerArray);*/
-			ClientboundPlayerInfoRemovePacket packetPlayOutPlayerInfo = new ClientboundPlayerInfoRemovePacket(List.of(toHide.getUniqueId()));
-			
-			sendPacket(viewer, packetPlayOutPlayerInfo);
-		} catch (SecurityException | IllegalArgumentException e) {
+			//ClientboundPlayerInfoRemovePacket packetPlayOutPlayerInfo = new ClientboundPlayerInfoRemovePacket(List.of(toHide.getUniqueId()));
+			Packet<?> packet;
+			if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
+				packet = new ClientboundPlayerInfoRemovePacket(List.of(toHide.getUniqueId()));
+			} else {
+				ServerPlayer nmsToHide = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(toHide);
+				packet = (Packet<?>)BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)BedwarsPlugin.getInstance().reflectionUtils.enumPlayerInfoActionClass, "REMOVE_PLAYER"), new ServerPlayer[]{nmsToHide});
+			}
+
+			sendPacket(viewer, packet);
+		} catch (SecurityException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
 			e.printStackTrace();
 		}
 	}
@@ -87,6 +100,18 @@ public class PlayerUtils {
 
 		switch (bukkitVersion) {
 			case "1.17.1-R0.1-SNAPSHOT":
+				try {
+					// DamageSource damageSource = DamageSource.OUT_OF_WORLD;
+					Field damageSourceField = net.minecraft.world.damagesource.DamageSource.class.getField("m");
+					net.minecraft.world.damagesource.DamageSource damageSource = (net.minecraft.world.damagesource.DamageSource)damageSourceField.get(null);
+
+					//entityPlayer.hurt(damageSource, amount);
+					Method hurtMethod = ServerPlayer.class.getMethod("damageEntity", net.minecraft.world.damagesource.DamageSource.class, float.class);
+					hurtMethod.invoke(entityPlayer, damageSource, amount);
+				} catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
+					e.printStackTrace();
+				}
+				break;
 			case "1.18-R0.1-SNAPSHOT":
 			case "1.18.1-R0.1-SNAPSHOT":
 			case "1.18.2-R0.1-SNAPSHOT":
@@ -96,11 +121,13 @@ public class PlayerUtils {
 			case "1.19.3-R0.1-SNAPSHOT":
 				try {
 					// DamageSource damageSource = DamageSource.OUT_OF_WORLD;
-					Field damageSourceField = net.minecraft.world.damagesource.DamageSource.class.getField("OUT_OF_WORLD");
+					Field damageSourceField = net.minecraft.world.damagesource.DamageSource.class.getField("m");
 					net.minecraft.world.damagesource.DamageSource damageSource = (net.minecraft.world.damagesource.DamageSource)damageSourceField.get(null);
 
-					entityPlayer.hurt(damageSource, amount);
-				} catch (NoSuchFieldException | IllegalAccessException e) {
+					//entityPlayer.hurt(damageSource, amount);
+					Method hurtMethod = ServerPlayer.class.getMethod("a", net.minecraft.world.damagesource.DamageSource.class, float.class);
+					hurtMethod.invoke(entityPlayer, damageSource, amount);
+				} catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
 					e.printStackTrace();
 				}
 				break;
@@ -145,11 +172,12 @@ public class PlayerUtils {
 	    try {
 			ServerPlayer handle = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(player);
 	    	//Object handle = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(player);
-			ServerGamePacketListenerImpl playerConnection = handle.connection;
+			//ServerGamePacketListenerImpl playerConnection = handle.connection;
+			ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(handle);
 	    	//Object playerConnection = BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(handle);
 
-			playerConnection.send(packet);
-	    	//BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
+			//playerConnection.send(packet);
+			BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
 	    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 	        e.printStackTrace();
 	    }

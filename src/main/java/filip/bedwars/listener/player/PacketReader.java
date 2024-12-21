@@ -8,6 +8,7 @@ import java.util.List;
 import org.bukkit.entity.Player;
 
 import filip.bedwars.BedwarsPlugin;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
@@ -58,11 +59,14 @@ public class PacketReader {
 			//Object cPlayer = craftPlayerClass.cast(player);
 			//ServerPlayer entityPlayer = cPlayer.getHandle();
 			//Object entityPlayer = getHandleMethod.invoke(cPlayer);
-			ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
+			//ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
+			ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
 			//Object playerConnection = playerConnectionField.get(entityPlayer);
-			Connection networkManager = playerConnection.connection;
+			Connection networkManager = (Connection)BedwarsPlugin.getInstance().reflectionUtils.playerConnectionConnectionField.get(playerConnection);
+			Channel channel = (Channel)BedwarsPlugin.getInstance().reflectionUtils.connectionChannelField.get(networkManager);
+			channelPipeline = channel.pipeline();
 			//Object networkManager = networkManagerField.get(playerConnection);
-			channelPipeline = networkManager.channel.pipeline();
+			//channelPipeline = networkManager.channel.pipeline();
 			//channelPipeline = ((Channel) channelField.get(networkManager)).pipeline();
 			uninject(); // Avoid duplicate handler
 			channelPipeline.addBefore("packet_handler", "bedwars_handler_" + player.getName(), channelDuplexHandler);
