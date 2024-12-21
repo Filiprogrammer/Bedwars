@@ -113,7 +113,9 @@ public class ArmorStandItemNPC {
 	}
 	
 	public int getEntityId() {
-		return entity.getId();
+		// .hashCode() does the same thing as .getId()
+		// We do not use .getId() because the method name is obfuscated on some nms version.
+		return entity.hashCode();
 		/*try {
 			return (int) getIdMethod.invoke(entity);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {

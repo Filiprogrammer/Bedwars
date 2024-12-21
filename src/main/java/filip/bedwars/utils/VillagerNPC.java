@@ -2,6 +2,7 @@ package filip.bedwars.utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -25,45 +26,46 @@ import net.minecraft.world.entity.npc.VillagerType;
 public class VillagerNPC {
 
 	private final ReflectionUtils reflectionUtils;
-	//private Field desertVillagerTypeField;
-	//private Field armorerVillagerProfessionField;
+	private VillagerType villagerType;
+	private VillagerProfession villagerProfession;
 	private net.minecraft.world.entity.npc.Villager entity;
 	
 	public VillagerNPC(Location location, String villagerType, String villagerProfession, String customName, Player... viewers) {
 		reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
 
-		/*try {
-			desertVillagerTypeField = reflectionUtils.villagerTypeClass.getField(villagerType);
-			armorerVillagerProfessionField = reflectionUtils.villagerProfessionClass.getField(villagerProfession);
-		} catch (NoSuchFieldException | SecurityException e) {
-			e.printStackTrace();
-		}*/
-		
+		this.villagerType = reflectionUtils.parseVillagerType(villagerType);
+		if (this.villagerType == null)
+			this.villagerType = VillagerType.DESERT;
+
+		this.villagerProfession = reflectionUtils.parseVillagerProfession(villagerProfession);
+		if (this.villagerProfession == null)
+			this.villagerProfession = VillagerProfession.ARMORER;
+
 		spawn(location, customName, viewers);
 	}
-	
+
 	private void spawn(Location location, String customName, Player[] viewers) {
 		try {
 			ServerLevel nmsWorld = reflectionUtils.worldToNMSWorld(location.getWorld());
 			//CraftWorld craftWorld = (CraftWorld)location.getWorld();
 			//Object craftWorld = reflectionUtils.craftWorldClass.cast(location.getWorld());
-			net.minecraft.world.entity.EntityType villagerType = (EntityType)BedwarsPlugin.getInstance().reflectionUtils.entityTypesVillagerField.get(null);
-			entity = new net.minecraft.world.entity.npc.Villager(villagerType, nmsWorld);
+			net.minecraft.world.entity.EntityType entityType = (EntityType)reflectionUtils.entityTypesVillagerField.get(null);
+			entity = new net.minecraft.world.entity.npc.Villager(entityType, nmsWorld);
 			//entity = reflectionUtils.entityVillagerConstructor.newInstance(reflectionUtils.entityTypesVillagerField.get(null), reflectionUtils.craftWorldGetHandleMethod.invoke(craftWorld));
-			BedwarsPlugin.getInstance().reflectionUtils.entitySetLocationMethod.invoke(entity, location.getX(), location.getY(), location.getZ(), 0f, 0f);
+			reflectionUtils.entitySetLocationMethod.invoke(entity, location.getX(), location.getY(), location.getZ(), 0f, 0f);
 			//entity.absMoveTo(location.getX(), location.getY(), location.getZ(), 0f, 0f);
 			//reflectionUtils.entitySetLocationMethod.invoke(entity, location.getX(), location.getY(), location.getZ(), 0f, 0f);
 			//entity.setCustomName(Component.literal(customName));
-			Component component = (Component)BedwarsPlugin.getInstance().reflectionUtils.componentNullToEmptyMethod.invoke(null, customName);
-			BedwarsPlugin.getInstance().reflectionUtils.entitySetCustomNameMethod.invoke(entity, component);
+			Component component = (Component)reflectionUtils.componentNullToEmptyMethod.invoke(null, customName);
+			reflectionUtils.entitySetCustomNameMethod.invoke(entity, component);
 			//reflectionUtils.entitySetCustomNameMethod.invoke(entity, reflectionUtils.chatComponentConstructor.newInstance(customName));
 			//entity.setCustomNameVisible(true);
-			BedwarsPlugin.getInstance().reflectionUtils.entitySetCustomNameVisibleMethod.invoke(entity, true);
+			reflectionUtils.entitySetCustomNameVisibleMethod.invoke(entity, true);
 			//reflectionUtils.entitySetCustomNameVisibleMethod.invoke(entity, true);
-			VillagerData villagerData = new VillagerData(VillagerType.DESERT, VillagerProfession.ARMORER, 5);
+			VillagerData villagerData = new VillagerData(villagerType, villagerProfession, 5);
 			//Object villagerData = reflectionUtils.villagerDataConstructor.newInstance(desertVillagerTypeField.get(null), armorerVillagerProfessionField.get(null), 5);
 			//entity.setVillagerData(villagerData);
-			BedwarsPlugin.getInstance().reflectionUtils.entityVillagerSetVillagerDataMethod.invoke(entity, villagerData);
+			reflectionUtils.entityVillagerSetVillagerDataMethod.invoke(entity, villagerData);
 			//reflectionUtils.entityVillagerSetVillagerDataMethod.invoke(entity, villagerData);
 			
 			respawn(viewers);
@@ -76,7 +78,7 @@ public class VillagerNPC {
 		for (Player p : viewers) {
 			try {
 				//entity.moveTo(x, y, z, 0f, 0f);
-				BedwarsPlugin.getInstance().reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, 0f, 0f);
+				reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, 0f, 0f);
 				//reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, 0f, 0f);
 				ClientboundTeleportEntityPacket packet = new ClientboundTeleportEntityPacket(entity);
 				//Object packet = reflectionUtils.packetPlayOutEntityTeleportConstructor.newInstance(entity);
@@ -86,10 +88,10 @@ public class VillagerNPC {
 				//ServerPlayer entityPlayer = craftPlayer.getHandle();
 				//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(craftPlayer);
 				//ServerGamePacketListenerImpl playerConnection =  entityPlayer.connection;
-				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
+				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
 				//Object playerConnection = reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
 				//playerConnection.send(packet);
-				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
+				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
 				//reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
@@ -108,10 +110,10 @@ public class VillagerNPC {
 				//ServerPlayer entityPlayer = craftPlayer.getHandle();
 				//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(craftPlayer);
 				//ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
-				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
+				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
 				//Object playerConnection = reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
 				//playerConnection.send(packet);
-				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
+				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
 				//reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
@@ -132,22 +134,22 @@ public class VillagerNPC {
 				//ServerPlayer entityPlayer = craftPlayer.getHandle();
 				//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(craftPlayer);
 				//ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
-				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
+				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
 				//Object playerConnection = reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
 				//playerConnection.send(packet);
-				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
+				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
 				//reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
 				//playerConnection.send(new ClientboundSetEntityDataPacket(entity.getId(), entity.getEntityData().getNonDefaultValues()));
-				SynchedEntityData synchedEntityData = (SynchedEntityData)BedwarsPlugin.getInstance().reflectionUtils.entityGetEntityDataMethod.invoke(entity);
+				SynchedEntityData synchedEntityData = (SynchedEntityData)reflectionUtils.entityGetEntityDataMethod.invoke(entity);
 				ClientboundSetEntityDataPacket setEntityDataPacket;
 
 				if (bukkitVersion.compareTo("1.19-R0.1-SNAPSHOT") >= 0) {
-					List<SynchedEntityData.DataValue<?>> packedItems = (List<SynchedEntityData.DataValue<?>>)BedwarsPlugin.getInstance().reflectionUtils.synchedEntityDataPackMethod.invoke(synchedEntityData);
+					List<SynchedEntityData.DataValue<?>> packedItems = (List<SynchedEntityData.DataValue<?>>)reflectionUtils.synchedEntityDataPackMethod.invoke(synchedEntityData);
 					setEntityDataPacket = new ClientboundSetEntityDataPacket(getEntityId(), packedItems);
 				} else {
 					setEntityDataPacket = ClientboundSetEntityDataPacket.class.getConstructor(int.class, SynchedEntityData.class, boolean.class).newInstance(getEntityId(), synchedEntityData, true);
 				}
-				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, setEntityDataPacket);
+				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, setEntityDataPacket);
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException e) {
 				e.printStackTrace();
 			}

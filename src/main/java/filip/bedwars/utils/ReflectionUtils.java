@@ -23,6 +23,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.npc.VillagerDataHolder;
+import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.VillagerType;
 
 public class ReflectionUtils {
 
@@ -363,6 +365,50 @@ public class ReflectionUtils {
 		// return ((CraftServer)server).getServer();
 		Object craftServer = craftServerClass.cast(server);
 		return (DedicatedServer)craftServerGetServerMethod.invoke(craftServer);
+	}
+
+	public VillagerType parseVillagerType(String name) {
+		for (Field field : VillagerType.class.getFields()) {
+			if (field.getType() != VillagerType.class)
+				continue;
+
+			int modifiers = field.getModifiers();
+			if (!Modifier.isPublic(modifiers) || !Modifier.isStatic(modifiers) || !Modifier.isFinal(modifiers))
+				continue;
+
+			try {
+				VillagerType villagerType = (VillagerType)field.get(null);
+				if (villagerType.toString().equalsIgnoreCase(name)) {
+					return villagerType;
+				}
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return null;
+	}
+
+	public VillagerProfession parseVillagerProfession(String name) {
+		for (Field field : VillagerProfession.class.getFields()) {
+			if (field.getType() != VillagerProfession.class)
+				continue;
+
+			int modifiers = field.getModifiers();
+			if (!Modifier.isPublic(modifiers) || !Modifier.isStatic(modifiers) || !Modifier.isFinal(modifiers))
+				continue;
+
+			try {
+				VillagerProfession villagerProfession = (VillagerProfession)field.get(null);
+				if (villagerProfession.toString().equalsIgnoreCase(name)) {
+					return villagerProfession;
+				}
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return null;
 	}
 
 }
