@@ -14,7 +14,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import net.minecraft.network.Connection;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public class PacketReader {
@@ -44,24 +43,7 @@ public class PacketReader {
         };
 		
         try {
-			//String versionStr = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-			//Class<?> craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + versionStr + ".entity.CraftPlayer");
-			//Method getHandleMethod = craftPlayerClass.getMethod("getHandle");
-			//Class<?> entityPlayerClass = Class.forName("net.minecraft.server." + versionStr + ".EntityPlayer");
-			//Field playerConnectionField = entityPlayerClass.getField("playerConnection");
-			//Class<?> playerConnectionClass = Class.forName("net.minecraft.server." + versionStr + ".PlayerConnection");
-			//Field networkManagerField = playerConnectionClass.getField("networkManager");
-			//Class<?> networkManagerClass = Class.forName("net.minecraft.server." + versionStr + ".NetworkManager");
-			//Field channelField = networkManagerClass.getField("channel");
-
-			ServerPlayer entityPlayer = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(player);
-			//CraftPlayer cPlayer = (CraftPlayer)player;
-			//Object cPlayer = craftPlayerClass.cast(player);
-			//ServerPlayer entityPlayer = cPlayer.getHandle();
-			//Object entityPlayer = getHandleMethod.invoke(cPlayer);
-			//ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
-			ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
-			//Object playerConnection = playerConnectionField.get(entityPlayer);
+			ServerGamePacketListenerImpl playerConnection = BedwarsPlugin.getInstance().reflectionUtils.playerGetConnection(player);
 			Connection networkManager = (Connection)BedwarsPlugin.getInstance().reflectionUtils.playerConnectionConnectionField.get(playerConnection);
 			Channel channel = (Channel)BedwarsPlugin.getInstance().reflectionUtils.connectionChannelField.get(networkManager);
 			channelPipeline = channel.pipeline();

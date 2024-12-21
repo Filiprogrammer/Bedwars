@@ -157,41 +157,29 @@ public class EnderDragonController {
 	}
 	
 	public void respawn(Player... viewers) {
-		try {
-			for (Player p : viewers) {
-				ServerPlayer entityPlayer = reflectionUtils.playerToNMSPlayer(p);
-				//ServerPlayer entityPlayer = ((CraftPlayer) p).getHandle();
-				//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(p));
-				// PacketPlayOutSpawnEntityLiving packet = new PacketPlayOutSpawnEntityLiving(dragon);
-				ClientboundAddEntityPacket packet = new ClientboundAddEntityPacket((net.minecraft.world.entity.Entity)dragon);
-				//Object packet = reflectionUtils.packetPlayOutSpawnEntityLivingConstructor.newInstance(dragon);
-				ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
-				//Object playerConnection = reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
-				playerConnection.send(packet);
-				//reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
+		for (Player p : viewers) {
+			try {
+				reflectionUtils.playerSendPacket(p, new ClientboundAddEntityPacket((net.minecraft.world.entity.Entity)dragon));
+			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+				e.printStackTrace();
 			}
-		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
 		}
 	}
 	
 	public void despawn(Player... viewers) {
-		try {
-			for (Player p : viewers) {
-				ServerPlayer entityPlayer = reflectionUtils.playerToNMSPlayer(p);
-				//ServerPlayer entityPlayer = ((CraftPlayer) p).getHandle();
-				//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(p));
-				// PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(dragon.getId());
-				ClientboundRemoveEntitiesPacket packet = new ClientboundRemoveEntitiesPacket(dragon.getId());
-				//Object packet = reflectionUtils.packetPlayOutEntityDestroyConstructor.newInstance(new int[] {dragon.getId()});
-				ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
-				//Object playerConnection = reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
-				playerConnection.send(packet);
-				//reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
+		for (Player p : viewers) {
+			try {
+				reflectionUtils.playerSendPacket(p, new ClientboundRemoveEntitiesPacket(getEntityId()));
+			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+				e.printStackTrace();
 			}
-		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
 		}
+	}
+
+	public int getEntityId() {
+		// .hashCode() does the same thing as .getId()
+		// We do not use .getId() because the method name is obfuscated on some nms version.
+		return dragon.hashCode();
 	}
 	
 	private boolean isTaskRunning() {
@@ -211,7 +199,8 @@ public class EnderDragonController {
 			dragon = new EnderDragon(net.minecraft.world.entity.EntityType.ENDER_DRAGON, worldServer);
 			//dragon = reflectionUtils.entityEnderDragonConstructor.newInstance(reflectionUtils.entityTypesEnderDragonField.get(null), worldServer);
 			// dragon.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
-			dragon.moveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
+			//dragon.moveTo(loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
+			BedwarsPlugin.getInstance().reflectionUtils.entitySetLocationMethod.invoke(dragon, loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
 			//reflectionUtils.entitySetLocationMethod.invoke(dragon, loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
 		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
@@ -250,16 +239,7 @@ public class EnderDragonController {
 					}
 				}
 
-				ServerPlayer entityPlayer = reflectionUtils.playerToNMSPlayer(p);
-				//ServerPlayer entityPlayer = ((CraftPlayer) p).getHandle();
-				//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(p));
-				// PacketPlayOutEntityTeleport packet = new PacketPlayOutEntityTeleport(dragon);
-				ClientboundTeleportEntityPacket packet = new ClientboundTeleportEntityPacket(dragon);
-				//Object packet = reflectionUtils.packetPlayOutEntityTeleportConstructor.newInstance(dragon);
-				ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
-				//Object playerConnection = reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
-				playerConnection.send(packet);
-				//reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
+				reflectionUtils.playerSendPacket(p, new ClientboundTeleportEntityPacket(dragon));
 			}
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();

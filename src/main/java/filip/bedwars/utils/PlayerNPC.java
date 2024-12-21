@@ -67,14 +67,7 @@ public class PlayerNPC {
         
         for (Player p : viewers) {
         	try {
-				ServerPlayer entityPlayer = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(p);
-				//CraftPlayer craftPlayer = (CraftPlayer)p;
-        		//Object craftPlayer = craftPlayerClass.cast(p);
-				//ServerPlayer entityPlayer = craftPlayer.getHandle();
-				//Object entityPlayer = getHandleCraftPlayerMethod.invoke(craftPlayer);
-				//ServerGamePacketListenerImpl connection = entityPlayer.connection;
-				ServerGamePacketListenerImpl connection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
-				//Object connection = playerConnectionField.get(entityPlayer);
+				ServerGamePacketListenerImpl connection = BedwarsPlugin.getInstance().reflectionUtils.playerGetConnection(p);
 				if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
 					connection.send(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, entity));
 				} else {
@@ -130,19 +123,16 @@ public class PlayerNPC {
 	}
 	
 	public void teleport(double x, double y, double z, float yaw, float pitch, Player... viewers) {
+		try {
+			BedwarsPlugin.getInstance().reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, yaw, pitch);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
+			return;
+		}
+
 		for (Player p : viewers) {
 			try {
-				//entity.moveTo(x, y, z, yaw, pitch);
-				BedwarsPlugin.getInstance().reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, yaw, pitch);
-				//setLocationMethod.invoke(entity, x, y, z, yaw, pitch);
-				ServerPlayer entityPlayer = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(p);
-				//CraftPlayer craftPlayer = (CraftPlayer)p;
-				//Object craftPlayer = craftPlayerClass.cast(p);
-				//ServerPlayer entityPlayer = craftPlayer.getHandle();
-				//Object entityPlayer = getHandleCraftPlayerMethod.invoke(craftPlayer);
-				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
-				//ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
-				//Object playerConnection = playerConnectionField.get(entityPlayer);
+				ServerGamePacketListenerImpl playerConnection = BedwarsPlugin.getInstance().reflectionUtils.playerGetConnection(p);
 				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, new ClientboundTeleportEntityPacket(entity));
 				//playerConnection.send(new ClientboundTeleportEntityPacket(entity));
 				//sendPacketMethod.invoke(playerConnection, packetPlayOutEntityTeleportConstructor.newInstance(entity));
@@ -161,27 +151,17 @@ public class PlayerNPC {
 	public void despawn(Player... viewers) {
 		for (Player p : viewers) {
 			try {
-				ServerPlayer entityPlayer = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(p);
-				//CraftPlayer craftPlayer = (CraftPlayer)p;
-				//Object craftPlayer = craftPlayerClass.cast(p);
-				//ServerPlayer entityPlayer = craftPlayer.getHandle();
-				//Object entityPlayer = getHandleCraftPlayerMethod.invoke(craftPlayer);
-				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
-				//ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
-				//Object playerConnection = playerConnectionField.get(entityPlayer);
-
-				// .hashCode() does the same thing as .getId()
-				// We do not use .getId() because the method name is obfuscated on some nms version.
-				int entityId = entity.hashCode();
-
-				ClientboundRemoveEntitiesPacket removeEntitiesPacket = new ClientboundRemoveEntitiesPacket(entityId);
-				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, removeEntitiesPacket);
-				//playerConnection.send(new ClientboundRemoveEntitiesPacket(entity.getId()));
-				//sendPacketMethod.invoke(playerConnection, packetPlayOutEntityDestroyConstructor.newInstance(new int[] {(int) getIdMethod.invoke(entity)}));
+				BedwarsPlugin.getInstance().reflectionUtils.playerSendPacket(p, new ClientboundRemoveEntitiesPacket(getEntityId()));
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public int getEntityId() {
+		// .hashCode() does the same thing as .getId()
+		// We do not use .getId() because the method name is obfuscated on some nms version.
+		return entity.hashCode();
 	}
 	
 }

@@ -23,6 +23,7 @@ import com.mojang.authlib.GameProfile;
 import filip.bedwars.BedwarsPlugin;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
@@ -632,6 +633,16 @@ public class ReflectionUtils {
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public ServerGamePacketListenerImpl playerGetConnection(Player player) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+		ServerPlayer nmsPlayer = playerToNMSPlayer(player);
+		return (ServerGamePacketListenerImpl)entityPlayerPlayerConnectionField.get(nmsPlayer);
+	}
+
+	public void playerSendPacket(Player player, Packet<?> packet) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		ServerGamePacketListenerImpl connection = playerGetConnection(player);
+		playerConnectionSendPacketMethod.invoke(connection, packet);
 	}
 
 }

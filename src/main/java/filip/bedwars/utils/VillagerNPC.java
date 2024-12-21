@@ -2,7 +2,6 @@ package filip.bedwars.utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -16,7 +15,6 @@ import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.VillagerData;
@@ -75,24 +73,16 @@ public class VillagerNPC {
 	}
 	
 	public void teleport(double x, double y, double z, Player... viewers) {
+		try {
+			reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, 0f, 0f);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
+			return;
+		}
+
 		for (Player p : viewers) {
 			try {
-				//entity.moveTo(x, y, z, 0f, 0f);
-				reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, 0f, 0f);
-				//reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, 0f, 0f);
-				ClientboundTeleportEntityPacket packet = new ClientboundTeleportEntityPacket(entity);
-				//Object packet = reflectionUtils.packetPlayOutEntityTeleportConstructor.newInstance(entity);
-				ServerPlayer entityPlayer = reflectionUtils.playerToNMSPlayer(p);
-				//CraftPlayer craftPlayer = (CraftPlayer)p;
-				//Object craftPlayer = reflectionUtils.craftPlayerClass.cast(p);
-				//ServerPlayer entityPlayer = craftPlayer.getHandle();
-				//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(craftPlayer);
-				//ServerGamePacketListenerImpl playerConnection =  entityPlayer.connection;
-				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
-				//Object playerConnection = reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
-				//playerConnection.send(packet);
-				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
-				//reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
+				reflectionUtils.playerSendPacket(p, new ClientboundTeleportEntityPacket(entity));
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
 			}
@@ -102,19 +92,7 @@ public class VillagerNPC {
 	public void despawn(Player... viewers) {
 		for (Player p : viewers) {
 			try {
-				ClientboundRemoveEntitiesPacket packet = new ClientboundRemoveEntitiesPacket(getEntityId());
-				//Object packet = reflectionUtils.packetPlayOutEntityDestroyConstructor.newInstance(new int[] {entity.getId()});
-				ServerPlayer entityPlayer = reflectionUtils.playerToNMSPlayer(p);
-				//CraftPlayer craftPlayer = (CraftPlayer)p;
-				//Object craftPlayer = reflectionUtils.craftPlayerClass.cast(p);
-				//ServerPlayer entityPlayer = craftPlayer.getHandle();
-				//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(craftPlayer);
-				//ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
-				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
-				//Object playerConnection = reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
-				//playerConnection.send(packet);
-				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
-				//reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
+				reflectionUtils.playerSendPacket(p, new ClientboundRemoveEntitiesPacket(getEntityId()));
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
 			}
@@ -128,14 +106,7 @@ public class VillagerNPC {
 			try {
 				//Object packet = reflectionUtils.packetPlayOutSpawnEntityLivingConstructor.newInstance(entity);
 				ClientboundAddEntityPacket packet = new ClientboundAddEntityPacket((net.minecraft.world.entity.Entity)entity);
-				ServerPlayer entityPlayer = reflectionUtils.playerToNMSPlayer(p);
-				//CraftPlayer craftPlayer = (CraftPlayer)p;
-				//Object craftPlayer = reflectionUtils.craftPlayerClass.cast(p);
-				//ServerPlayer entityPlayer = craftPlayer.getHandle();
-				//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(craftPlayer);
-				//ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
-				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
-				//Object playerConnection = reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
+				ServerGamePacketListenerImpl playerConnection = reflectionUtils.playerGetConnection(p);
 				//playerConnection.send(packet);
 				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
 				//reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
@@ -160,13 +131,6 @@ public class VillagerNPC {
 		// .hashCode() does the same thing as .getId()
 		// We do not use .getId() because the method name is obfuscated on some nms version.
 		return entity.hashCode();
-		/*try {
-			return (int) reflectionUtils.entityGetIdMethod.invoke(entity);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
-		
-		return 0;*/
 	}
 	
 }

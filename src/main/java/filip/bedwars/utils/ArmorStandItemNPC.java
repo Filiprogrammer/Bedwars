@@ -21,7 +21,6 @@ import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.decoration.ArmorStand;
 
@@ -57,14 +56,7 @@ public class ArmorStandItemNPC {
 			//entityArmorStandClass.getMethod("setInvisible", boolean.class).invoke(entity, true);
 
 			for (Player p : viewers) {
-				ServerPlayer entityPlayer = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(p);
-				//CraftPlayer craftPlayer = (CraftPlayer)p;
-				//Object craftPlayer = craftPlayerClass.cast(p);
-				//ServerPlayer entityPlayer = craftPlayer.getHandle();
-				//Object entityPlayer = getHandleCraftPlayerMethod.invoke(craftPlayer);
-				//ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
-				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
-				//Object playerConnection = playerConnectionField.get(entityPlayer);
+				ServerGamePacketListenerImpl playerConnection = BedwarsPlugin.getInstance().reflectionUtils.playerGetConnection(p);
 				//playerConnection.send(new ClientboundAddEntityPacket(entity));
 				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, new ClientboundAddEntityPacket(entity));
 				//sendPacketMethod.invoke(playerConnection, packetPlayOutSpawnEntityConstructor.newInstance(entity));
@@ -94,24 +86,16 @@ public class ArmorStandItemNPC {
 	}
 	
 	public void teleport(double x, double y, double z, Player... viewers) {
+		try {
+			BedwarsPlugin.getInstance().reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, 0f, 0f);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
+			return;
+		}
+
 		for (Player p : viewers) {
 			try {
-				//entity.moveTo(x, y, z);
-				BedwarsPlugin.getInstance().reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, 0f, 0f);
-				//setPositionMethod.invoke(entity, x, y, z);
-				ClientboundTeleportEntityPacket packet = new ClientboundTeleportEntityPacket(entity);
-				//Object packet = packetPlayOutEntityTeleportConstructor.newInstance(entity);
-				ServerPlayer entityPlayer = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(p);
-				//CraftPlayer craftPlayer = (CraftPlayer)p;
-				//Object craftPlayer = craftPlayerClass.cast(p);
-				//ServerPlayer entityPlayer = craftPlayer.getHandle();
-				//Object entityPlayer = getHandleCraftPlayerMethod.invoke(craftPlayer);
-				//ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
-				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
-				//Object playerConnection = playerConnectionField.get(entityPlayer);
-				//playerConnection.send(packet);
-				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
-				//sendPacketMethod.invoke(playerConnection, packet);
+				BedwarsPlugin.getInstance().reflectionUtils.playerSendPacket(p, new ClientboundTeleportEntityPacket(entity));
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
 			}
@@ -121,19 +105,7 @@ public class ArmorStandItemNPC {
 	public void despawn(Player... viewers) {
 		for (Player p : viewers) {
 			try {
-				ClientboundRemoveEntitiesPacket packet = new ClientboundRemoveEntitiesPacket(getEntityId());
-				//Object packet = packetPlayOutEntityDestroyConstructor.newInstance(new int[] {entity.getId()});
-				ServerPlayer entityPlayer = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(p);
-				//CraftPlayer craftPlayer = (CraftPlayer)p;
-				//Object craftPlayer = craftPlayerClass.cast(p);
-				//ServerPlayer entityPlayer = craftPlayer.getHandle();
-				//Object entityPlayer = getHandleCraftPlayerMethod.invoke(craftPlayer);
-				//ServerGamePacketListenerImpl playerConnection = entityPlayer.connection;
-				ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(entityPlayer);
-				//Object playerConnection = playerConnectionField.get(entityPlayer);
-				//playerConnection.send(packet);
-				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
-				//sendPacketMethod.invoke(playerConnection, packet);
+				BedwarsPlugin.getInstance().reflectionUtils.playerSendPacket(p, new ClientboundRemoveEntitiesPacket(getEntityId()));
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
 			}

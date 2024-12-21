@@ -20,7 +20,6 @@ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public class PlayerUtils {
 
@@ -36,7 +35,7 @@ public class PlayerUtils {
 			// viewerConnection.sendPacket(new PacketPlayOutEntityDestroy(toHideEntityId));
 			ClientboundRemoveEntitiesPacket packetPlayOutEntityDestroy = new ClientboundRemoveEntitiesPacket(toHideEntityId);
 			//Object packetPlayOutEntityDestroy = BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutEntityDestroyConstructor.newInstance(new int[] {toHideEntityId});
-			sendPacket(viewer, packetPlayOutEntityDestroy);
+			BedwarsPlugin.getInstance().reflectionUtils.playerSendPacket(viewer, packetPlayOutEntityDestroy);
 		} catch (SecurityException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
@@ -52,7 +51,7 @@ public class PlayerUtils {
 			// viewerConnection.sendPacket(new PacketPlayOutNamedEntitySpawn(toHideEntityPlayer));
 			ClientboundAddEntityPacket packetPlayOutNamedEntitySpawn = new ClientboundAddEntityPacket(toHideEntityPlayer);
 			//Object packetPlayOutNamedEntitySpawn = BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutNamedEntitySpawnConstructor.newInstance(toHideEntityPlayer);
-			sendPacket(viewer, packetPlayOutNamedEntitySpawn);
+			BedwarsPlugin.getInstance().reflectionUtils.playerSendPacket(viewer, packetPlayOutNamedEntitySpawn);
 		} catch (SecurityException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
@@ -76,7 +75,7 @@ public class PlayerUtils {
 				packet = (Packet<?>)BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)BedwarsPlugin.getInstance().reflectionUtils.enumPlayerInfoActionClass, "REMOVE_PLAYER"), new ServerPlayer[]{nmsToHide});
 			}
 
-			sendPacket(viewer, packet);
+			BedwarsPlugin.getInstance().reflectionUtils.playerSendPacket(viewer, packet);
 		} catch (SecurityException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
 			e.printStackTrace();
 		}
@@ -166,21 +165,6 @@ public class PlayerUtils {
 
 		for (PotionEffect potionEffect : player.getActivePotionEffects())
 			player.removePotionEffect(potionEffect.getType());
-	}
-
-	private static void sendPacket(Player player, net.minecraft.network.protocol.Packet<?> packet) {
-	    try {
-			ServerPlayer handle = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(player);
-	    	//Object handle = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(player);
-			//ServerGamePacketListenerImpl playerConnection = handle.connection;
-			ServerGamePacketListenerImpl playerConnection = (ServerGamePacketListenerImpl)BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(handle);
-	    	//Object playerConnection = BedwarsPlugin.getInstance().reflectionUtils.entityPlayerPlayerConnectionField.get(handle);
-
-			//playerConnection.send(packet);
-			BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
-	    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-	        e.printStackTrace();
-	    }
 	}
 
 }

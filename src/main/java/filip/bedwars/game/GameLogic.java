@@ -691,10 +691,13 @@ public class GameLogic implements Listener {
 
 							//hasTag = nmsOffHandItemStack.hasTag();
 							hasTag = (boolean) BedwarsPlugin.getInstance().reflectionUtils.itemStackHasTagMethod.invoke(nmsOffHandItemStack);
-							if (hasTag)
-								hasKey = nmsOffHandItemStack.getTag().contains("bedwars-fireball");
+							if (hasTag) {
+								CompoundTag nbtTagCompound = (CompoundTag)BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsOffHandItemStack);
+								hasKey = (boolean)BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundHasKeyMethod.invoke(nbtTagCompound, "bedwars-fireball");
+								//hasKey = nmsOffHandItemStack.getTag().contains("bedwars-fireball");
 								//hasKey = (boolean) BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundHasKeyMethod.invoke(nmsOffHandItemStack.getTag(), "bedwars-fireball");
-							
+							}
+
 							if (!(hasTag && hasKey))
 								shouldLaunchFireball = true;
 						} else {
