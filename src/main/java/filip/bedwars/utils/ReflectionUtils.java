@@ -90,7 +90,9 @@ public class ReflectionUtils {
 	//public Method itemStackGetTagMethod;
 	public Method entitySetCustomNameMethod;
 	public final Method entitySetCustomNameVisibleMethod;
+	public final Method entitySetInvisibleMethod;
 	public Method entityVillagerSetVillagerDataMethod;
+	public final Method entityArmorStandSetSmallMethod;
 	//public Method damageSourceDamageEntityMethod;
 	//public Method iChatBaseComponentAddSiblingMethod;
 	//public Method entityPlayerGetCombatTrackerMethod;
@@ -230,6 +232,13 @@ public class ReflectionUtils {
 		} else {
 			entitySetCustomNameVisibleMethod = entityClass.getMethod("n", boolean.class);
 		}
+
+		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0) {
+			entitySetInvisibleMethod = entityClass.getMethod("setInvisible", boolean.class);
+		} else {
+			entitySetInvisibleMethod = entityClass.getMethod("j", boolean.class);
+		}
+
 		//entityVillagerSetVillagerDataMethod = entityVillagerClass.getMethod("setVillagerData", villagerDataClass);
 		for (Method method : VillagerDataHolder.class.getMethods()) {
 			if (method.getParameterCount() != 1)
@@ -240,6 +249,15 @@ public class ReflectionUtils {
 				break;
 			}
 		}
+
+		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0) {
+			entityArmorStandSetSmallMethod = net.minecraft.world.entity.decoration.ArmorStand.class.getMethod("setSmall", boolean.class);
+		} else if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") <= 0) {
+			entityArmorStandSetSmallMethod = net.minecraft.world.entity.decoration.ArmorStand.class.getMethod("a", boolean.class);
+		} else {
+			entityArmorStandSetSmallMethod = net.minecraft.world.entity.decoration.ArmorStand.class.getMethod("t", boolean.class);
+		}
+
 		//damageSourceDamageEntityMethod = entityPlayerClass.getMethod("damageEntity", damageSourceClass, float.class);
 		//iChatBaseComponentAddSiblingMethod = iChatBaseComponentClass.getMethod("addSibling", iChatBaseComponentClass);
 		//entityPlayerGetCombatTrackerMethod = entityPlayerClass.getMethod("getCombatTracker");
