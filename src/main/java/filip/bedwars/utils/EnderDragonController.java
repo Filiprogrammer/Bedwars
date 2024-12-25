@@ -25,7 +25,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonHoldingPatternPhase;
-import net.minecraft.world.entity.boss.enderdragon.phases.DragonLandingApproachPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonLandingPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
 import net.minecraft.world.phys.Vec3;
@@ -270,19 +269,6 @@ public class EnderDragonController {
 			Object dragonChargePlayerPhase = reflectionUtils.dragonPhaseManagerGetCurrentPhaseMethod.invoke(phaseManager);
 			reflectionUtils.dragonChargePlayerPhaseSetTargetMethod.invoke(dragonChargePlayerPhase, new Vec3(loc.getX(), loc.getY(), loc.getZ()));
 		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void dragonLandingApproach(Location loc) {
-		try {
-			Object phaseManager = reflectionUtils.entityEnderDragonGetPhaseManagerMethod.invoke(dragon);
-			reflectionUtils.dragonPhaseManagerSetPhaseMethod.invoke(phaseManager, EnderDragonPhase.LANDING_APPROACH);
-			Object dragonLandingApproachPhase = reflectionUtils.dragonPhaseManagerGetCurrentPhaseMethod.invoke(phaseManager);
-			Field dField = DragonLandingApproachPhase.class.getDeclaredField("d");
-			dField.setAccessible(true);
-			dField.set(dragonLandingApproachPhase, new Vec3(loc.getX(), loc.getY(), loc.getZ()));
-		} catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 	}
