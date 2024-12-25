@@ -67,7 +67,7 @@ public class BedwarsPlugin extends JavaPlugin {
 		plugin = this;
 		try {
 			reflectionUtils = new ReflectionUtils();
-		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | NoSuchFieldException e) {
 			e.printStackTrace();
 			getServer().getPluginManager().disablePlugin(this);
 		}

@@ -43,10 +43,11 @@ public class ReflectionUtils {
 	public final Class<?> craftWorldClass;
 	public final Class<?> craftPlayerClass;
 	public final Class<?> craftServerClass;
+	public final Class<?> craftEntityClass;
 	public final Class<?> dragonControllerPhaseClass;
 	public final Class<?> dragonControllerStrafeClass;
 	public final Class<?> dragonControllerChargeClass;
-	public final Class<?> dragonControllerManagerClass;
+	public final Class<?> dragonPhaseManagerClass;
 	public final Class<?> entityEnderDragonClass;
 	public final Class<?> entityLivingClass;
 	public final Class<?> entityPlayerClass;
@@ -58,7 +59,6 @@ public class ReflectionUtils {
 	//public Class<?> packetPlayOutSpawnEntityLivingClass;
 	public final Class<?> playerConnectionClass;
 	public final Class<?> vec3DClass;
-	public final Class<?> worldClass;
 	//public Class<?> itemStackClass;
 	//public Class<?> nbtTagCompoundClass;
 	public final Class<?> craftItemStackClass;
@@ -77,22 +77,23 @@ public class ReflectionUtils {
 	//public Class<?> packetPlayOutNamedEntitySpawnClass;
 	//public Class<?> damageSourceClass;
 	//public Class<?> combatTrackerClass;
-	//public Method entityEnderDragonTickMethod;
+	public final Method mobTickMethod;
 	public Method entitySetLocationMethod;
 	//public Method entityGetIdMethod;
-	//public Method entityGetWorldMethod;
+	public Method entityLevelMethod;
 	public Method entityGetEntityDataMethod;
 	public final Method craftWorldGetHandleMethod;
 	public final Method craftWorldGetNameMethod;
 	public final Method craftPlayerGetHandleMethod;
 	public final Method craftServerGetServerMethod;
-	public final Method worldGetWorldMethod;
+	public final Method craftEntityGetLocationMethod;
+	public final Method levelGetWorldMethod;
 	public Method playerConnectionSendPacketMethod;
-	//public Method entityEnderDragonGetDragonControllerManagerMethod;
-	public Method dragonControllerManagerSetControllerPhaseMethod;
-	public Method dragonControllerManagerBMethod;
-	public final Method dragonControllerStrafeAMethod;
-	public final Method dragonControllerChargeAMethod;
+	public Method entityEnderDragonGetPhaseManagerMethod;
+	public Method dragonPhaseManagerSetPhaseMethod;
+	public Method dragonPhaseManagerGetCurrentPhaseMethod;
+	public Method dragonStrafePlayerPhaseSetTargetMethod;
+	public Method dragonChargePlayerPhaseSetTargetMethod;
 	public final Method craftItemStackAsNMSCopyMethod;
 	public final Method craftItemStackAsBukkitCopyMethod;
 	public Method itemStackGetOrCreateTagMethod;
@@ -113,9 +114,6 @@ public class ReflectionUtils {
 	public Method combatTrackerGetDeathMessageMethod;
 	public Field entityPlayerPlayerConnectionField;
 	//public Field entityTypesEnderDragonField;
-	//public Field entityLocXField;
-	//public Field entityLocYField;
-	//public Field entityLocZField;
 	//public Field dragonControllerPhaseStrafePlayerField;
 	//public Field dragonControllerPhaseHoldingPatternField;
 	//public Field dragonControllerPhaseChargingPlayerField;
@@ -149,17 +147,19 @@ public class ReflectionUtils {
 	public Method mutableComponentAppendMethod;
 	public Method entityLivingGetCombatTrackerMethod;
 	public final Method serverPlayerSendSystemMessageMethod;
+	public final Method entityGetBukkitEntityMethod;
 
-	public ReflectionUtils() throws ClassNotFoundException, NoSuchMethodException, SecurityException {
+	public ReflectionUtils() throws ClassNotFoundException, NoSuchMethodException, SecurityException, NoSuchFieldException {
 		String bukkitVersion = Bukkit.getBukkitVersion();
 		String serverVersion = BedwarsPlugin.getInstance().getServerVersion();
 		craftWorldClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".CraftWorld");
 		craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".entity.CraftPlayer");
 		craftServerClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".CraftServer");
+		craftEntityClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".entity.CraftEntity");
 		dragonControllerPhaseClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerPhase");
 		dragonControllerStrafeClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerStrafe");
 		dragonControllerChargeClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerCharge");
-		dragonControllerManagerClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager");
+		dragonPhaseManagerClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager");
 		entityEnderDragonClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon");
 		entityLivingClass = Class.forName("net.minecraft.world.entity.EntityLiving");
 		entityPlayerClass = Class.forName("net.minecraft.server.level.EntityPlayer");
@@ -171,7 +171,6 @@ public class ReflectionUtils {
 		//packetPlayOutSpawnEntityLivingClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving");
 		playerConnectionClass = Class.forName("net.minecraft.server.network.PlayerConnection");
 		vec3DClass = Class.forName("net.minecraft.world.phys.Vec3D");
-		worldClass = Class.forName("net.minecraft.world.level.World");
 		entityVillagerClass = Class.forName("net.minecraft.world.entity.npc.EntityVillager");
 		//iChatBaseComponentClass = Class.forName("net.minecraft.network.chat.IChatBaseComponent");
 		//chatComponentTextClass = Class.forName("net.minecraft.server." + serverVersion + ".ChatComponentText");
@@ -185,7 +184,13 @@ public class ReflectionUtils {
 		//packetPlayOutNamedEntitySpawnClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutNamedEntitySpawn");
 		//damageSourceClass = Class.forName("net.minecraft.server." + serverVersion + ".DamageSource");
 		//combatTrackerClass = Class.forName("net.minecraft.server." + serverVersion + ".CombatTracker");
-		//entityEnderDragonTickMethod = entityEnderDragonClass.getMethod("tick");
+		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0) {
+			mobTickMethod = net.minecraft.world.entity.Mob.class.getMethod("tick");
+		} else if (bukkitVersion.compareTo("1.19.2-R0.1-SNAPSHOT") <= 0) {
+			mobTickMethod = net.minecraft.world.entity.Mob.class.getMethod("k");
+		} else {
+			mobTickMethod = net.minecraft.world.entity.Mob.class.getMethod("l");
+		}
 
 		for (Method method : entityClass.getMethods()) {
 			if (method.getParameterCount() != 5)
@@ -205,6 +210,12 @@ public class ReflectionUtils {
 		// 1.19 & 1.19.1: .ae()
 
 		//entityGetWorldMethod = entityClass.getMethod("getWorld");
+		for (Method method : entityClass.getMethods()) {
+			if (method.getParameterCount() == 0 && method.getReturnType() == net.minecraft.world.level.Level.class) {
+				entityLevelMethod = method;
+				break;
+			}
+		}
 
 		for (Method method : entityClass.getMethods()) {
 			if (method.getParameterCount() == 0 && method.getReturnType() == SynchedEntityData.class) {
@@ -217,7 +228,8 @@ public class ReflectionUtils {
 		craftWorldGetNameMethod = craftWorldClass.getMethod("getName");
 		craftPlayerGetHandleMethod = craftPlayerClass.getMethod("getHandle");
 		craftServerGetServerMethod = craftServerClass.getMethod("getServer");
-		worldGetWorldMethod = worldClass.getMethod("getWorld");
+		craftEntityGetLocationMethod = craftEntityClass.getMethod("getLocation");
+		levelGetWorldMethod = net.minecraft.world.level.Level.class.getMethod("getWorld");
 		for (Method method : playerConnectionClass.getMethods()) {
 			if (method.getParameterCount() == 1 && method.getParameterTypes()[0] == packetClass) {
 				playerConnectionSendPacketMethod = method;
@@ -226,20 +238,42 @@ public class ReflectionUtils {
 		}
 		//playerConnectionSendPacketMethod = playerConnectionClass.getMethod("sendPacket", packetClass);
 		//entityEnderDragonGetDragonControllerManagerMethod = entityEnderDragonClass.getMethod("getDragonControllerManager");
-		for (Method method : dragonControllerManagerClass.getMethods()) {
-			if (method.getName().equals("setControllerPhase")) {
-				dragonControllerManagerSetControllerPhaseMethod = method;
+		for (Method method : entityEnderDragonClass.getMethods()) {
+			if (method.getParameterCount() == 0 && method.getReturnType() == net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhaseManager.class) {
+				entityEnderDragonGetPhaseManagerMethod = method;
 				break;
 			}
 		}
-		for (Method method : dragonControllerManagerClass.getMethods()) {
-			if (method.getName().equals("b")) {
-				dragonControllerManagerBMethod = method;
+		for (Method method : dragonPhaseManagerClass.getMethods()) {
+			if (method.getParameterCount() != 1)
+				continue;
+
+			if (method.getParameterTypes()[0] != net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase.class)
+				continue;
+
+			if (method.getReturnType().equals(Void.TYPE)) {
+				dragonPhaseManagerSetPhaseMethod = method;
 				break;
 			}
 		}
-		dragonControllerStrafeAMethod = dragonControllerStrafeClass.getMethod("a", entityLivingClass);
-		dragonControllerChargeAMethod = dragonControllerChargeClass.getMethod("a", vec3DClass);
+		for (Method method : dragonPhaseManagerClass.getMethods()) {
+			if (method.getParameterCount() == 0 && method.getReturnType() == net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance.class) {
+				dragonPhaseManagerGetCurrentPhaseMethod = method;
+				break;
+			}
+		}
+		for (Method method : dragonControllerStrafeClass.getMethods()) {
+			if (method.getParameterCount() == 1 && method.getParameterTypes()[0] == entityLivingClass) {
+				dragonStrafePlayerPhaseSetTargetMethod = method;
+				break;
+			}
+		}
+		for (Method method : dragonControllerChargeClass.getMethods()) {
+			if (method.getParameterCount() == 1 && method.getParameterTypes()[0] == vec3DClass) {
+				dragonChargePlayerPhaseSetTargetMethod = method;
+				break;
+			}
+		}
 		//entitySetCustomNameMethod = entityClass.getMethod("setCustomName", iChatBaseComponentClass);
 		for (Method method : entityClass.getMethods()) {
 			if (method.getParameterCount() != 1)
@@ -305,12 +339,6 @@ public class ReflectionUtils {
 		//entityPlayerPlayerConnectionField = entityPlayerClass.getField("playerConnection");
 
 		//entityTypesEnderDragonField = entityTypesClass.getField("ENDER_DRAGON");
-		//entityLocXField = entityClass.getDeclaredField("xo");
-		//entityLocXField.setAccessible(true);
-		//entityLocYField = entityClass.getDeclaredField("yo");
-		//entityLocYField.setAccessible(true);
-		//entityLocZField = entityClass.getDeclaredField("zo");
-		//entityLocZField.setAccessible(true);
 		//dragonControllerPhaseStrafePlayerField = dragonControllerPhaseClass.getField("STRAFE_PLAYER");
 		//dragonControllerPhaseHoldingPatternField = dragonControllerPhaseClass.getField("HOLDING_PATTERN");
 		//dragonControllerPhaseChargingPlayerField = dragonControllerPhaseClass.getField("CHARGING_PLAYER");
@@ -558,6 +586,8 @@ public class ReflectionUtils {
 		} else {
 			serverPlayerSendSystemMessageMethod = ServerPlayer.class.getMethod("a", Component.class);
 		}
+
+		entityGetBukkitEntityMethod = entityClass.getMethod("getBukkitEntity");
 	}
 
 	public ServerPlayer playerToNMSPlayer(Player player) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
