@@ -108,29 +108,34 @@ public class EnderDragonController {
 						currentTargetEntity = null;
 					else
 						currentTargetEntity = targetEntities.get(random.nextInt(targetEntities.size()));
-					
-					dragonPhase = random.nextInt(5);
 				}
-				
+
+				if (random.nextInt(100) == 0) {
+					dragonPhase = random.nextInt(4);
+				}
+
 				if (currentTargetEntity == null) {
 					dragonHoldingPattern(spawnLoc);
 				} else {
 					switch (dragonPhase) {
 					case 0:
-						dragonHoldingPattern(currentTargetEntity.getLocation());
+						dragonChargingPlayer(currentTargetEntity.getLocation().clone().add(0, -1, 0));
 						break;
 					case 1:
-						if (reflectionUtils.entityLivingClass.isInstance(currentTargetEntity))
-							dragonStrafePlayer((LivingEntity)currentTargetEntity);
+						try {
+							net.minecraft.world.entity.Entity nmsEntity = reflectionUtils.entityToNMSEntity(currentTargetEntity);
+							if (reflectionUtils.entityLivingClass.isInstance(nmsEntity)) {
+								dragonStrafePlayer((LivingEntity)nmsEntity);
+							}
+						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+							e.printStackTrace();
+						}
 						break;
 					case 2:
-						dragonChargingPlayer(currentTargetEntity.getLocation());
+						dragonLanding(currentTargetEntity.getLocation());
 						break;
 					case 3:
-						dragonLandingApproach(currentTargetEntity.getLocation());
-						break;
-					case 4:
-						dragonLanding(currentTargetEntity.getLocation());
+						dragonHoldingPattern(currentTargetEntity.getLocation());
 						break;
 					}
 				}

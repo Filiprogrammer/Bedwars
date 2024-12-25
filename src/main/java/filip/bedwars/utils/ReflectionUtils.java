@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -86,6 +87,7 @@ public class ReflectionUtils {
 	public final Method craftWorldGetNameMethod;
 	public final Method craftPlayerGetHandleMethod;
 	public final Method craftServerGetServerMethod;
+	public final Method craftEntityGetHandleMethod;
 	public final Method craftEntityGetLocationMethod;
 	public final Method levelGetWorldMethod;
 	public Method playerConnectionSendPacketMethod;
@@ -228,6 +230,7 @@ public class ReflectionUtils {
 		craftWorldGetNameMethod = craftWorldClass.getMethod("getName");
 		craftPlayerGetHandleMethod = craftPlayerClass.getMethod("getHandle");
 		craftServerGetServerMethod = craftServerClass.getMethod("getServer");
+		craftEntityGetHandleMethod = craftEntityClass.getMethod("getHandle");
 		craftEntityGetLocationMethod = craftEntityClass.getMethod("getLocation");
 		levelGetWorldMethod = net.minecraft.world.level.Level.class.getMethod("getWorld");
 		for (Method method : playerConnectionClass.getMethods()) {
@@ -606,6 +609,12 @@ public class ReflectionUtils {
 		// return ((CraftServer)server).getServer();
 		Object craftServer = craftServerClass.cast(server);
 		return (DedicatedServer)craftServerGetServerMethod.invoke(craftServer);
+	}
+
+	public net.minecraft.world.entity.Entity entityToNMSEntity(Entity entity) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		// return ((CraftEntity)entity).getHandle();
+		Object craftEntity = craftEntityClass.cast(entity);
+		return (net.minecraft.world.entity.Entity)craftEntityGetHandleMethod.invoke(craftEntity);
 	}
 
 	public VillagerType parseVillagerType(String name) {
