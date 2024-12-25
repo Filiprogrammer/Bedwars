@@ -118,7 +118,7 @@ public class EnderDragonController {
 				} else {
 					switch (dragonPhase) {
 					case 0:
-						dragonChargingPlayer(currentTargetEntity.getLocation().clone().add(0, -1, 0));
+						dragonChargingPlayer(currentTargetEntity.getLocation().clone().add(0, -2, 0));
 						break;
 					case 1:
 						try {
@@ -131,10 +131,10 @@ public class EnderDragonController {
 						}
 						break;
 					case 2:
-						dragonLanding(currentTargetEntity.getLocation());
+						dragonLanding(currentTargetEntity.getLocation().clone().add(0, -2, 0));
 						break;
 					case 3:
-						dragonHoldingPattern(currentTargetEntity.getLocation());
+						dragonHoldingPattern(currentTargetEntity.getLocation().clone().add(0, -2, 0));
 						break;
 					}
 				}
