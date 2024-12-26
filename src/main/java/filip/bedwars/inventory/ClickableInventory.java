@@ -1,11 +1,12 @@
 package filip.bedwars.inventory;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+
+import filip.bedwars.BedwarsPlugin;
+import filip.bedwars.utils.ReflectionUtils;
 
 public abstract class ClickableInventory implements IClickable {
 	
@@ -37,7 +38,7 @@ public abstract class ClickableInventory implements IClickable {
 		
 		return (this.player == player) && invTitle.equals(inventoryGetTitle(this.inventory));
 	}
-	
+
 	/**
 	 * An ugly way to get the title of the inventory because inventory.getTitle() has been removed in 1.14
 	 * @param inv
@@ -45,38 +46,23 @@ public abstract class ClickableInventory implements IClickable {
 	 */
 	private String inventoryGetTitle(Inventory inv) {
 		try {
-			String versionStr = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-			
-			Class<?> craftInventoryCustomClass = Class.forName("org.bukkit.craftbukkit." + versionStr + ".inventory.CraftInventoryCustom");
-			Class<?>[] craftInventoryCustomClasses = craftInventoryCustomClass.getDeclaredClasses();
-			Class<?> minecraftInventoryClass = null;
-			for (Class<?> subclass : craftInventoryCustomClasses) {
-				if (subclass.getSimpleName().equals("MinecraftInventory")) {
-					minecraftInventoryClass = subclass;
-					break;
-				}
-			}
-			Class<?> craftInventoryClass = Class.forName("org.bukkit.craftbukkit." + versionStr + ".inventory.CraftInventory");
-			Method getInventoryMethod = craftInventoryClass.getMethod("getInventory");
-			
+			ReflectionUtils reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
 			// CraftInventory cinv = (CraftInventory) inv;
-			Object cinv = craftInventoryClass.cast(inv);
-			
+			Object cinv = reflectionUtils.craftInventoryClass.cast(inv);
+
 			// IInventory iinv = cinv.getInventory();
-			Object iinv = getInventoryMethod.invoke(cinv);
-			
-			if (!iinv.getClass().getSimpleName().equals("MinecraftInventory"))
+			Object iinv = reflectionUtils.craftInventoryGetInventoryMethod.invoke(cinv);
+
+			if (iinv.getClass() != reflectionUtils.minecraftInventoryClass)
 				return null;
-			
-			Object minv = minecraftInventoryClass.cast(iinv);
-			Method getTitleMethod = minecraftInventoryClass.getMethod("getTitle");
-			getTitleMethod.setAccessible(true);
-			String title = (String) getTitleMethod.invoke(minv);
+
+			Object minv = reflectionUtils.minecraftInventoryClass.cast(iinv);
+			String title = (String) reflectionUtils.minecraftInventoryGetTitleMethod.invoke(minv);
 			return title;
-		} catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
     }
 }

@@ -25,38 +25,24 @@ public class PlayerUtils {
 
 	public static void hidePlayerEntity(Player toHide, Player viewer) {
 		try {
-			// .hashCode() does the same thing as .getId()
-			// We do not use .getId() because the method name is obfuscated on some nms version.
-			int toHideEntityId = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(toHide).hashCode();
-			//Object toHideCraftPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerClass.cast(toHide);
-			//Object toHideEntityPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(toHideCraftPlayer);
-			//int toHideEntityId = (int) BedwarsPlugin.getInstance().reflectionUtils.entityGetIdMethod.invoke(toHideEntityPlayer);
-
-			// viewerConnection.sendPacket(new PacketPlayOutEntityDestroy(toHideEntityId));
+			int toHideEntityId = toHide.getEntityId();
 			ClientboundRemoveEntitiesPacket packetPlayOutEntityDestroy = new ClientboundRemoveEntitiesPacket(toHideEntityId);
-			//Object packetPlayOutEntityDestroy = BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutEntityDestroyConstructor.newInstance(new int[] {toHideEntityId});
 			BedwarsPlugin.getInstance().reflectionUtils.playerSendPacket(viewer, packetPlayOutEntityDestroy);
 		} catch (SecurityException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public static void showPlayerEntity(Player toHide, Player viewer) {
-		try {
-			// EntityPlayer toHideEntityPlayer = ((CraftPlayer) toHide).getHandle();
-			//Object toHideCraftPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerClass.cast(toHide);
-			//Object toHideEntityPlayer = BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(toHideCraftPlayer);
-			ServerPlayer toHideEntityPlayer = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(toHide);
 
-			// viewerConnection.sendPacket(new PacketPlayOutNamedEntitySpawn(toHideEntityPlayer));
-			ClientboundAddEntityPacket packetPlayOutNamedEntitySpawn = new ClientboundAddEntityPacket(toHideEntityPlayer);
-			//Object packetPlayOutNamedEntitySpawn = BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutNamedEntitySpawnConstructor.newInstance(toHideEntityPlayer);
+	public static void showPlayerEntity(Player toShow, Player viewer) {
+		try {
+			ServerPlayer toShowEntityPlayer = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(toShow);
+			ClientboundAddEntityPacket packetPlayOutNamedEntitySpawn = new ClientboundAddEntityPacket(toShowEntityPlayer);
 			BedwarsPlugin.getInstance().reflectionUtils.playerSendPacket(viewer, packetPlayOutNamedEntitySpawn);
 		} catch (SecurityException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void hidePlayer(Player toHide, Player viewer) {
 		String bukkitVersion = Bukkit.getBukkitVersion();
 

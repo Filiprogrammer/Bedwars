@@ -41,115 +41,133 @@ import net.minecraft.world.entity.npc.VillagerType;
 
 public class ReflectionUtils {
 
-	public final Class<?> craftWorldClass;
-	public final Class<?> craftPlayerClass;
-	public final Class<?> craftServerClass;
+	// org.bukkit.craftbukkit
 	public final Class<?> craftEntityClass;
-	public final Class<?> dragonControllerPhaseClass;
-	public final Class<?> dragonControllerStrafeClass;
-	public final Class<?> dragonControllerChargeClass;
-	public final Class<?> dragonPhaseManagerClass;
-	public final Class<?> entityEnderDragonClass;
-	public final Class<?> entityLivingClass;
-	public final Class<?> entityPlayerClass;
-	public final Class<?> entityClass;
-	public final Class<?> entityTypesClass;
-	public final Class<?> packetClass;
-	public final Class<?> packetPlayOutEntityDestroyClass;
-	public final Class<?> packetPlayOutEntityTeleportClass;
-	//public Class<?> packetPlayOutSpawnEntityLivingClass;
-	public final Class<?> playerConnectionClass;
-	public final Class<?> vec3DClass;
-	//public Class<?> itemStackClass;
-	//public Class<?> nbtTagCompoundClass;
-	public final Class<?> craftItemStackClass;
-	//public Class<?> nbtTagIntClass;
-	//public Class<?> nbtBaseClass;
-	public final Class<?> entityVillagerClass;
-	//public final Class<?> iChatBaseComponentClass;
-	//public Class<?> chatComponentTextClass;
-	//public final Class<?> villagerDataClass;
-	public final Class<?> villagerTypeClass;
-	public final Class<?> villagerProfessionClass;
-	public final Class<?> entityHumanClass;
-	public final Class<?> packetPlayOutPlayerInfoClass;
-	public final Class<?> enumPlayerInfoActionClass;
-	public final Class<?> playerInfoDataClass;
-	//public Class<?> packetPlayOutNamedEntitySpawnClass;
-	//public Class<?> damageSourceClass;
-	//public Class<?> combatTrackerClass;
-	public final Method mobTickMethod;
-	public Method entitySetLocationMethod;
-	//public Method entityGetIdMethod;
-	public Method entityLevelMethod;
-	public Method entityGetEntityDataMethod;
-	public final Method craftWorldGetHandleMethod;
-	public final Method craftWorldGetNameMethod;
-	public final Method craftPlayerGetHandleMethod;
-	public final Method craftServerGetServerMethod;
 	public final Method craftEntityGetHandleMethod;
 	public final Method craftEntityGetLocationMethod;
+	public final Class<?> craftInventoryClass;
+	public final Method craftInventoryGetInventoryMethod;
+	public final Class<?> craftItemStackClass;
+	public final Method craftItemStackAsNMSCopyMethod;
+	public final Method craftItemStackAsBukkitCopyMethod;
+	public final Class<?> craftPlayerClass;
+	public final Method craftPlayerGetHandleMethod;
+	public final Class<?> craftServerClass;
+	public final Method craftServerGetServerMethod;
+	public final Class<?> craftWorldClass;
+	public final Method craftWorldGetHandleMethod;
+	public final Method craftWorldGetNameMethod;
+	public final Class<?> minecraftInventoryClass;
+	public final Method minecraftInventoryGetTitleMethod;
+
+	// net.minecraft.network
+	public Field connectionChannelField;
+
+	// net.minecraft.network.chat
+	public Method componentNullToEmptyMethod;
+	public Method mutableComponentAppendMethod;
+
+	// net.minecraft.network.protocol
+	public final Class<?> packetClass;
+	public final Class<?> packetPlayOutEntityDestroyClass;
+	public final Class<?> clientboundTeleportEntityPacketClass;
+	//public Class<?> packetPlayOutSpawnEntityLivingClass;
+	public final Class<?> packetPlayOutPlayerInfoClass;
+	//public Class<?> packetPlayOutNamedEntitySpawnClass;
+	//public Constructor<?> packetPlayOutSpawnEntityLivingConstructor;
+	//public Constructor<?> packetPlayOutEntityDestroyConstructor;
+	public final Constructor<?> clientboundTeleportEntityPacketConstructor;
+	public final Constructor<?> packetPlayOutPlayerInfoConstructor;
+	//public Constructor<?> packetPlayOutNamedEntitySpawnConstructor;
+	public Method packetPlayOutPlayerInfoEntriesMethod;
+	public Method clientboundUpdateAttributesPacketGetEntityIdMethod;
+	public Method clientboundSetEquipmentPacketGetEntityIdMethod;
+	public Method clientboundSetEntityDataPacketIdMethod;
+	public Method clientboundAddEntityPacketGetIdMethod;
+	public final Class<?> enumPlayerInfoActionClass;
+	public final Class<?> playerInfoDataClass;
+	public Method playerInfoDataGetGameProfileMethod;
+
+	// net.minecraft.network.syncher
+	public Method synchedEntityDataPackMethod;
+
+	// net.minecraft.server
+	public final Class<?> entityPlayerClass;
+	public final Class<?> playerConnectionClass;
+	public Field entityPlayerPlayerConnectionField;
+	public final Constructor<?> serverPlayerConstructor;
+	public final Method serverPlayerSendSystemMessageMethod;
+
+	// net.minecraft.world
+	public final Class<?> dragonControllerPhaseClass;
+	public final Class<?> dragonStrafePlayerPhaseClass;
+	public final Class<?> dragonChargePlayerPhaseClass;
+	public final Class<?> enderDragonPhaseManagerClass;
+	public final Class<?> entityEnderDragonClass;
+	public Constructor<?> entityEnderDragonConstructor;
+	public final Class<?> entityLivingClass;
+	public Method entityLivingGetCombatTrackerMethod;
+	public final Class<?> entityClass;
+	public Method entitySetLocationMethod;
+	public Method entityLevelMethod;
+	public Method entityGetEntityDataMethod;
+	public final Method entityGetBukkitEntityMethod;
+	public Method entitySetCustomNameMethod;
+	public final Method entitySetCustomNameVisibleMethod;
+	public final Method entitySetInvisibleMethod;
+	public final Class<?> entityHumanClass;
+	public final Class<?> entityVillagerClass;
+	public Method entityVillagerSetVillagerDataMethod;
+	public Constructor<?> entityVillagerConstructor;
+	public final Class<?> entityTypesClass;
+	public Field entityTypesVillagerField;
+	public final Class<?> vec3DClass;
+	public final Constructor<?> vec3DConstructor;
+	public final Class<?> villagerTypeClass;
+	public final Class<?> villagerProfessionClass;
+	public final Method mobTickMethod;
 	public final Method levelGetWorldMethod;
 	public Method playerConnectionSendPacketMethod;
+	public Field playerConnectionConnectionField;
 	public Method entityEnderDragonGetPhaseManagerMethod;
 	public Method dragonPhaseManagerSetPhaseMethod;
 	public Method dragonPhaseManagerGetCurrentPhaseMethod;
 	public Method dragonStrafePlayerPhaseSetTargetMethod;
 	public Method dragonChargePlayerPhaseSetTargetMethod;
-	public final Method craftItemStackAsNMSCopyMethod;
-	public final Method craftItemStackAsBukkitCopyMethod;
 	public Method itemStackGetOrCreateTagMethod;
-	//public Method nbtTagCompoundSetMethod;
-	public final Method nbtTagCompoundHasKeyMethod;
 	public Method itemStackSetTagMethod;
 	public final Method itemStackHasTagMethod;
 	//public Method itemStackGetTagMethod;
-	public Method entitySetCustomNameMethod;
-	public final Method entitySetCustomNameVisibleMethod;
-	public final Method entitySetInvisibleMethod;
-	public Method entityVillagerSetVillagerDataMethod;
 	public final Method entityArmorStandSetSmallMethod;
+	public Method combatTrackerGetDeathMessageMethod;
+
+	// net.minecraft.nbt
+	public final Method nbtTagCompoundHasKeyMethod;
+	public Method compoundTagPutIntMethod;
+
+	//public Class<?> itemStackClass;
+	//public Class<?> nbtTagCompoundClass;
+	//public Class<?> nbtTagIntClass;
+	//public Class<?> nbtBaseClass;
+	//public final Class<?> iChatBaseComponentClass;
+	//public Class<?> chatComponentTextClass;
+	//public final Class<?> villagerDataClass;
+	//public Class<?> damageSourceClass;
+	//public Class<?> combatTrackerClass;
+
 	//public Method damageSourceDamageEntityMethod;
 	//public Method iChatBaseComponentAddSiblingMethod;
 	//public Method entityPlayerGetCombatTrackerMethod;
 	//public Method entityPlayerSendMessageMethod;
-	public Method combatTrackerGetDeathMessageMethod;
-	public Field entityPlayerPlayerConnectionField;
 	//public Field entityTypesEnderDragonField;
 	//public Field dragonControllerPhaseStrafePlayerField;
 	//public Field dragonControllerPhaseHoldingPatternField;
 	//public Field dragonControllerPhaseChargingPlayerField;
 	//public Field dragonControllerPhaseLandingField;
 	//public Field dragonControllerPhaseLandingApproachField;
-	public Field entityTypesVillagerField;
-	//public Constructor<?> packetPlayOutSpawnEntityLivingConstructor;
-	//public Constructor<?> packetPlayOutEntityDestroyConstructor;
-	public Constructor<?> entityEnderDragonConstructor;
-	public final Constructor<?> packetPlayOutEntityTeleportConstructor;
-	public final Constructor<?> vec3DConstructor;
 	//public Constructor<?> nbtTagIntConstructor;
-	public Constructor<?> entityVillagerConstructor;
 	//public Constructor<?> chatComponentConstructor;
 	//public final Constructor<?> villagerDataConstructor;
-	public Constructor<?> packetPlayOutPlayerInfoConstructor;
-	//public Constructor<?> packetPlayOutNamedEntitySpawnConstructor;
-
-	public final Constructor<?> serverPlayerConstructor;
-	public Method componentNullToEmptyMethod;
-	public Method synchedEntityDataPackMethod;
-	public Field playerConnectionConnectionField;
-	public Field connectionChannelField;
-	public Method compoundTagPutIntMethod;
-	public Method packetPlayOutPlayerInfoEntriesMethod;
-	public Method playerInfoDataGetGameProfileMethod;
-	public Method clientboundUpdateAttributesPacketGetEntityIdMethod;
-	public Method clientboundSetEquipmentPacketGetEntityIdMethod;
-	public Method clientboundSetEntityDataPacketIdMethod;
-	public Method clientboundAddEntityPacketGetIdMethod;
-	public Method mutableComponentAppendMethod;
-	public Method entityLivingGetCombatTrackerMethod;
-	public final Method serverPlayerSendSystemMessageMethod;
-	public final Method entityGetBukkitEntityMethod;
 
 	public ReflectionUtils() throws ClassNotFoundException, NoSuchMethodException, SecurityException, NoSuchFieldException {
 		String bukkitVersion = Bukkit.getBukkitVersion();
@@ -159,9 +177,9 @@ public class ReflectionUtils {
 		craftServerClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".CraftServer");
 		craftEntityClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".entity.CraftEntity");
 		dragonControllerPhaseClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerPhase");
-		dragonControllerStrafeClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerStrafe");
-		dragonControllerChargeClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerCharge");
-		dragonPhaseManagerClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager");
+		dragonStrafePlayerPhaseClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerStrafe");
+		dragonChargePlayerPhaseClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerCharge");
+		enderDragonPhaseManagerClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager");
 		entityEnderDragonClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon");
 		entityLivingClass = Class.forName("net.minecraft.world.entity.EntityLiving");
 		entityPlayerClass = Class.forName("net.minecraft.server.level.EntityPlayer");
@@ -169,7 +187,7 @@ public class ReflectionUtils {
 		entityTypesClass = Class.forName("net.minecraft.world.entity.EntityTypes");
 		packetClass = Class.forName("net.minecraft.network.protocol.Packet");
 		packetPlayOutEntityDestroyClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy");
-		packetPlayOutEntityTeleportClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport");
+		clientboundTeleportEntityPacketClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport");
 		//packetPlayOutSpawnEntityLivingClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving");
 		playerConnectionClass = Class.forName("net.minecraft.server.network.PlayerConnection");
 		vec3DClass = Class.forName("net.minecraft.world.phys.Vec3D");
@@ -247,7 +265,7 @@ public class ReflectionUtils {
 				break;
 			}
 		}
-		for (Method method : dragonPhaseManagerClass.getMethods()) {
+		for (Method method : enderDragonPhaseManagerClass.getMethods()) {
 			if (method.getParameterCount() != 1)
 				continue;
 
@@ -259,19 +277,19 @@ public class ReflectionUtils {
 				break;
 			}
 		}
-		for (Method method : dragonPhaseManagerClass.getMethods()) {
+		for (Method method : enderDragonPhaseManagerClass.getMethods()) {
 			if (method.getParameterCount() == 0 && method.getReturnType() == net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance.class) {
 				dragonPhaseManagerGetCurrentPhaseMethod = method;
 				break;
 			}
 		}
-		for (Method method : dragonControllerStrafeClass.getMethods()) {
+		for (Method method : dragonStrafePlayerPhaseClass.getMethods()) {
 			if (method.getParameterCount() == 1 && method.getParameterTypes()[0] == entityLivingClass) {
 				dragonStrafePlayerPhaseSetTargetMethod = method;
 				break;
 			}
 		}
-		for (Method method : dragonControllerChargeClass.getMethods()) {
+		for (Method method : dragonChargePlayerPhaseClass.getMethods()) {
 			if (method.getParameterCount() == 1 && method.getParameterTypes()[0] == vec3DClass) {
 				dragonChargePlayerPhaseSetTargetMethod = method;
 				break;
@@ -372,10 +390,15 @@ public class ReflectionUtils {
 				break;
 			}
 		}
-		packetPlayOutEntityTeleportConstructor = packetPlayOutEntityTeleportClass.getConstructor(entityClass);
+		clientboundTeleportEntityPacketConstructor = clientboundTeleportEntityPacketClass.getConstructor(entityClass);
 		vec3DConstructor = vec3DClass.getConstructor(double.class, double.class, double.class);
 		//itemStackClass = Class.forName("net.minecraft.server." + serverVersion + ".ItemStack");
 		//nbtTagCompoundClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagCompound");
+		craftInventoryClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".inventory.CraftInventory");
+		craftInventoryGetInventoryMethod = craftInventoryClass.getMethod("getInventory");
+		minecraftInventoryClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".inventory.CraftInventoryCustom$MinecraftInventory");
+		minecraftInventoryGetTitleMethod = minecraftInventoryClass.getMethod("getTitle");
+		minecraftInventoryGetTitleMethod.setAccessible(true);
 		craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".inventory.CraftItemStack");
 		craftItemStackAsNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
 		craftItemStackAsBukkitCopyMethod = craftItemStackClass.getMethod("asBukkitCopy", net.minecraft.world.item.ItemStack.class);

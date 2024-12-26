@@ -26,9 +26,12 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 
 public class ArmorStandItemNPC {
 
+	private final ReflectionUtils reflectionUtils;
 	private ArmorStand entity;
 
 	public ArmorStandItemNPC(Location location, String customName, Material material, Player... viewers) {
+		reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
+
 		spawn(location, customName, material, viewers);
 	}
 
@@ -36,48 +39,40 @@ public class ArmorStandItemNPC {
 		String bukkitVersion = Bukkit.getBukkitVersion();
 
 		try {
-			ServerLevel nmsWorld = BedwarsPlugin.getInstance().reflectionUtils.worldToNMSWorld(location.getWorld());
-			//CraftWorld craftWorld = (CraftWorld)location.getWorld();
-			//Object craftWorld = craftWorldClass.cast(location.getWorld());
+			ServerLevel nmsWorld = reflectionUtils.worldToNMSWorld(location.getWorld());
 			entity = new ArmorStand(nmsWorld, location.getX(), location.getY(), location.getZ());
-			//entity = entityArmorStandConstructor.newInstance(getHandleCraftWorldMethod.invoke(craftWorld), location.getX(), location.getY(), location.getZ());
-			//entity.setSmall(true);
-			BedwarsPlugin.getInstance().reflectionUtils.entityArmorStandSetSmallMethod.invoke(entity, true);
-			//entityArmorStandClass.getMethod("setSmall", boolean.class).invoke(entity, true);
-			//entity.setCustomName(Component.literal(customName));
-			Component component = (Component)BedwarsPlugin.getInstance().reflectionUtils.componentNullToEmptyMethod.invoke(null, customName);
-			BedwarsPlugin.getInstance().reflectionUtils.entitySetCustomNameMethod.invoke(entity, component);
-			//entityArmorStandClass.getMethod("setCustomName", iChatBaseComponentClass).invoke(entity, chatComponentConstructor.newInstance(customName));
-			//entity.setCustomNameVisible(true);
-			BedwarsPlugin.getInstance().reflectionUtils.entitySetCustomNameVisibleMethod.invoke(entity, true);
-			//entityArmorStandClass.getMethod("setCustomNameVisible", boolean.class).invoke(entity, true);
-			//entity.setInvisible(true);
-			BedwarsPlugin.getInstance().reflectionUtils.entitySetInvisibleMethod.invoke(entity, true);
-			//entityArmorStandClass.getMethod("setInvisible", boolean.class).invoke(entity, true);
+			// entity.setSmall(true);
+			reflectionUtils.entityArmorStandSetSmallMethod.invoke(entity, true);
+			// entity.setCustomName(Component.literal(customName));
+			Component component = (Component)reflectionUtils.componentNullToEmptyMethod.invoke(null, customName);
+			reflectionUtils.entitySetCustomNameMethod.invoke(entity, component);
+			// entity.setCustomNameVisible(true);
+			reflectionUtils.entitySetCustomNameVisibleMethod.invoke(entity, true);
+			// entity.setInvisible(true);
+			reflectionUtils.entitySetInvisibleMethod.invoke(entity, true);
 
 			for (Player p : viewers) {
-				ServerGamePacketListenerImpl playerConnection = BedwarsPlugin.getInstance().reflectionUtils.playerGetConnection(p);
-				//playerConnection.send(new ClientboundAddEntityPacket(entity));
-				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, new ClientboundAddEntityPacket(entity));
-				//sendPacketMethod.invoke(playerConnection, packetPlayOutSpawnEntityConstructor.newInstance(entity));
-				SynchedEntityData synchedEntityData = (SynchedEntityData)BedwarsPlugin.getInstance().reflectionUtils.entityGetEntityDataMethod.invoke(entity);
+				ServerGamePacketListenerImpl playerConnection = reflectionUtils.playerGetConnection(p);
+				// playerConnection.send(new ClientboundAddEntityPacket(entity));
+				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, new ClientboundAddEntityPacket(entity));
+				SynchedEntityData synchedEntityData = (SynchedEntityData)reflectionUtils.entityGetEntityDataMethod.invoke(entity);
 				ClientboundSetEntityDataPacket setEntityDataPacket;
 
 				if (bukkitVersion.compareTo("1.19-R0.1-SNAPSHOT") >= 0) {
-					List<SynchedEntityData.DataValue<?>> packedItems = (List<SynchedEntityData.DataValue<?>>)BedwarsPlugin.getInstance().reflectionUtils.synchedEntityDataPackMethod.invoke(synchedEntityData);
+					List<SynchedEntityData.DataValue<?>> packedItems = (List<SynchedEntityData.DataValue<?>>)reflectionUtils.synchedEntityDataPackMethod.invoke(synchedEntityData);
 					setEntityDataPacket = new ClientboundSetEntityDataPacket(getEntityId(), packedItems);
 				} else {
 					setEntityDataPacket = ClientboundSetEntityDataPacket.class.getConstructor(int.class, SynchedEntityData.class, boolean.class).newInstance(getEntityId(), synchedEntityData, true);
 				}
 
-				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, setEntityDataPacket);
+				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, setEntityDataPacket);
 				//playerConnection.send(new ClientboundSetEntityDataPacket(entity.getId(), entity.getEntityData().getNonDefaultValues()));
 				//sendPacketMethod.invoke(playerConnection, packetPlayOutEntityMetadataConstructor.newInstance(getIdMethod.invoke(entity), getDataWatcherMethod.invoke(entity), true));
 				List<Pair<net.minecraft.world.entity.EquipmentSlot, net.minecraft.world.item.ItemStack>> list = Lists.newArrayList();
-				net.minecraft.world.item.ItemStack nmsItemStack = (net.minecraft.world.item.ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, new ItemStack(material));
+				net.minecraft.world.item.ItemStack nmsItemStack = (net.minecraft.world.item.ItemStack)reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, new ItemStack(material));
 				list.add(Pair.of(net.minecraft.world.entity.EquipmentSlot.HEAD, nmsItemStack));
 				//playerConnection.send(new ClientboundSetEquipmentPacket(getEntityId(), list));
-				BedwarsPlugin.getInstance().reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, new ClientboundSetEquipmentPacket(getEntityId(), list));
+				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, new ClientboundSetEquipmentPacket(getEntityId(), list));
 				//sendPacketMethod.invoke(playerConnection, packetPlayOutEntityEquipmentConstructor.newInstance(getIdMethod.invoke(entity), Enum.valueOf((Class<Enum>)enumItemSlotClass, "HEAD"), asNMSCopyMethod.invoke(craftItemStackClass, new ItemStack(material))));
 			}
 		} catch (SecurityException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException e) {
@@ -87,7 +82,7 @@ public class ArmorStandItemNPC {
 	
 	public void teleport(double x, double y, double z, Player... viewers) {
 		try {
-			BedwarsPlugin.getInstance().reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, 0f, 0f);
+			reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, 0f, 0f);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 			return;
@@ -95,7 +90,7 @@ public class ArmorStandItemNPC {
 
 		for (Player p : viewers) {
 			try {
-				BedwarsPlugin.getInstance().reflectionUtils.playerSendPacket(p, new ClientboundTeleportEntityPacket(entity));
+				reflectionUtils.playerSendPacket(p, new ClientboundTeleportEntityPacket(entity));
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
 			}
@@ -105,7 +100,7 @@ public class ArmorStandItemNPC {
 	public void despawn(Player... viewers) {
 		for (Player p : viewers) {
 			try {
-				BedwarsPlugin.getInstance().reflectionUtils.playerSendPacket(p, new ClientboundRemoveEntitiesPacket(getEntityId()));
+				reflectionUtils.playerSendPacket(p, new ClientboundRemoveEntitiesPacket(getEntityId()));
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
 			}
@@ -116,13 +111,6 @@ public class ArmorStandItemNPC {
 		// .hashCode() does the same thing as .getId()
 		// We do not use .getId() because the method name is obfuscated on some nms version.
 		return entity.hashCode();
-		/*try {
-			return (int) getIdMethod.invoke(entity);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
-		
-		return 0;*/
 	}
-	
+
 }
