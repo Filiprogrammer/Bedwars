@@ -363,14 +363,11 @@ public class GameLogic implements Listener {
 		for (Player p : gameWorld.getWorld().getPlayers()) {
 			if (game.containsPlayer(p.getUniqueId())) {
 				// Show the new spectator all of the game players
-				player.sendMessage("GameLogic.java: joinSpectator: Showing " + p.getName());
 				player.showPlayer(BedwarsPlugin.getInstance(), p);
 				// Hide the new spectator from the game players
-				p.sendMessage("GameLogic.java: joinSpectator: Hiding " + player.getName());
 				p.hidePlayer(BedwarsPlugin.getInstance(), player);
 			} else {
 				// Show the new spectator all of the other spectators
-				player.sendMessage("GameLogic.java: joinSpectator: Showing " + p.getName());
 				player.showPlayer(BedwarsPlugin.getInstance(), p);
 			}
 		}
@@ -1072,14 +1069,10 @@ public class GameLogic implements Listener {
 
 			for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 				if (p.getWorld().getName().equals(gameWorld.getWorld().getName())) {
-					player.sendMessage("GameLogic.java: onPlayerChangedWorld: Hiding " + p.getName());
 					player.hidePlayer(BedwarsPlugin.getInstance(), p);
-					p.sendMessage("GameLogic.java: onPlayerChangedWorld: Hiding " + player.getName());
 					p.hidePlayer(BedwarsPlugin.getInstance(), player);
 				} else if (GameManager.getInstance().getGameOfPlayer(p) == null && GameManager.getInstance().getGameOfPlayer(player) == null) {
-					p.sendMessage("GameLogic.java: onPlayerChangedWorld: Showing " + player.getName());
 					p.showPlayer(BedwarsPlugin.getInstance(), player);
-					player.sendMessage("GameLogic.java: onPlayerChangedWorld: Showing " + p.getName());
 					player.showPlayer(BedwarsPlugin.getInstance(), p);
 				}
 			}

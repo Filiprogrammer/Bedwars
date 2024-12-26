@@ -167,14 +167,10 @@ public class Lobby {
 		// Make sure only players of the same game see each other
 		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 			if (game.containsPlayer(p.getUniqueId())) {
-				p.sendMessage("Lobby.java: joinPlayer: Showing " + player.getName());
 				p.showPlayer(BedwarsPlugin.getInstance(), player);
-				player.sendMessage("Lobby.java: joinPlayer: Showing " + p.getName());
 				player.showPlayer(BedwarsPlugin.getInstance(), p);
 			} else {
-				p.sendMessage("Lobby.java: joinPlayer: Hiding " + player.getName());
 				p.hidePlayer(BedwarsPlugin.getInstance(), player);
-				player.sendMessage("Lobby.java: joinPlayer: Hiding " + p.getName());
 				player.hidePlayer(BedwarsPlugin.getInstance(), p);
 			}
 		}

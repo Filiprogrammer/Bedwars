@@ -331,9 +331,7 @@ public class Game implements Listener {
 
 		for (GamePlayer gp : players) {
 			Player p = gp.getPlayer();
-			p.sendMessage("Game.java: onPlayerJoin: Hiding " + player.getName());
 			p.hidePlayer(BedwarsPlugin.getInstance(), player);
-			player.sendMessage("Game.java: onPlayerJoin: Hiding " + p.getName());
 			player.hidePlayer(BedwarsPlugin.getInstance(), p);
 		}
 	}
