@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -72,7 +71,6 @@ import org.jetbrains.annotations.NotNull;
 
 import com.destroystokyo.paper.Title;
 import com.destroystokyo.paper.event.player.PlayerUseUnknownEntityEvent;
-import com.mojang.authlib.GameProfile;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.config.GameStatesConfig;
@@ -95,7 +93,6 @@ import filip.bedwars.game.state.GameState;
 import filip.bedwars.game.state.GameStateSetting;
 import filip.bedwars.inventory.ClickableInventory;
 import filip.bedwars.inventory.IClickable;
-import filip.bedwars.listener.player.IPacketListener;
 import filip.bedwars.utils.EnderDragonController;
 import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.PlayerUtils;
@@ -108,12 +105,6 @@ import filip.bedwars.world.GameWorldManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
-import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
-import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket;
 import net.minecraft.server.level.ServerPlayer;
 
 public class GameLogic implements Listener {
@@ -129,7 +120,6 @@ public class GameLogic implements Listener {
 	private List<IClickable> itemShopClickables = new ArrayList<IClickable>();
 	private List<IClickable> teamShopClickables = new ArrayList<IClickable>();
 	private Map<UUID, Integer> selectedItemShopCategory = new HashMap<UUID, Integer>();
-	private IPacketListener packetListener;
 	private BukkitTask bukkitTask;
 	private BukkitRunnable bukkitRunnable;
 	public final Set<EnderDragonController> enderDragonControllers = new HashSet<>();
@@ -209,179 +199,7 @@ public class GameLogic implements Listener {
 				}
 			}
 		};
-		
-		packetListener = new IPacketListener() {
-			public boolean writePacket(Object packet, Player player) {
-				if (packet instanceof ClientboundAddEntityPacket) {
-					try {
-						int a = (int)BedwarsPlugin.getInstance().reflectionUtils.clientboundAddEntityPacketGetIdMethod.invoke(packet);
 
-						for (Player p : gameWorld.getWorld().getPlayers())
-							if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
-								return false;
-					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						e.printStackTrace();
-					}
-
-					return true;
-				}
-
-				if (packet instanceof ClientboundSetEntityDataPacket) {
-					try {
-						int a = (int)BedwarsPlugin.getInstance().reflectionUtils.clientboundSetEntityDataPacketIdMethod.invoke(packet);
-
-						for (Player p : gameWorld.getWorld().getPlayers())
-							if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
-								return false;
-					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						e.printStackTrace();
-					}
-
-					return true;
-				}
-
-				if (packet instanceof ClientboundUpdateAttributesPacket) {
-					try {
-						int a = (int)BedwarsPlugin.getInstance().reflectionUtils.clientboundUpdateAttributesPacketGetEntityIdMethod.invoke(packet);
-
-						for (Player p : gameWorld.getWorld().getPlayers())
-							if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
-								return false;
-					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						e.printStackTrace();
-					}
-
-					return true;
-				}
-
-				if (packet instanceof ClientboundSetEquipmentPacket) {
-					try {
-						int a = (int)BedwarsPlugin.getInstance().reflectionUtils.clientboundSetEquipmentPacketGetEntityIdMethod.invoke(packet);
-
-						for (Player p : gameWorld.getWorld().getPlayers())
-							if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
-								return false;
-					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						e.printStackTrace();
-					}
-
-					return true;
-				}
-
-				if (packet instanceof ClientboundRotateHeadPacket) {
-					Field entityIdField = null;
-
-					for (Field f : ClientboundRotateHeadPacket.class.getDeclaredFields()) {
-						if (f.getType() == int.class) {
-							entityIdField = f;
-							break;
-						}
-					}
-
-					int a = -1;
-					try {
-						entityIdField.setAccessible(true);
-						a = entityIdField.getInt(packet);
-					} catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
-						e.printStackTrace();
-					}
-
-					for (Player p : gameWorld.getWorld().getPlayers())
-						if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
-							return false;
-
-					return true;
-				}
-
-				/*if (packet.getClass().getSimpleName().equals("PacketPlayOutNamedEntitySpawn")
-				 || packet.getClass().getSimpleName().equals("PacketPlayOutEntityMetadata")
-				 || packet.getClass().getSimpleName().equals("PacketPlayOutUpdateAttributes")
-				 || packet.getClass().getSimpleName().equals("PacketPlayOutEntityEquipment")
-				 || packet.getClass().getSimpleName().equals("PacketPlayOutEntityHeadRotation")) {
-					
-					int a = -1;
-					try {
-						Field aField = packet.getClass().getDeclaredField("a");
-						aField.setAccessible(true);
-						a = aField.getInt(packet);
-					} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-						e.printStackTrace();
-					}
-					
-					for (Player p : gameWorld.getWorld().getPlayers())
-						if (p.getEntityId() == a && !game.containsPlayer(p.getUniqueId()))
-							return false;
-					
-					return true;
-				}*/
-
-				String bukkitVersion = Bukkit.getBukkitVersion();
-
-				if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
-					if (packet instanceof ClientboundPlayerInfoUpdatePacket) {
-						ClientboundPlayerInfoUpdatePacket playerInfoUpdatePacket = (ClientboundPlayerInfoUpdatePacket)packet;
-						List<ClientboundPlayerInfoUpdatePacket.Entry> b = playerInfoUpdatePacket.entries();
-
-						for (ClientboundPlayerInfoUpdatePacket.Entry playerInfoData : b)
-							if (game.containsPlayer(playerInfoData.profileId()))
-								return true;
-
-						return false;
-					}
-				} else {
-					if (BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutPlayerInfoClass.isInstance(packet)) {
-						try {
-							List<?> b = (List<?>)BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutPlayerInfoEntriesMethod.invoke(packet);
-
-							for (Object playerInfoData : b) {
-								GameProfile gameProfile = (GameProfile)BedwarsPlugin.getInstance().reflectionUtils.playerInfoDataGetGameProfileMethod.invoke(playerInfoData);
-
-								if (game.containsPlayer(gameProfile.getId()))
-									return true;
-							}
-						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-							e.printStackTrace();
-						}
-
-						return false;
-					}
-				}
-
-				/*if (packet.getClass().getSimpleName().equals("PacketPlayOutPlayerInfo")) {
-					try {
-						Field aField = packet.getClass().getDeclaredField("a");
-						aField.setAccessible(true);
-						Class<?> enumPlayerInfoActionClass = Class.forName("net.minecraft.server." + BedwarsPlugin.getInstance().getServerVersion() + ".PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
-						Class<?> playerInfoDataClass = Class.forName("net.minecraft.server." + BedwarsPlugin.getInstance().getServerVersion() + ".PacketPlayOutPlayerInfo$PlayerInfoData");
-						Method aMethod = playerInfoDataClass.getMethod("a");
-						
-						Object a = aField.get(packet);
-						
-						if (a == enumPlayerInfoActionClass.getField("REMOVE_PLAYER").get(null))
-							return true;
-						
-						Field bField = packet.getClass().getDeclaredField("b");
-						bField.setAccessible(true);
-						
-						List<?> b = (List<?>) bField.get(packet);
-						
-						for (Object playerInfoData : b) {
-							GameProfile gameProfile = (GameProfile) aMethod.invoke(playerInfoData);
-							
-							if (game.containsPlayer(gameProfile.getId()))
-								return true;
-						}
-					} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException e) {
-						e.printStackTrace();
-					}
-					
-					return false;
-				}*/
-				
-				return true;
-			}
-		};
-		
 		BedwarsPlugin.getInstance().getServer().getPluginManager().registerEvents(this, BedwarsPlugin.getInstance());
 		
 		List<GamePlayer> syncPlayersList = game.getPlayers();
@@ -393,8 +211,6 @@ public class GameLogic implements Listener {
 			for (GamePlayer gamePlayer : syncPlayersList) {
 				Player player = gamePlayer.getPlayer();
 				players[i] = player;
-				// Add a packet listener
-				BedwarsPlugin.getInstance().addPacketListener(player, packetListener);
 				// Teleport player to the spawnpoint of their base
 				teleportToSpawn(gamePlayer);
 				
@@ -543,7 +359,22 @@ public class GameLogic implements Listener {
 		
 		for (EnderDragonController enderDragonController : enderDragonControllers)
 			enderDragonController.addViewer(player);
-		
+
+		for (Player p : gameWorld.getWorld().getPlayers()) {
+			if (game.containsPlayer(p.getUniqueId())) {
+				// Show the new spectator all of the game players
+				player.sendMessage("GameLogic.java: joinSpectator: Showing " + p.getName());
+				player.showPlayer(BedwarsPlugin.getInstance(), p);
+				// Hide the new spectator from the game players
+				p.sendMessage("GameLogic.java: joinSpectator: Hiding " + player.getName());
+				p.hidePlayer(BedwarsPlugin.getInstance(), player);
+			} else {
+				// Show the new spectator all of the other spectators
+				player.sendMessage("GameLogic.java: joinSpectator: Showing " + p.getName());
+				player.showPlayer(BedwarsPlugin.getInstance(), p);
+			}
+		}
+
 		scoreboardManager.update(player);
 	}
 	
@@ -591,8 +422,10 @@ public class GameLogic implements Listener {
 		for (EnderDragonController enderDragonController : enderDragonControllers)
 			enderDragonController.stopTask();
 		
-		for (Player p : gameWorld.getWorld().getPlayers())
+		for (Player p : gameWorld.getWorld().getPlayers()) {
+			PlayerUtils.playerReset(p);
 			p.teleport(MainConfig.getInstance().getMainLobby());
+		}
 		
 		HandlerList.unregisterAll(this);
 		
@@ -1088,10 +921,7 @@ public class GameLogic implements Listener {
 					}
 					
 					checkGameOver();
-					
-					for (GamePlayer gp : game.getPlayers())
-						PlayerUtils.hidePlayer(player, gp.getPlayer());
-					
+
 					Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), () -> {
 						player.spigot().respawn();
 						
@@ -1235,8 +1065,25 @@ public class GameLogic implements Listener {
 	
 	@EventHandler
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
-		if (event.getFrom().getName().equals(gameWorld.getWorld().getName()))
-			scoreboardManager.reset(event.getPlayer());
+		Player player = event.getPlayer();
+
+		if (event.getFrom().getName().equals(gameWorld.getWorld().getName())) {
+			scoreboardManager.reset(player);
+
+			for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+				if (p.getWorld().getName().equals(gameWorld.getWorld().getName())) {
+					player.sendMessage("GameLogic.java: onPlayerChangedWorld: Hiding " + p.getName());
+					player.hidePlayer(BedwarsPlugin.getInstance(), p);
+					p.sendMessage("GameLogic.java: onPlayerChangedWorld: Hiding " + player.getName());
+					p.hidePlayer(BedwarsPlugin.getInstance(), player);
+				} else if (GameManager.getInstance().getGameOfPlayer(p) == null && GameManager.getInstance().getGameOfPlayer(player) == null) {
+					p.sendMessage("GameLogic.java: onPlayerChangedWorld: Showing " + player.getName());
+					p.showPlayer(BedwarsPlugin.getInstance(), player);
+					player.sendMessage("GameLogic.java: onPlayerChangedWorld: Showing " + p.getName());
+					player.showPlayer(BedwarsPlugin.getInstance(), p);
+				}
+			}
+		}
 	}
 	
 	@EventHandler
@@ -1385,8 +1232,6 @@ public class GameLogic implements Listener {
 				break;
 			}
 		}
-
-		BedwarsPlugin.getInstance().removePacketListener(player, packetListener);
 	}
 	
 	private void checkGameOver() {

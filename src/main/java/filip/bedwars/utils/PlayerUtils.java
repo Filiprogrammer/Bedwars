@@ -3,7 +3,6 @@ package filip.bedwars.utils;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -15,57 +14,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
 import filip.bedwars.BedwarsPlugin;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
-import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.server.level.ServerPlayer;
 
 public class PlayerUtils {
-
-	public static void hidePlayerEntity(Player toHide, Player viewer) {
-		try {
-			int toHideEntityId = toHide.getEntityId();
-			ClientboundRemoveEntitiesPacket packetPlayOutEntityDestroy = new ClientboundRemoveEntitiesPacket(toHideEntityId);
-			BedwarsPlugin.getInstance().reflectionUtils.playerSendPacket(viewer, packetPlayOutEntityDestroy);
-		} catch (SecurityException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static void showPlayerEntity(Player toShow, Player viewer) {
-		try {
-			ServerPlayer toShowEntityPlayer = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(toShow);
-			ClientboundAddEntityPacket packetPlayOutNamedEntitySpawn = new ClientboundAddEntityPacket(toShowEntityPlayer);
-			BedwarsPlugin.getInstance().reflectionUtils.playerSendPacket(viewer, packetPlayOutNamedEntitySpawn);
-		} catch (SecurityException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static void hidePlayer(Player toHide, Player viewer) {
-		String bukkitVersion = Bukkit.getBukkitVersion();
-
-		try {
-			/*Object entityPlayerArray = java.lang.reflect.Array.newInstance(BedwarsPlugin.getInstance().reflectionUtils.entityPlayerClass, 1);
-			java.lang.reflect.Array.set(entityPlayerArray, 0, BedwarsPlugin.getInstance().reflectionUtils.craftPlayerGetHandleMethod.invoke(BedwarsPlugin.getInstance().reflectionUtils.craftPlayerClass.cast(toHide)));
-			Object packetPlayOutPlayerInfo = BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutPlayerInfoConstructor.newInstance(
-					Enum.valueOf((Class<Enum>)BedwarsPlugin.getInstance().reflectionUtils.enumPlayerInfoActionClass, "REMOVE_PLAYER"),
-					entityPlayerArray);*/
-			//ClientboundPlayerInfoRemovePacket packetPlayOutPlayerInfo = new ClientboundPlayerInfoRemovePacket(List.of(toHide.getUniqueId()));
-			Packet<?> packet;
-			if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
-				packet = new ClientboundPlayerInfoRemovePacket(List.of(toHide.getUniqueId()));
-			} else {
-				ServerPlayer nmsToHide = BedwarsPlugin.getInstance().reflectionUtils.playerToNMSPlayer(toHide);
-				packet = (Packet<?>)BedwarsPlugin.getInstance().reflectionUtils.packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)BedwarsPlugin.getInstance().reflectionUtils.enumPlayerInfoActionClass, "REMOVE_PLAYER"), new ServerPlayer[]{nmsToHide});
-			}
-
-			BedwarsPlugin.getInstance().reflectionUtils.playerSendPacket(viewer, packet);
-		} catch (SecurityException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
-			e.printStackTrace();
-		}
-	}
 
 	public static void damagePlayerVoid(Player player, float amount) {
 		String bukkitVersion = Bukkit.getBukkitVersion();

@@ -34,8 +34,6 @@ import filip.bedwars.inventory.IPlacable;
 import filip.bedwars.inventory.IUsable;
 import filip.bedwars.listener.inventory.InventoryClickListener;
 import filip.bedwars.listener.player.BlockPlaceListener;
-import filip.bedwars.listener.player.IPacketListener;
-import filip.bedwars.listener.player.PacketReader;
 import filip.bedwars.listener.player.PlayerChangedWorldListener;
 import filip.bedwars.listener.player.PlayerInteractListener;
 import filip.bedwars.listener.player.PlayerQuitListener;
@@ -57,7 +55,6 @@ public class BedwarsPlugin extends JavaPlugin {
 	private List<ICommand> commands = new ArrayList<ICommand>();
 	private ICommand helpCommand;
 	private List<ArenaSetup> arenaSetups = new ArrayList<ArenaSetup>();
-	private List<PacketReader> packetReaders = new ArrayList<PacketReader>();
 	private WorldInitListener worldInitListener;
 
 	public ReflectionUtils reflectionUtils;
@@ -138,9 +135,6 @@ public class BedwarsPlugin extends JavaPlugin {
 	public void onDisable() {
 		for (Game game : new ArrayList<Game>(GameManager.getInstance().getGames()))
 			game.endGame();
-		
-		for (PacketReader reader : packetReaders)
-			reader.uninject();
 	}
 	
 	public static BedwarsPlugin getInstance() {
@@ -292,47 +286,6 @@ public class BedwarsPlugin extends JavaPlugin {
     	}
     	
     	return false;
-    }
-    
-    public void addPacketListener(Player player, IPacketListener packetListener) {
-    	PacketReader packetReader = null;
-    	
-    	for (PacketReader pr : packetReaders) {
-    		if (pr.getPlayer().equals(player)) {
-    			packetReader = pr;
-    			break;
-    		}
-    	}
-    	
-    	if (packetReader == null) {
-    		packetReader = new PacketReader(player);
-    		packetReaders.add(packetReader);
-    	}
-    	
-    	packetReader.addListener(packetListener);
-    }
-    
-    public boolean removePacketListener(Player player, IPacketListener packetListener) {
-    	PacketReader packetReader = null;
-    	
-    	for (PacketReader pr : packetReaders) {
-    		if (pr.getPlayer().equals(player)) {
-    			packetReader = pr;
-    			break;
-    		}
-    	}
-    	
-    	if (packetReader == null)
-    		return false;
-    	
-    	boolean ret = packetReader.removeListener(packetListener);
-    	
-		if (!packetReader.hasListeners()) {
-			packetReader.uninject();
-			return packetReaders.remove(packetReader);
-		}
-    	
-    	return ret;
     }
     
     public void addWorldInitHandler(WorldInitHandler handler) {

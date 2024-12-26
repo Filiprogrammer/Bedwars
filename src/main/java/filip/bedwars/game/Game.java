@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,6 +14,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,6 +25,7 @@ import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.lobby.Lobby;
 import filip.bedwars.utils.MessageSender;
+import filip.bedwars.utils.PlayerUtils;
 import filip.bedwars.utils.SoundPlayer;
 import filip.bedwars.utils.TeamColorConverter;
 import filip.bedwars.world.GameWorld;
@@ -93,7 +96,10 @@ public class Game implements Listener {
 	 * Cleans everything up after a game
 	 */
 	public void endGame() {
-		for (GamePlayer gamePlayer : new ArrayList<GamePlayer>(players))
+		List<GamePlayer> tempPlayers = new ArrayList<GamePlayer>(players);
+		players.clear();
+
+		for (GamePlayer gamePlayer : tempPlayers)
 			leavePlayer(gamePlayer.getPlayer());
 		
 		HandlerList.unregisterAll(this);
@@ -189,13 +195,44 @@ public class Game implements Listener {
 				Player p = gp.getPlayer();
 				MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "player-left").replace("%player%", player.getName()));
 			}
-			
-			return true;
-		} else {
-			if (isRunning()) {
-				gameLogic.leavePlayer(player);
-				return true;
+
+			for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+				if (containsPlayer(p.getUniqueId())) {
+					p.sendMessage("Game.java: leavePlayer A: Hiding " + player.getName());
+					p.hidePlayer(BedwarsPlugin.getInstance(), player);
+					player.sendMessage("Game.java: leavePlayer A: Hiding " + p.getName());
+					player.hidePlayer(BedwarsPlugin.getInstance(), p);
+				} else if (GameManager.getInstance().getGameOfPlayer(p) == null) {
+					p.sendMessage("Game.java: leavePlayer A: Showing " + player.getName());
+					p.showPlayer(BedwarsPlugin.getInstance(), player);
+					player.sendMessage("Game.java: leavePlayer A: Showing " + p.getName());
+					player.showPlayer(BedwarsPlugin.getInstance(), p);
+				}
 			}
+
+			PlayerUtils.playerReset(player);
+
+			return true;
+		} else if (isRunning()) {
+			gameLogic.leavePlayer(player);
+
+			for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+				if (containsPlayer(p.getUniqueId())) {
+					p.sendMessage("Game.java: leavePlayer B: Hiding " + player.getName());
+					p.hidePlayer(BedwarsPlugin.getInstance(), player);
+					player.sendMessage("Game.java: leavePlayer B: Hiding " + p.getName());
+					player.hidePlayer(BedwarsPlugin.getInstance(), p);
+				} else if (GameManager.getInstance().getGameOfPlayer(p) == null) {
+					p.sendMessage("Game.java: leavePlayer B: Showing " + player.getName());
+					p.showPlayer(BedwarsPlugin.getInstance(), player);
+					player.sendMessage("Game.java: leavePlayer B: Showing " + p.getName());
+					player.showPlayer(BedwarsPlugin.getInstance(), p);
+				}
+			}
+
+			PlayerUtils.playerReset(player);
+
+			return true;
 		}
 		
 		return false;
@@ -307,6 +344,26 @@ public class Game implements Listener {
 				if (player.getWorld().getName().equals(gameLogic.getGameWorld().getWorld().getName()))
 					gameLogic.joinSpectator(player);
 			}
+		}
+	}
+
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		Player player = event.getPlayer();
+
+		if (isRunning()) {
+			if (player.getWorld().getName().equals(gameLogic.getGameWorld().getWorld().getName())) {
+				gameLogic.joinSpectator(player);
+				return;
+			}
+		}
+
+		for (GamePlayer gp : players) {
+			Player p = gp.getPlayer();
+			p.sendMessage("Game.java: onPlayerJoin: Hiding " + player.getName());
+			p.hidePlayer(BedwarsPlugin.getInstance(), player);
+			player.sendMessage("Game.java: onPlayerJoin: Hiding " + p.getName());
+			player.hidePlayer(BedwarsPlugin.getInstance(), p);
 		}
 	}
 	
