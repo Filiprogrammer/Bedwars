@@ -196,40 +196,11 @@ public class Game implements Listener {
 				MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "player-left").replace("%player%", player.getName()));
 			}
 
-			for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-				if (containsPlayer(p.getUniqueId())) {
-					p.sendMessage("Game.java: leavePlayer A: Hiding " + player.getName());
-					p.hidePlayer(BedwarsPlugin.getInstance(), player);
-					player.sendMessage("Game.java: leavePlayer A: Hiding " + p.getName());
-					player.hidePlayer(BedwarsPlugin.getInstance(), p);
-				} else if (GameManager.getInstance().getGameOfPlayer(p) == null) {
-					p.sendMessage("Game.java: leavePlayer A: Showing " + player.getName());
-					p.showPlayer(BedwarsPlugin.getInstance(), player);
-					player.sendMessage("Game.java: leavePlayer A: Showing " + p.getName());
-					player.showPlayer(BedwarsPlugin.getInstance(), p);
-				}
-			}
-
 			PlayerUtils.playerReset(player);
 
 			return true;
 		} else if (isRunning()) {
 			gameLogic.leavePlayer(player);
-
-			for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-				if (containsPlayer(p.getUniqueId())) {
-					p.sendMessage("Game.java: leavePlayer B: Hiding " + player.getName());
-					p.hidePlayer(BedwarsPlugin.getInstance(), player);
-					player.sendMessage("Game.java: leavePlayer B: Hiding " + p.getName());
-					player.hidePlayer(BedwarsPlugin.getInstance(), p);
-				} else if (GameManager.getInstance().getGameOfPlayer(p) == null) {
-					p.sendMessage("Game.java: leavePlayer B: Showing " + player.getName());
-					p.showPlayer(BedwarsPlugin.getInstance(), player);
-					player.sendMessage("Game.java: leavePlayer B: Showing " + p.getName());
-					player.showPlayer(BedwarsPlugin.getInstance(), p);
-				}
-			}
-
 			PlayerUtils.playerReset(player);
 
 			return true;
