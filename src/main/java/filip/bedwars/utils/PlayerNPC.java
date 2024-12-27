@@ -48,6 +48,8 @@ public class PlayerNPC {
 
 			if (bukkitVersion.compareTo("1.20.2-R0.1-SNAPSHOT") >= 0) {
 				entity = new ServerPlayer(nmsServer, nmsWorld, gameprofile, ClientInformation.createDefault());
+			} else if (bukkitVersion.compareTo("1.19-R0.1-SNAPSHOT") >= 0) {
+				entity = (ServerPlayer)reflectionUtils.serverPlayerConstructor.newInstance(nmsServer, nmsWorld, gameprofile, null);
 			} else {
 				entity = (ServerPlayer)reflectionUtils.serverPlayerConstructor.newInstance(nmsServer, nmsWorld, gameprofile);
 			}

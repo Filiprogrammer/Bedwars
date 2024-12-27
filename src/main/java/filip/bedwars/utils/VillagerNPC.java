@@ -114,7 +114,7 @@ public class VillagerNPC {
 				SynchedEntityData synchedEntityData = (SynchedEntityData)reflectionUtils.entityGetEntityDataMethod.invoke(entity);
 				ClientboundSetEntityDataPacket setEntityDataPacket;
 
-				if (bukkitVersion.compareTo("1.19-R0.1-SNAPSHOT") >= 0) {
+				if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
 					List<SynchedEntityData.DataValue<?>> packedItems = (List<SynchedEntityData.DataValue<?>>)reflectionUtils.synchedEntityDataPackMethod.invoke(synchedEntityData);
 					setEntityDataPacket = new ClientboundSetEntityDataPacket(getEntityId(), packedItems);
 				} else {
