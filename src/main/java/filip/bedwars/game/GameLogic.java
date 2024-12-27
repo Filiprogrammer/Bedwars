@@ -96,16 +96,15 @@ import filip.bedwars.inventory.IClickable;
 import filip.bedwars.utils.EnderDragonController;
 import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.PlayerUtils;
-import filip.bedwars.utils.ReflectionUtils;
 import filip.bedwars.utils.SoundPlayer;
 import filip.bedwars.utils.TeamColorConverter;
 import filip.bedwars.utils.VillagerNPC;
 import filip.bedwars.world.GameWorld;
 import filip.bedwars.world.GameWorldManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.server.level.ServerPlayer;
 
 public class GameLogic implements Listener {
 
@@ -839,6 +838,7 @@ public class GameLogic implements Listener {
 		
 		// Check if the player is in the game world
 		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
+			Component deathMessage = event.deathMessage();
 			event.setDeathMessage(null);
 			GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
 			
@@ -957,42 +957,40 @@ public class GameLogic implements Listener {
 						public void onCancel() {}
 					});
 				}
-				
+
 				for (Player p : gameWorld.getWorld().getPlayers()) {
+					LegacyComponentSerializer serializer = LegacyComponentSerializer.legacySection();
+					TextComponent c = serializer.deserialize(MessagesConfig.getInstance().getStringValue(p.getLocale(), "prefix")).append(deathMessage);
+
+					if (isFinalKill)
+						c = c.append(serializer.deserialize(MessagesConfig.getInstance().getStringValue(player.getLocale(), "final-kill")));
+
+					p.sendMessage(c);
+				}
+
+				// Use for versions below 1.16:
+				/*for (Player p : gameWorld.getWorld().getPlayers()) {
 					ReflectionUtils reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
 
 					try {
 						ServerPlayer entityPlayerVictim = reflectionUtils.playerToNMSPlayer(player);
-						//ServerPlayer entityPlayerVictim = ((CraftPlayer)player).getHandle();
-						//Object entityPlayerVictim = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(player));
 						ServerPlayer entityPlayer = reflectionUtils.playerToNMSPlayer(p);
-						//ServerPlayer entityPlayer = ((CraftPlayer)p).getHandle();
-						//Object entityPlayer = reflectionUtils.craftPlayerGetHandleMethod.invoke(reflectionUtils.craftPlayerClass.cast(p));
-						
-						MutableComponent deathMessage = (MutableComponent)BedwarsPlugin.getInstance().reflectionUtils.componentNullToEmptyMethod.invoke(null, MessagesConfig.getInstance().getStringValue(p.getLocale(), "prefix"));
-						//MutableComponent deathMessage =  Component.literal(MessagesConfig.getInstance().getStringValue(p.getLocale(), "prefix"));
-						//Object deathMessage = reflectionUtils.chatComponentConstructor.newInstance(MessagesConfig.getInstance().getStringValue(p.getLocale(), "prefix"));
+
+						net.minecraft.network.chat.MutableComponent deathMessageComponent = (net.minecraft.network.chat.MutableComponent)BedwarsPlugin.getInstance().reflectionUtils.componentNullToEmptyMethod.invoke(null, MessagesConfig.getInstance().getStringValue(p.getLocale(), "prefix"));
 						Object combatTracker = BedwarsPlugin.getInstance().reflectionUtils.entityLivingGetCombatTrackerMethod.invoke(entityPlayerVictim);
 						Object component = BedwarsPlugin.getInstance().reflectionUtils.combatTrackerGetDeathMessageMethod.invoke(combatTracker);
-						BedwarsPlugin.getInstance().reflectionUtils.mutableComponentAppendMethod.invoke(deathMessage, component);
-						//deathMessage.append(entityPlayerVictim.getCombatTracker().getDeathMessage());
-						//deathMessage = reflectionUtils.iChatBaseComponentAddSiblingMethod.invoke(deathMessage, reflectionUtils.combatTrackerGetDeathMessageMethod.invoke(reflectionUtils.entityPlayerGetCombatTrackerMethod.invoke(entityPlayerVictim)));
-						
+						BedwarsPlugin.getInstance().reflectionUtils.mutableComponentAppendMethod.invoke(deathMessageComponent, component);
+
 						if(isFinalKill) {
-							Component finalKillComponent = (Component)BedwarsPlugin.getInstance().reflectionUtils.componentNullToEmptyMethod.invoke(null, MessagesConfig.getInstance().getStringValue(player.getLocale(), "final-kill"));
-							//deathMessage.append(finalKillComponent);
-							BedwarsPlugin.getInstance().reflectionUtils.mutableComponentAppendMethod.invoke(deathMessage, finalKillComponent);
-							//deathMessage = deathMessage.append(Component.literal("§cFINAL KILL!"));
-							//deathMessage = reflectionUtils.iChatBaseComponentAddSiblingMethod.invoke(deathMessage, reflectionUtils.chatComponentConstructor.newInstance("§cFINAL KILL!"));
+							net.minecraft.network.chat.Component finalKillComponent = (net.minecraft.network.chat.Component)BedwarsPlugin.getInstance().reflectionUtils.componentNullToEmptyMethod.invoke(null, MessagesConfig.getInstance().getStringValue(player.getLocale(), "final-kill"));
+							BedwarsPlugin.getInstance().reflectionUtils.mutableComponentAppendMethod.invoke(deathMessageComponent, finalKillComponent);
 						}
 
-						//entityPlayer.sendSystemMessage(deathMessage);
-						BedwarsPlugin.getInstance().reflectionUtils.nmsPlayerSendSystemMessage(entityPlayer, deathMessage);
-						//reflectionUtils.entityPlayerSendMessageMethod.invoke(entityPlayer, deathMessage);
+						BedwarsPlugin.getInstance().reflectionUtils.nmsPlayerSendSystemMessage(entityPlayer, deathMessageComponent);
 					} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 						e.printStackTrace();
 					}
-				}
+				}*/
 			}
 		}
 	}
