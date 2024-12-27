@@ -48,6 +48,8 @@ public class PlayerNPC {
 
 			if (bukkitVersion.compareTo("1.20.2-R0.1-SNAPSHOT") >= 0) {
 				entity = new ServerPlayer(nmsServer, nmsWorld, gameprofile, ClientInformation.createDefault());
+			} else if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
+				entity = (ServerPlayer)reflectionUtils.serverPlayerConstructor.newInstance(nmsServer, nmsWorld, gameprofile);
 			} else if (bukkitVersion.compareTo("1.19-R0.1-SNAPSHOT") >= 0) {
 				entity = (ServerPlayer)reflectionUtils.serverPlayerConstructor.newInstance(nmsServer, nmsWorld, gameprofile, null);
 			} else {
@@ -62,12 +64,15 @@ public class PlayerNPC {
         for (Player p : viewers) {
         	try {
 				ServerGamePacketListenerImpl connection = reflectionUtils.playerGetConnection(p);
+				Object playerInfoUpdatePacket;
+
 				if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
-					connection.send(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, entity));
+					playerInfoUpdatePacket = new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, entity);
 				} else {
-					Object playerInfoPacket = reflectionUtils.clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)reflectionUtils.enumPlayerInfoActionClass, "ADD_PLAYER"), new ServerPlayer[]{entity});
-					reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, playerInfoPacket);
+					playerInfoUpdatePacket = reflectionUtils.clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)reflectionUtils.enumPlayerInfoActionClass, "ADD_PLAYER"), new ServerPlayer[]{entity});
 				}
+
+				reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, playerInfoUpdatePacket);
 				//Object[] entityPlayerArray = (Object[]) java.lang.reflect.Array.newInstance(entityPlayerClass, 1);
 				//entityPlayerArray[0] = entity;
 				//sendPacketMethod.invoke(connection, clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)enumPlayerInfoActionClass, "ADD_PLAYER"), entityPlayerArray));
@@ -91,22 +96,20 @@ public class PlayerNPC {
 				reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, new ClientboundRotateHeadPacket(entity, headYaw));
 
 				Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), () -> {
-					if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
-						connection.send(new ClientboundPlayerInfoRemovePacket(List.of(entity.getUUID())));
-					} else {
-						try {
-							Object playerInfoPacket = reflectionUtils.clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)reflectionUtils.enumPlayerInfoActionClass, "REMOVE_PLAYER"), new ServerPlayer[]{entity});
-							reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, playerInfoPacket);
-						} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-							e.printStackTrace();
+					try {
+						Object playerInfoRemovePacket;
+
+						if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
+							UUID entityUUID = (UUID)reflectionUtils.entityGetUUIDMethod.invoke(entity);
+							playerInfoRemovePacket = new ClientboundPlayerInfoRemovePacket(List.of(entityUUID));
+						} else {
+							playerInfoRemovePacket = reflectionUtils.clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)reflectionUtils.enumPlayerInfoActionClass, "REMOVE_PLAYER"), new ServerPlayer[]{entity});
 						}
-					}
-					
-					/*try {
-						sendPacketMethod.invoke(connection, clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)enumPlayerInfoActionClass, "REMOVE_PLAYER"), entityPlayerArray));
-					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+
+						reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, playerInfoRemovePacket);
+					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 						e.printStackTrace();
-					}*/
+					}
 				}, 5L);
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
 				e.printStackTrace();

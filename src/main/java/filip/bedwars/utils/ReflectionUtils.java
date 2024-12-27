@@ -89,7 +89,7 @@ public class ReflectionUtils {
 	public Method playerInfoDataGetGameProfileMethod;
 
 	// net.minecraft.network.syncher
-	public Method synchedEntityDataPackMethod;
+	public final Method synchedEntityDataPackAllMethod;
 
 	// net.minecraft.server
 	public final Class<?> entityPlayerClass;
@@ -111,6 +111,7 @@ public class ReflectionUtils {
 	public Method entitySetLocationMethod;
 	public Method entityLevelMethod;
 	public Method entityGetEntityDataMethod;
+	public Method entityGetUUIDMethod;
 	public final Method entityGetBukkitEntityMethod;
 	public Method entitySetCustomNameMethod;
 	public final Method entitySetCustomNameVisibleMethod;
@@ -187,10 +188,16 @@ public class ReflectionUtils {
 		clientboundRemoveEntitiesPacketClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy");
 		clientboundTeleportEntityPacketClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport");
 		//packetPlayOutSpawnEntityLivingClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving");
-		clientboundPlayerInfoPacketClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo");
+		if (bukkitVersion.compareTo("1.19.2-R0.1-SNAPSHOT") <= 0) {
+			clientboundPlayerInfoPacketClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo");
+			enumPlayerInfoActionClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
+			playerInfoDataClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData");
+		} else {
+			clientboundPlayerInfoPacketClass = null;
+			enumPlayerInfoActionClass = null;
+			playerInfoDataClass = null;
+		}
 		//packetPlayOutNamedEntitySpawnClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutNamedEntitySpawn");
-		enumPlayerInfoActionClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
-		playerInfoDataClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData");
 
 		// net.minecraft.server - classes
 		entityPlayerClass = Class.forName("net.minecraft.server.level.EntityPlayer");
@@ -257,17 +264,19 @@ public class ReflectionUtils {
 		}
 
 		// net.minecraft.network.protocol - methods
-		for (Method method : clientboundPlayerInfoPacketClass.getMethods()) {
-			if (method.getParameterCount() != 0)
-				continue;
+		if (bukkitVersion.compareTo("1.19.2-R0.1-SNAPSHOT") <= 0) {
+			for (Method method : clientboundPlayerInfoPacketClass.getMethods()) {
+				if (method.getParameterCount() != 0)
+					continue;
 
-			if (method.getReturnType() != List.class)
-				continue;
+				if (method.getReturnType() != List.class)
+					continue;
 
-			ParameterizedType parameterizedType = (ParameterizedType)method.getGenericReturnType();
-			if (parameterizedType.getActualTypeArguments()[0] == playerInfoDataClass) {
-				clientboundPlayerInfoPacketEntriesMethod = method;
-				break;
+				ParameterizedType parameterizedType = (ParameterizedType)method.getGenericReturnType();
+				if (parameterizedType.getActualTypeArguments()[0] == playerInfoDataClass) {
+					clientboundPlayerInfoPacketEntriesMethod = method;
+					break;
+				}
 			}
 		}
 		for (Method method : ClientboundUpdateAttributesPacket.class.getMethods()) {
@@ -294,19 +303,20 @@ public class ReflectionUtils {
 				break;
 			}
 		}
-		for (Method method : playerInfoDataClass.getMethods()) {
-			if (method.getReturnType() == GameProfile.class) {
-				playerInfoDataGetGameProfileMethod = method;
-				break;
+		if (bukkitVersion.compareTo("1.19.2-R0.1-SNAPSHOT") <= 0) {
+			for (Method method : playerInfoDataClass.getMethods()) {
+				if (method.getReturnType() == GameProfile.class) {
+					playerInfoDataGetGameProfileMethod = method;
+					break;
+				}
 			}
 		}
 
 		// net.minecraft.network.syncher - methods
-		for (Method method : SynchedEntityData.class.getMethods()) {
-			if (method.getParameterCount() == 0 && method.getReturnType() == List.class) {
-				synchedEntityDataPackMethod = method;
-				break;
-			}
+		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0) {
+			synchedEntityDataPackAllMethod = SynchedEntityData.class.getMethod("getAll");
+		} else {
+			synchedEntityDataPackAllMethod = SynchedEntityData.class.getMethod("c");
 		}
 
 		// net.minecraft.server - methods
@@ -344,6 +354,12 @@ public class ReflectionUtils {
 		for (Method method : entityClass.getMethods()) {
 			if (method.getParameterCount() == 0 && method.getReturnType() == SynchedEntityData.class) {
 				entityGetEntityDataMethod = method;
+				break;
+			}
+		}
+		for (Method method : entityClass.getMethods()) {
+			if (method.getParameterCount() == 0 && method.getReturnType() == UUID.class && method.getAnnotations().length == 0) {
+				entityGetUUIDMethod = method;
 				break;
 			}
 		}
@@ -508,7 +524,11 @@ public class ReflectionUtils {
 
 		// net.minecraft.network.protocol - constructors
 		clientboundTeleportEntityPacketConstructor = clientboundTeleportEntityPacketClass.getConstructor(entityClass);
-		clientboundPlayerInfoPacketConstructor = clientboundPlayerInfoPacketClass.getConstructor(enumPlayerInfoActionClass, java.lang.reflect.Array.newInstance(entityPlayerClass, 0).getClass());
+		if (bukkitVersion.compareTo("1.19.2-R0.1-SNAPSHOT") <= 0) {
+			clientboundPlayerInfoPacketConstructor = clientboundPlayerInfoPacketClass.getConstructor(enumPlayerInfoActionClass, java.lang.reflect.Array.newInstance(entityPlayerClass, 0).getClass());
+		} else {
+			clientboundPlayerInfoPacketConstructor = null;
+		}
 		//packetPlayOutSpawnEntityLivingConstructor = packetPlayOutSpawnEntityLivingClass.getConstructor(entityLivingClass);
 		//clientboundRemoveEntitiesPacketConstructor = clientboundRemoveEntitiesPacketClass.getConstructor(new int[0].getClass());
 		//packetPlayOutNamedEntitySpawnConstructor = packetPlayOutNamedEntitySpawnClass.getConstructor(entityHumanClass);
