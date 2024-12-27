@@ -63,12 +63,12 @@ public class PlayerNPC {
 				if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
 					connection.send(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, entity));
 				} else {
-					Object playerInfoPacket = reflectionUtils.packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)reflectionUtils.enumPlayerInfoActionClass, "ADD_PLAYER"), new ServerPlayer[]{entity});
+					Object playerInfoPacket = reflectionUtils.clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)reflectionUtils.enumPlayerInfoActionClass, "ADD_PLAYER"), new ServerPlayer[]{entity});
 					reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, playerInfoPacket);
 				}
 				//Object[] entityPlayerArray = (Object[]) java.lang.reflect.Array.newInstance(entityPlayerClass, 1);
 				//entityPlayerArray[0] = entity;
-				//sendPacketMethod.invoke(connection, packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)enumPlayerInfoActionClass, "ADD_PLAYER"), entityPlayerArray));
+				//sendPacketMethod.invoke(connection, clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)enumPlayerInfoActionClass, "ADD_PLAYER"), entityPlayerArray));
 
 				if (bukkitVersion.compareTo("1.20.2-R0.1-SNAPSHOT") >= 0) {
 					connection.send(new ClientboundAddEntityPacket(entity));
@@ -93,7 +93,7 @@ public class PlayerNPC {
 						connection.send(new ClientboundPlayerInfoRemovePacket(List.of(entity.getUUID())));
 					} else {
 						try {
-							Object playerInfoPacket = reflectionUtils.packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)reflectionUtils.enumPlayerInfoActionClass, "REMOVE_PLAYER"), new ServerPlayer[]{entity});
+							Object playerInfoPacket = reflectionUtils.clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)reflectionUtils.enumPlayerInfoActionClass, "REMOVE_PLAYER"), new ServerPlayer[]{entity});
 							reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, playerInfoPacket);
 						} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 							e.printStackTrace();
@@ -101,7 +101,7 @@ public class PlayerNPC {
 					}
 					
 					/*try {
-						sendPacketMethod.invoke(connection, packetPlayOutPlayerInfoConstructor.newInstance(Enum.valueOf((Class<Enum>)enumPlayerInfoActionClass, "REMOVE_PLAYER"), entityPlayerArray));
+						sendPacketMethod.invoke(connection, clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)enumPlayerInfoActionClass, "REMOVE_PLAYER"), entityPlayerArray));
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
 						e.printStackTrace();
 					}*/

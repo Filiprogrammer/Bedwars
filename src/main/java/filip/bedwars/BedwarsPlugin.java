@@ -92,43 +92,6 @@ public class BedwarsPlugin extends JavaPlugin {
 		commands.add(new LeaveCommand());
 		commands.add(new SkipCountdownCommand());
 		helpCommand = new HelpCommand();
-		
-		// TODO: Well fuck, cannot get this to work anymore
-		/*try {
- 			Class<?> tagsBlockClass = net.minecraft.tags.BlockTags.class;
-			Field DRAGON_IMMUNEField = null;
-			Field witherImmuneField = null;
-			for (Field f : tagsBlockClass.getFields()) {
-				System.out.println("Field: " + f.getName());
-				if (net.minecraft.tags.BlockTags.DRAGON_IMMUNE == f.get(null)) {
-					System.out.println("DRAGON_IMMUNE!!!");
-					DRAGON_IMMUNEField = f;
-					break;
-				}
-			}
-			for (Field f : tagsBlockClass.getFields()) {
-				System.out.println("Field: " + f.getName());
-				if (net.minecraft.tags.BlockTags.WITHER_IMMUNE == f.get(null)) {
-					System.out.println("WITHER_IMMUNE!!!");
-					witherImmuneField = f;
-					break;
-				}
-			}
-
- 			//Field DRAGON_IMMUNEField = tagsBlockClass.getField("DRAGON_IMMUNE");
- 			DRAGON_IMMUNEField.setAccessible(true);
-			System.out.println("declfields: ");
-			for (Field f : Field.class.getFields()) {
-				System.out.println(f.getName());
-			}
-			Field modifiers = Field.class.getDeclaredField("modifiers");
-			modifiers.setAccessible(true);
-			modifiers.setInt(DRAGON_IMMUNEField, DRAGON_IMMUNEField.getModifiers() & ~java.lang.reflect.Modifier.FINAL);
-			//Field witherImmuneField = Class.forName("net.minecraft.tags.BlockTags").getField("WITHER_IMMUNE");
- 			DRAGON_IMMUNEField.set(null, witherImmuneField.get(null));
- 		} catch (Exception e) {
- 			e.printStackTrace();
- 		}*/
 	}
 	
 	@Override

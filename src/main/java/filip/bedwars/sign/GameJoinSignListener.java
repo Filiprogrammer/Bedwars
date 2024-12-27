@@ -72,7 +72,7 @@ public class GameJoinSignListener implements Listener {
 			return;
 		}
 		
-		GameManager.getInstance().joinGame(arena, event.getPlayer());
+		GameManager.getInstance().joinGame(arena, player);
 	}
 	
 	@EventHandler

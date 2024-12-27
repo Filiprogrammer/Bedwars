@@ -507,7 +507,7 @@ public class GameLogic implements Listener {
 					boolean hasKey = false;
 					if (hasTag) {
 						CompoundTag nbtTagCompound = (CompoundTag)BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsItemStack);
-						hasKey = (boolean)BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundHasKeyMethod.invoke(nbtTagCompound, "bedwars-fireball");
+						hasKey = (boolean)BedwarsPlugin.getInstance().reflectionUtils.compoundTagHasKeyMethod.invoke(nbtTagCompound, "bedwars-fireball");
 						//hasKey = nmsItemStack.getTag().contains("bedwars-fireball");
 					}
 
@@ -523,9 +523,9 @@ public class GameLogic implements Listener {
 							hasTag = (boolean) BedwarsPlugin.getInstance().reflectionUtils.itemStackHasTagMethod.invoke(nmsOffHandItemStack);
 							if (hasTag) {
 								CompoundTag nbtTagCompound = (CompoundTag)BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsOffHandItemStack);
-								hasKey = (boolean)BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundHasKeyMethod.invoke(nbtTagCompound, "bedwars-fireball");
+								hasKey = (boolean)BedwarsPlugin.getInstance().reflectionUtils.compoundTagHasKeyMethod.invoke(nbtTagCompound, "bedwars-fireball");
 								//hasKey = nmsOffHandItemStack.getTag().contains("bedwars-fireball");
-								//hasKey = (boolean) BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundHasKeyMethod.invoke(nmsOffHandItemStack.getTag(), "bedwars-fireball");
+								//hasKey = (boolean) BedwarsPlugin.getInstance().reflectionUtils.compoundTagHasKeyMethod.invoke(nmsOffHandItemStack.getTag(), "bedwars-fireball");
 							}
 
 							if (!(hasTag && hasKey))
@@ -680,7 +680,7 @@ public class GameLogic implements Listener {
 			boolean hasKey = false;
 			if (hasTag) {
 				CompoundTag nbtTagCompound = (CompoundTag)BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsItemStack);
-				hasKey = (boolean)BedwarsPlugin.getInstance().reflectionUtils.nbtTagCompoundHasKeyMethod.invoke(nbtTagCompound, "bedwars-blast-proof");
+				hasKey = (boolean)BedwarsPlugin.getInstance().reflectionUtils.compoundTagHasKeyMethod.invoke(nbtTagCompound, "bedwars-blast-proof");
 				//hasKey = nmsItemStack.getTag().contains("bedwars-blast-proof");
 				//hasKey = (boolean) hasKeyMethod.invoke(getTagMethod.invoke(nmsItemStack), "bedwars-blast-proof");
 			}
