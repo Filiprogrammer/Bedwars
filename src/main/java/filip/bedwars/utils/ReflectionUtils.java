@@ -7,6 +7,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -79,6 +81,12 @@ public class ReflectionUtils {
 	public final Class<?> clientboundPlayerInfoPacketClass;
 	public final Constructor<?> clientboundPlayerInfoPacketConstructor;
 	public Method clientboundPlayerInfoPacketEntriesMethod;
+	public final Class<?> clientboundPlayerInfoUpdatePacketClass;
+	public final Constructor<?> clientboundPlayerInfoUpdatePacketConstructor;
+	public Field clientboundPlayerInfoUpdatePacketEntriesField;
+	public final Class<?> clientboundPlayerInfoUpdatePacketActionEnum;
+	public final Class<?> clientboundPlayerInfoUpdatePacketEntryClass;
+	public final Constructor<?>clientboundPlayerInfoUpdatePacketEntryConstructor;
 	//public Class<?> packetPlayOutNamedEntitySpawnClass;
 	//public Constructor<?> packetPlayOutSpawnEntityLivingConstructor;
 	//public Constructor<?> clientboundRemoveEntitiesPacketConstructor;
@@ -195,10 +203,35 @@ public class ReflectionUtils {
 			clientboundPlayerInfoPacketClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo");
 			enumPlayerInfoActionClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
 			playerInfoDataClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData");
+			clientboundPlayerInfoUpdatePacketClass = null;
+			clientboundPlayerInfoUpdatePacketConstructor = null;
+			clientboundPlayerInfoUpdatePacketActionEnum = null;
+			clientboundPlayerInfoUpdatePacketEntryClass = null;
+			clientboundPlayerInfoUpdatePacketEntryConstructor = null;
 		} else {
 			clientboundPlayerInfoPacketClass = null;
 			enumPlayerInfoActionClass = null;
 			playerInfoDataClass = null;
+			clientboundPlayerInfoUpdatePacketClass = Class.forName("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket");
+			clientboundPlayerInfoUpdatePacketConstructor = clientboundPlayerInfoUpdatePacketClass.getConstructor(EnumSet.class, Collection.class);
+			for (Field field : clientboundPlayerInfoUpdatePacketClass.getDeclaredFields()) {
+				if (field.getType() == List.class) {
+					clientboundPlayerInfoUpdatePacketEntriesField = field;
+					break;
+				}
+			}
+			clientboundPlayerInfoUpdatePacketEntriesField.setAccessible(true);
+			clientboundPlayerInfoUpdatePacketActionEnum = Class.forName("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$a");
+			clientboundPlayerInfoUpdatePacketEntryClass = Class.forName("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$b");
+			clientboundPlayerInfoUpdatePacketEntryConstructor = clientboundPlayerInfoUpdatePacketEntryClass.getConstructor(
+				UUID.class,
+				GameProfile.class,
+				boolean.class,
+				int.class,
+				net.minecraft.world.level.GameType.class,
+				net.minecraft.network.chat.Component.class,
+				net.minecraft.network.chat.RemoteChatSession.Data.class
+			);
 		}
 		//packetPlayOutNamedEntitySpawnClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutNamedEntitySpawn");
 
@@ -407,7 +440,7 @@ public class ReflectionUtils {
 		}
 		levelGetWorldMethod = net.minecraft.world.level.Level.class.getMethod("getWorld");
 		for (Method method : playerConnectionClass.getMethods()) {
-			if (method.getParameterCount() == 1 && method.getParameterTypes()[0] == packetClass) {
+			if (method.getParameterCount() == 1 && method.getParameterTypes()[0] == packetClass && method.getReturnType().equals(Void.TYPE)) {
 				playerConnectionSendPacketMethod = method;
 				break;
 			}

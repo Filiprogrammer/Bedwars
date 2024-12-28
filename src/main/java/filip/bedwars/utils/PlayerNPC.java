@@ -2,6 +2,9 @@ package filip.bedwars.utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,7 +19,6 @@ import filip.bedwars.BedwarsPlugin;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
@@ -25,6 +27,7 @@ import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.level.GameType;
 
 public class PlayerNPC {
 
@@ -64,14 +67,25 @@ public class PlayerNPC {
 		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException | SecurityException e) {
 			e.printStackTrace();
 		}
-        
-        for (Player p : viewers) {
-        	try {
+
+		for (Player p : viewers) {
+			try {
 				ServerGamePacketListenerImpl connection = reflectionUtils.playerGetConnection(p);
 				Object playerInfoUpdatePacket;
 
 				if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
-					playerInfoUpdatePacket = new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, entity);
+					Object actions = EnumSet.of(Enum.valueOf((Class<Enum>) reflectionUtils.clientboundPlayerInfoUpdatePacketActionEnum, "ADD_PLAYER"));
+					playerInfoUpdatePacket = reflectionUtils.clientboundPlayerInfoUpdatePacketConstructor.newInstance(actions, new ArrayList<>());
+					Object entry = reflectionUtils.clientboundPlayerInfoUpdatePacketEntryConstructor.newInstance(
+						entityUUID,
+						gameprofile,
+						false,
+						0,
+						GameType.SURVIVAL,
+						null,
+						null
+					);
+					reflectionUtils.clientboundPlayerInfoUpdatePacketEntriesField.set(playerInfoUpdatePacket, Collections.singletonList(entry));
 				} else {
 					playerInfoUpdatePacket = reflectionUtils.clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)reflectionUtils.enumPlayerInfoActionClass, "ADD_PLAYER"), new ServerPlayer[]{entity});
 				}
