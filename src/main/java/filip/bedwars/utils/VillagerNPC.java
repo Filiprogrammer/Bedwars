@@ -45,8 +45,6 @@ public class VillagerNPC {
 	private void spawn(Location location, String customName, Player[] viewers) {
 		try {
 			ServerLevel nmsWorld = reflectionUtils.worldToNMSWorld(location.getWorld());
-			//CraftWorld craftWorld = (CraftWorld)location.getWorld();
-			//Object craftWorld = reflectionUtils.craftWorldClass.cast(location.getWorld());
 			net.minecraft.world.entity.EntityType entityType = (EntityType)reflectionUtils.entityTypesVillagerField.get(null);
 			entity = new net.minecraft.world.entity.npc.Villager(entityType, nmsWorld);
 			//entity = reflectionUtils.entityVillagerConstructor.newInstance(reflectionUtils.entityTypesVillagerField.get(null), reflectionUtils.craftWorldGetHandleMethod.invoke(craftWorld));
