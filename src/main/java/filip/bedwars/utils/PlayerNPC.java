@@ -39,11 +39,12 @@ public class PlayerNPC {
 
 	private void spawn(Location location, String customName, Player[] viewers) {
 		String bukkitVersion = Bukkit.getBukkitVersion();
+		UUID entityUUID = UUID.randomUUID();
+		GameProfile gameprofile = new GameProfile(entityUUID, "Spawn-Point");
 
 		try {
 			ServerLevel nmsWorld = reflectionUtils.worldToNMSWorld(location.getWorld());
 			DedicatedServer nmsServer = reflectionUtils.serverToNMSServer(Bukkit.getServer());
-			GameProfile gameprofile = new GameProfile(UUID.randomUUID(), customName);
 			gameprofile.getProperties().put("textures", new Property("textures", "eyJ0aW1lc3RhbXAiOjE1NjE3NjI0MTIxMDksInByb2ZpbGVJZCI6IjA5NzJiZGQxNGI4NjQ5ZmI5ZWNjYTM1M2Y4NDkxYTUxIiwicHJvZmlsZU5hbWUiOiJNSEZfTGF2YVNsaW1lIiwic2lnbmF0dXJlUmVxdWlyZWQiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9kOTBkNjFlOGNlOTUxMWEwYTJiNWVhMjc0MmNiMWVmMzYxMzEzODBlZDQxMjllMWIxNjNjZThmZjAwMGRlOGVhIn19fQ==", "ltQQFsgURcn3q235uAc0NsZBuziCQtDrlKDwrAYf7n2isEyNHATncmvCxQf14K8PJJ+vw/vIecQsiqdj7xSw3sWGsWflSppuVqmA2K2S0mBUFdEByHVVVs8NyqIoZZZGgUDe2L/PjNm2hewdxZDUx3EvU7KoeqyoILEna75XWPrY/QR+T30wOLBxvqeJ1j6N4LcJlIFhPq8DUvB6Z5QKPpldMOrNlBxjVwbsalUfcPpsqGZf6PyCBp/HZIy1q0XWbY4li68Vux1txDQZXpDRrbfg6VLzzZuwcVdtny3EaXb0pI+NGFW8BbaaTaZBl8nxxhfT0aoX7KaGffa+ugF7pmKWTQV4zDNTaupa3+ZMXDF8scszw+qUnbJmxQf274Ulk36K/srU9pBPyVmsN28Te/x/N9XZggulzgSjUM4IkrwESVdl1xl90ATlh4GsCD/KojBc8HO5Tmjr7Dt6+FiZwMzsyKW+cv7tVq7SAjn0r86KwgICea8oTdk7rQGn2hdUNkzdcMet/Dv6UzPYGbrNkvEQEfpoikK74ZZONw1XCoAMPRN81DL3PnVa7xJ/zyFHqluA50vBUvsaj/LJwXAaO5dyBnx7hy8Fmd9EYqFyHZxpTIeoiyIx0sbBSH3LH9OxbFn2uPOe6hxoO5vfNwEq9ryLy4hNq/vr/sYWzomvPGQ="));
 
 			if (bukkitVersion.compareTo("1.20.2-R0.1-SNAPSHOT") >= 0) {
@@ -56,8 +57,11 @@ public class PlayerNPC {
 				entity = (ServerPlayer)reflectionUtils.serverPlayerConstructor.newInstance(nmsServer, nmsWorld, gameprofile);
 			}
 
+			// Avoid Kyori Adventure warning on Paper due to use of legacy formatting codes
+			reflectionUtils.gameProfileNameField.set(gameprofile, customName);
+
 			reflectionUtils.entitySetLocationMethod.invoke(entity, location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
-		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException | SecurityException e) {
 			e.printStackTrace();
 		}
         
@@ -100,7 +104,6 @@ public class PlayerNPC {
 						Object playerInfoRemovePacket;
 
 						if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
-							UUID entityUUID = (UUID)reflectionUtils.entityGetUUIDMethod.invoke(entity);
 							playerInfoRemovePacket = new ClientboundPlayerInfoRemovePacket(List.of(entityUUID));
 						} else {
 							playerInfoRemovePacket = reflectionUtils.clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)reflectionUtils.enumPlayerInfoActionClass, "REMOVE_PLAYER"), new ServerPlayer[]{entity});

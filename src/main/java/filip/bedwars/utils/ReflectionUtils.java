@@ -60,6 +60,9 @@ public class ReflectionUtils {
 	public final Class<?> minecraftInventoryClass;
 	public final Method minecraftInventoryGetTitleMethod;
 
+	// com.mojang.authlib
+	public final Field gameProfileNameField;
+
 	// net.minecraft.network
 	public Field connectionChannelField;
 
@@ -550,6 +553,10 @@ public class ReflectionUtils {
 			}
 		}
 		vec3DConstructor = vec3DClass.getConstructor(double.class, double.class, double.class);
+
+		// com.mojang.authlib
+		gameProfileNameField = GameProfile.class.getDeclaredField("name");
+		gameProfileNameField.setAccessible(true);
 
 		// net.minecraft.network - fields
 		for (Field field : net.minecraft.network.Connection.class.getFields()) {
