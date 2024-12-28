@@ -86,8 +86,9 @@ public class ReflectionUtils {
 	public Field clientboundPlayerInfoUpdatePacketEntriesField;
 	public final Class<?> clientboundPlayerInfoUpdatePacketActionEnum;
 	public final Class<?> clientboundPlayerInfoUpdatePacketEntryClass;
-	public final Constructor<?>clientboundPlayerInfoUpdatePacketEntryConstructor;
-	//public Class<?> packetPlayOutNamedEntitySpawnClass;
+	public final Constructor<?> clientboundPlayerInfoUpdatePacketEntryConstructor;
+	public final Class<?> clientboundAddPlayerPacketClass;
+	public final Constructor<?> clientboundAddPlayerPacketConstructor;
 	//public Constructor<?> packetPlayOutSpawnEntityLivingConstructor;
 	//public Constructor<?> clientboundRemoveEntitiesPacketConstructor;
 	//public Constructor<?> packetPlayOutNamedEntitySpawnConstructor;
@@ -233,7 +234,11 @@ public class ReflectionUtils {
 				net.minecraft.network.chat.RemoteChatSession.Data.class
 			);
 		}
-		//packetPlayOutNamedEntitySpawnClass = Class.forName("net.minecraft.server." + serverVersion + ".PacketPlayOutNamedEntitySpawn");
+		if (bukkitVersion.compareTo("1.20.2-R0.1-SNAPSHOT") >= 0) {
+			clientboundAddPlayerPacketClass = null;
+		} else {
+			clientboundAddPlayerPacketClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn");
+		}
 
 		// net.minecraft.server - classes
 		entityPlayerClass = Class.forName("net.minecraft.server.level.EntityPlayer");
@@ -567,7 +572,11 @@ public class ReflectionUtils {
 		}
 		//packetPlayOutSpawnEntityLivingConstructor = packetPlayOutSpawnEntityLivingClass.getConstructor(entityLivingClass);
 		//clientboundRemoveEntitiesPacketConstructor = clientboundRemoveEntitiesPacketClass.getConstructor(new int[0].getClass());
-		//packetPlayOutNamedEntitySpawnConstructor = packetPlayOutNamedEntitySpawnClass.getConstructor(entityHumanClass);
+		if (bukkitVersion.compareTo("1.20.2-R0.1-SNAPSHOT") >= 0) {
+			clientboundAddPlayerPacketConstructor = null;
+		} else {
+			clientboundAddPlayerPacketConstructor = clientboundAddPlayerPacketClass.getConstructor(entityHumanClass);
+		}
 
 		// net.minecraft.server - constructors
 		serverPlayerConstructor = ServerPlayer.class.getConstructors()[0];

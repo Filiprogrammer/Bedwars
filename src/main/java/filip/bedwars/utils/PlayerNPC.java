@@ -1,6 +1,5 @@
 package filip.bedwars.utils;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +15,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
 import filip.bedwars.BedwarsPlugin;
-import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
@@ -91,19 +89,14 @@ public class PlayerNPC {
 				}
 
 				reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, playerInfoUpdatePacket);
-				//Object[] entityPlayerArray = (Object[]) java.lang.reflect.Array.newInstance(entityPlayerClass, 1);
-				//entityPlayerArray[0] = entity;
-				//sendPacketMethod.invoke(connection, clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)enumPlayerInfoActionClass, "ADD_PLAYER"), entityPlayerArray));
 
 				if (bukkitVersion.compareTo("1.20.2-R0.1-SNAPSHOT") >= 0) {
 					connection.send(new ClientboundAddEntityPacket(entity));
 				} else {
 					try {
-						Class<?> clientboundAddPlayerPacketClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn");
-						Constructor<?> clientboundAddPlayerPacketConstructor = clientboundAddPlayerPacketClass.getConstructor(net.minecraft.world.entity.player.Player.class);
-						Packet<?> addPlayerPacket = (Packet<?>) clientboundAddPlayerPacketConstructor.newInstance(entity);
+						Object addPlayerPacket = reflectionUtils.clientboundAddPlayerPacketConstructor.newInstance(entity);
 						reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, addPlayerPacket);
-					} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+					} catch (SecurityException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
 						e.printStackTrace();
 					}
 				}
