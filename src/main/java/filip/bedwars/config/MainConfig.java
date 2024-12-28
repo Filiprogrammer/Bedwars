@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
@@ -249,13 +250,20 @@ public class MainConfig extends SingleConfig {
 		if (gameLobbySection == null)
 			gameLobbySection = config.createSection("game-lobby");
 			
-		String gameLobbyWorld = gameLobbySection.getString("w", "world");
+		String gameLobbyWorldName = gameLobbySection.getString("w", "world");
+		World gameLobbyWorld = Bukkit.getWorld(gameLobbyWorldName);
+
+		if (gameLobbyWorld == null) {
+			gameLobby = new Location(Bukkit.getWorlds().get(0), 0, 65, 0);
+			return;
+		}
+
 		double gameLobbyX = gameLobbySection.getDouble("x", 0.0);
 		double gameLobbyY = gameLobbySection.getDouble("y", 65.0);
 		double gameLobbyZ = gameLobbySection.getDouble("z", 0.0);
 		float gameLobbyYaw = (float) gameLobbySection.getDouble("yaw", 0.0);
 		float gameLobbyPitch = (float) gameLobbySection.getDouble("pitch", 0.0);
-		gameLobby = new Location(Bukkit.getWorld(gameLobbyWorld), gameLobbyX, gameLobbyY, gameLobbyZ, gameLobbyYaw, gameLobbyPitch);
+		gameLobby = new Location(gameLobbyWorld, gameLobbyX, gameLobbyY, gameLobbyZ, gameLobbyYaw, gameLobbyPitch);
 	}
 	
 	public static MainConfig getInstance() {
