@@ -21,9 +21,10 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import filip.bedwars.BedwarsPlugin;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
+import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonHoldingPatternPhase;
@@ -44,6 +45,7 @@ public class EnderDragonController {
 	private int dragonPhase;
 	private Random random = new Random();
 	private final Location spawnLoc;
+	private ServerLevel nmsWorld;
 	
 	public EnderDragonController(Location loc, List<Entity> targetEntities, Set<Player> viewers) {
 		reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
@@ -161,10 +163,21 @@ public class EnderDragonController {
 	}
 	
 	public void respawn(Player... viewers) {
+		String bukkitVersion = Bukkit.getBukkitVersion();
+
 		for (Player p : viewers) {
 			try {
-				reflectionUtils.playerSendPacket(p, new ClientboundAddEntityPacket((net.minecraft.world.entity.Entity)dragon));
-			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+				final Packet<?> addEntityPacket;
+				if (bukkitVersion.compareTo("1.21-R0.1-SNAPSHOT") >= 0) {
+					addEntityPacket = (Packet<?>)reflectionUtils.clientboundAddEntityPacketConstructor.newInstance(
+						dragon,
+						new ServerEntity(nmsWorld, dragon, 0, false, packet -> {}, Set.of())
+					);
+				} else {
+					addEntityPacket = (Packet<?>)reflectionUtils.clientboundAddEntityPacketConstructor.newInstance(dragon);
+				}
+				reflectionUtils.playerSendPacket(p, addEntityPacket);
+			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
 				e.printStackTrace();
 			}
 		}
@@ -200,8 +213,8 @@ public class EnderDragonController {
 	
 	private void spawn(Location loc) {
 		try {
-			ServerLevel worldServer = reflectionUtils.worldToNMSWorld(loc.getWorld());
-			dragon = new EnderDragon(net.minecraft.world.entity.EntityType.ENDER_DRAGON, worldServer);
+			nmsWorld = reflectionUtils.worldToNMSWorld(loc.getWorld());
+			dragon = new EnderDragon(net.minecraft.world.entity.EntityType.ENDER_DRAGON, nmsWorld);
 			BedwarsPlugin.getInstance().reflectionUtils.entitySetLocationMethod.invoke(dragon, loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
 		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();

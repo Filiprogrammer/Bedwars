@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -22,6 +23,7 @@ import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -31,6 +33,7 @@ public class PlayerNPC {
 
 	private final ReflectionUtils reflectionUtils;
 	private ServerPlayer entity;
+	private ServerLevel nmsWorld;
 
 	public PlayerNPC(Location location, String customName, Player... viewers) {
 		reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
@@ -44,7 +47,7 @@ public class PlayerNPC {
 		GameProfile gameprofile = new GameProfile(entityUUID, "Spawn-Point");
 
 		try {
-			ServerLevel nmsWorld = reflectionUtils.worldToNMSWorld(location.getWorld());
+			nmsWorld = reflectionUtils.worldToNMSWorld(location.getWorld());
 			DedicatedServer nmsServer = reflectionUtils.serverToNMSServer(Bukkit.getServer());
 			gameprofile.getProperties().put("textures", new Property("textures", "eyJ0aW1lc3RhbXAiOjE1NjE3NjI0MTIxMDksInByb2ZpbGVJZCI6IjA5NzJiZGQxNGI4NjQ5ZmI5ZWNjYTM1M2Y4NDkxYTUxIiwicHJvZmlsZU5hbWUiOiJNSEZfTGF2YVNsaW1lIiwic2lnbmF0dXJlUmVxdWlyZWQiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9kOTBkNjFlOGNlOTUxMWEwYTJiNWVhMjc0MmNiMWVmMzYxMzEzODBlZDQxMjllMWIxNjNjZThmZjAwMGRlOGVhIn19fQ==", "ltQQFsgURcn3q235uAc0NsZBuziCQtDrlKDwrAYf7n2isEyNHATncmvCxQf14K8PJJ+vw/vIecQsiqdj7xSw3sWGsWflSppuVqmA2K2S0mBUFdEByHVVVs8NyqIoZZZGgUDe2L/PjNm2hewdxZDUx3EvU7KoeqyoILEna75XWPrY/QR+T30wOLBxvqeJ1j6N4LcJlIFhPq8DUvB6Z5QKPpldMOrNlBxjVwbsalUfcPpsqGZf6PyCBp/HZIy1q0XWbY4li68Vux1txDQZXpDRrbfg6VLzzZuwcVdtny3EaXb0pI+NGFW8BbaaTaZBl8nxxhfT0aoX7KaGffa+ugF7pmKWTQV4zDNTaupa3+ZMXDF8scszw+qUnbJmxQf274Ulk36K/srU9pBPyVmsN28Te/x/N9XZggulzgSjUM4IkrwESVdl1xl90ATlh4GsCD/KojBc8HO5Tmjr7Dt6+FiZwMzsyKW+cv7tVq7SAjn0r86KwgICea8oTdk7rQGn2hdUNkzdcMet/Dv6UzPYGbrNkvEQEfpoikK74ZZONw1XCoAMPRN81DL3PnVa7xJ/zyFHqluA50vBUvsaj/LJwXAaO5dyBnx7hy8Fmd9EYqFyHZxpTIeoiyIx0sbBSH3LH9OxbFn2uPOe6hxoO5vfNwEq9ryLy4hNq/vr/sYWzomvPGQ="));
 
@@ -69,8 +72,8 @@ public class PlayerNPC {
 		for (Player p : viewers) {
 			try {
 				ServerGamePacketListenerImpl connection = reflectionUtils.playerGetConnection(p);
-				Object playerInfoUpdatePacket;
 
+				Object playerInfoUpdatePacket;
 				if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
 					Object actions = EnumSet.of(Enum.valueOf((Class<Enum>) reflectionUtils.clientboundPlayerInfoUpdatePacketActionEnum, "ADD_PLAYER"));
 					playerInfoUpdatePacket = reflectionUtils.clientboundPlayerInfoUpdatePacketConstructor.newInstance(actions, new ArrayList<>());
@@ -90,16 +93,19 @@ public class PlayerNPC {
 
 				reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, playerInfoUpdatePacket);
 
-				if (bukkitVersion.compareTo("1.20.2-R0.1-SNAPSHOT") >= 0) {
-					connection.send(new ClientboundAddEntityPacket(entity));
+				final Object addPlayerPacket;
+				if (bukkitVersion.compareTo("1.21-R0.1-SNAPSHOT") >= 0) {
+					addPlayerPacket = reflectionUtils.clientboundAddEntityPacketConstructor.newInstance(
+						entity,
+						new ServerEntity(nmsWorld, entity, 0, false, packet -> {}, Set.of())
+					);
+				} else if (bukkitVersion.compareTo("1.20.2-R0.1-SNAPSHOT") >= 0) {
+					addPlayerPacket = reflectionUtils.clientboundAddEntityPacketConstructor.newInstance(entity);
 				} else {
-					try {
-						Object addPlayerPacket = reflectionUtils.clientboundAddPlayerPacketConstructor.newInstance(entity);
-						reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, addPlayerPacket);
-					} catch (SecurityException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-						e.printStackTrace();
-					}
+					addPlayerPacket = reflectionUtils.clientboundAddPlayerPacketConstructor.newInstance(entity);
 				}
+
+				reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, addPlayerPacket);
 
 				float var0 = (location.getYaw() * 256.0F / 360.0F);
 		        int var1 = (int)var0;

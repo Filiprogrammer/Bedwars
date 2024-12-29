@@ -88,12 +88,12 @@ public class ReflectionUtils {
 	public final Constructor<?> clientboundPlayerInfoUpdatePacketEntryConstructor;
 	public final Class<?> clientboundAddPlayerPacketClass;
 	public final Constructor<?> clientboundAddPlayerPacketConstructor;
-	//public Constructor<?> packetPlayOutSpawnEntityLivingConstructor;
 	//public Constructor<?> clientboundRemoveEntitiesPacketConstructor;
 	//public Constructor<?> packetPlayOutNamedEntitySpawnConstructor;
 	public Method clientboundUpdateAttributesPacketGetEntityIdMethod;
 	public Method clientboundSetEquipmentPacketGetEntityIdMethod;
 	public Method clientboundSetEntityDataPacketIdMethod;
+	public final Constructor<?> clientboundAddEntityPacketConstructor;
 	public Method clientboundAddEntityPacketGetIdMethod;
 	public final Class<?> enumPlayerInfoActionClass;
 	public final Class<?> playerInfoDataClass;
@@ -535,7 +535,7 @@ public class ReflectionUtils {
 			itemStackHasTagMethod = net.minecraft.world.item.ItemStack.class.getMethod("u");
 		}
 		//itemStackGetTagMethod = itemStackClass.getMethod("getTag");
-		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0) {
+		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0 || bukkitVersion.compareTo("1.20.5-R0.1-SNAPSHOT") >= 0) {
 			entityArmorStandSetSmallMethod = net.minecraft.world.entity.decoration.ArmorStand.class.getMethod("setSmall", boolean.class);
 		} else if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") <= 0) {
 			entityArmorStandSetSmallMethod = net.minecraft.world.entity.decoration.ArmorStand.class.getMethod("a", boolean.class);
@@ -576,12 +576,16 @@ public class ReflectionUtils {
 		} else {
 			clientboundPlayerInfoPacketConstructor = null;
 		}
-		//packetPlayOutSpawnEntityLivingConstructor = packetPlayOutSpawnEntityLivingClass.getConstructor(entityLivingClass);
 		//clientboundRemoveEntitiesPacketConstructor = clientboundRemoveEntitiesPacketClass.getConstructor(new int[0].getClass());
 		if (bukkitVersion.compareTo("1.20.2-R0.1-SNAPSHOT") >= 0) {
 			clientboundAddPlayerPacketConstructor = null;
 		} else {
 			clientboundAddPlayerPacketConstructor = clientboundAddPlayerPacketClass.getConstructor(entityHumanClass);
+		}
+		if (bukkitVersion.compareTo("1.21-R0.1-SNAPSHOT") >= 0) {
+			clientboundAddEntityPacketConstructor = ClientboundAddEntityPacket.class.getConstructor(entityClass, net.minecraft.server.level.ServerEntity.class);
+		} else {
+			clientboundAddEntityPacketConstructor = ClientboundAddEntityPacket.class.getConstructor(entityClass);
 		}
 
 		// net.minecraft.server - constructors

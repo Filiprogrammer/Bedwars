@@ -2,6 +2,7 @@ package filip.bedwars.utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -9,11 +10,11 @@ import org.bukkit.entity.Player;
 
 import filip.bedwars.BedwarsPlugin;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.EntityType;
@@ -27,6 +28,7 @@ public class VillagerNPC {
 	private VillagerType villagerType;
 	private VillagerProfession villagerProfession;
 	private net.minecraft.world.entity.npc.Villager entity;
+	private ServerLevel nmsWorld;
 	
 	public VillagerNPC(Location location, String villagerType, String villagerProfession, String customName, Player... viewers) {
 		reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
@@ -44,7 +46,7 @@ public class VillagerNPC {
 
 	private void spawn(Location location, String customName, Player[] viewers) {
 		try {
-			ServerLevel nmsWorld = reflectionUtils.worldToNMSWorld(location.getWorld());
+			nmsWorld = reflectionUtils.worldToNMSWorld(location.getWorld());
 			net.minecraft.world.entity.EntityType entityType = (EntityType)reflectionUtils.entityTypesVillagerField.get(null);
 			entity = new net.minecraft.world.entity.npc.Villager(entityType, nmsWorld);
 			//entity = reflectionUtils.entityVillagerConstructor.newInstance(reflectionUtils.entityTypesVillagerField.get(null), reflectionUtils.craftWorldGetHandleMethod.invoke(craftWorld));
@@ -102,12 +104,19 @@ public class VillagerNPC {
 
 		for (Player p : viewers) {
 			try {
-				//Object packet = reflectionUtils.packetPlayOutSpawnEntityLivingConstructor.newInstance(entity);
-				ClientboundAddEntityPacket packet = new ClientboundAddEntityPacket((net.minecraft.world.entity.Entity)entity);
+				final Object addEntityPacket;
+				if (bukkitVersion.compareTo("1.21-R0.1-SNAPSHOT") >= 0) {
+					addEntityPacket = reflectionUtils.clientboundAddEntityPacketConstructor.newInstance(
+						entity,
+						new ServerEntity(nmsWorld, entity, 0, false, packet -> {}, Set.of())
+					);
+				} else {
+					addEntityPacket = reflectionUtils.clientboundAddEntityPacketConstructor.newInstance(entity);
+				}
+
 				ServerGamePacketListenerImpl playerConnection = reflectionUtils.playerGetConnection(p);
 				//playerConnection.send(packet);
-				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
-				//reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, packet);
+				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, addEntityPacket);
 				//playerConnection.send(new ClientboundSetEntityDataPacket(entity.getId(), entity.getEntityData().getNonDefaultValues()));
 				SynchedEntityData synchedEntityData = (SynchedEntityData)reflectionUtils.entityGetEntityDataMethod.invoke(entity);
 				ClientboundSetEntityDataPacket setEntityDataPacket;

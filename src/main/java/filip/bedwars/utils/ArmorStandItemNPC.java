@@ -2,6 +2,7 @@ package filip.bedwars.utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,12 +15,12 @@ import com.mojang.datafixers.util.Pair;
 
 import filip.bedwars.BedwarsPlugin;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.decoration.ArmorStand;
@@ -54,7 +55,17 @@ public class ArmorStandItemNPC {
 			for (Player p : viewers) {
 				ServerGamePacketListenerImpl playerConnection = reflectionUtils.playerGetConnection(p);
 				// playerConnection.send(new ClientboundAddEntityPacket(entity));
-				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, new ClientboundAddEntityPacket(entity));
+				final Object addEntityPacket;
+				if (bukkitVersion.compareTo("1.21-R0.1-SNAPSHOT") >= 0) {
+					addEntityPacket = reflectionUtils.clientboundAddEntityPacketConstructor.newInstance(
+						entity,
+						new ServerEntity(nmsWorld, entity, 0, false, packet -> {}, Set.of())
+					);
+				} else {
+					addEntityPacket = reflectionUtils.clientboundAddEntityPacketConstructor.newInstance(entity);
+				}
+				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, addEntityPacket);
+
 				SynchedEntityData synchedEntityData = (SynchedEntityData)reflectionUtils.entityGetEntityDataMethod.invoke(entity);
 				ClientboundSetEntityDataPacket setEntityDataPacket;
 
