@@ -10,6 +10,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -152,6 +153,8 @@ public class ReflectionUtils {
 	//public Method itemStackGetTagMethod;
 	public final Method entityArmorStandSetSmallMethod;
 	public Method combatTrackerGetDeathMessageMethod;
+	public final Class<?> positionMoveRotationClass;
+	public final Method positionMoveRotationOfMethod;
 
 	// net.minecraft.nbt
 	public final Method compoundTagHasKeyMethod;
@@ -226,15 +229,28 @@ public class ReflectionUtils {
 			clientboundPlayerInfoUpdatePacketEntriesField.setAccessible(true);
 			clientboundPlayerInfoUpdatePacketActionEnum = Class.forName("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$a");
 			clientboundPlayerInfoUpdatePacketEntryClass = Class.forName("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$b");
-			clientboundPlayerInfoUpdatePacketEntryConstructor = clientboundPlayerInfoUpdatePacketEntryClass.getConstructor(
-				UUID.class,
-				GameProfile.class,
-				boolean.class,
-				int.class,
-				net.minecraft.world.level.GameType.class,
-				net.minecraft.network.chat.Component.class,
-				net.minecraft.network.chat.RemoteChatSession.Data.class
-			);
+			if (bukkitVersion.compareTo("1.21.1-R0.1-SNAPSHOT") <= 0) {
+				clientboundPlayerInfoUpdatePacketEntryConstructor = clientboundPlayerInfoUpdatePacketEntryClass.getConstructor(
+					UUID.class,
+					GameProfile.class,
+					boolean.class,
+					int.class,
+					net.minecraft.world.level.GameType.class,
+					net.minecraft.network.chat.Component.class,
+					net.minecraft.network.chat.RemoteChatSession.Data.class
+				);
+			} else {
+				clientboundPlayerInfoUpdatePacketEntryConstructor = clientboundPlayerInfoUpdatePacketEntryClass.getConstructor(
+					UUID.class,
+					GameProfile.class,
+					boolean.class,
+					int.class,
+					net.minecraft.world.level.GameType.class,
+					net.minecraft.network.chat.Component.class,
+					int.class,
+					net.minecraft.network.chat.RemoteChatSession.Data.class
+				);
+			}
 		}
 		if (bukkitVersion.compareTo("1.20.2-R0.1-SNAPSHOT") >= 0) {
 			clientboundAddPlayerPacketClass = null;
@@ -260,6 +276,11 @@ public class ReflectionUtils {
 		vec3DClass = Class.forName("net.minecraft.world.phys.Vec3D");
 		villagerTypeClass = Class.forName("net.minecraft.world.entity.npc.VillagerType");
 		villagerProfessionClass = Class.forName("net.minecraft.world.entity.npc.VillagerProfession");
+		if (bukkitVersion.compareTo("1.21.1-R0.1-SNAPSHOT") <= 0) {
+			positionMoveRotationClass = null;
+		} else {
+			positionMoveRotationClass = Class.forName("net.minecraft.world.entity.PositionMoveRotation");
+		}
 
 		// org.bukkit.craftbukkit - methods
 		craftEntityGetHandleMethod = craftEntityClass.getMethod("getHandle");
@@ -442,7 +463,7 @@ public class ReflectionUtils {
 				break;
 			}
 		}
-		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0) {
+		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0 || bukkitVersion.compareTo("1.20.5-R0.1-SNAPSHOT") >= 0) {
 			mobTickMethod = net.minecraft.world.entity.Mob.class.getMethod("tick");
 		} else if (bukkitVersion.compareTo("1.19.2-R0.1-SNAPSHOT") <= 0) {
 			mobTickMethod = net.minecraft.world.entity.Mob.class.getMethod("k");
@@ -548,6 +569,11 @@ public class ReflectionUtils {
 				break;
 			}
 		}
+		if (bukkitVersion.compareTo("1.21.1-R0.1-SNAPSHOT") <= 0) {
+			positionMoveRotationOfMethod = null;
+		} else {
+			positionMoveRotationOfMethod = positionMoveRotationClass.getMethod("of", entityClass);
+		}
 
 		// net.minecraft.nbt - methods
 		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0) {
@@ -570,7 +596,16 @@ public class ReflectionUtils {
 		}
 
 		// net.minecraft.network.protocol - constructors
-		clientboundTeleportEntityPacketConstructor = clientboundTeleportEntityPacketClass.getConstructor(entityClass);
+		if (bukkitVersion.compareTo("1.21.1-R0.1-SNAPSHOT") <= 0) {
+			clientboundTeleportEntityPacketConstructor = clientboundTeleportEntityPacketClass.getConstructor(entityClass);
+		} else {
+			clientboundTeleportEntityPacketConstructor = clientboundTeleportEntityPacketClass.getConstructor(
+				int.class,
+				positionMoveRotationClass,
+				Set.class,
+				boolean.class
+			);
+		}
 		if (bukkitVersion.compareTo("1.19.2-R0.1-SNAPSHOT") <= 0) {
 			clientboundPlayerInfoPacketConstructor = clientboundPlayerInfoPacketClass.getConstructor(enumPlayerInfoActionClass, java.lang.reflect.Array.newInstance(entityPlayerClass, 0).getClass());
 		} else {

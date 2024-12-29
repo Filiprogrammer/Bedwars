@@ -16,11 +16,10 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
 import filip.bedwars.BedwarsPlugin;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
-import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerEntity;
@@ -77,15 +76,29 @@ public class PlayerNPC {
 				if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
 					Object actions = EnumSet.of(Enum.valueOf((Class<Enum>) reflectionUtils.clientboundPlayerInfoUpdatePacketActionEnum, "ADD_PLAYER"));
 					playerInfoUpdatePacket = reflectionUtils.clientboundPlayerInfoUpdatePacketConstructor.newInstance(actions, new ArrayList<>());
-					Object entry = reflectionUtils.clientboundPlayerInfoUpdatePacketEntryConstructor.newInstance(
-						entityUUID,
-						gameprofile,
-						false,
-						0,
-						GameType.SURVIVAL,
-						null,
-						null
-					);
+					final Object entry;
+					if (bukkitVersion.compareTo("1.21.1-R0.1-SNAPSHOT") <= 0) {
+						entry = reflectionUtils.clientboundPlayerInfoUpdatePacketEntryConstructor.newInstance(
+							entityUUID,
+							gameprofile,
+							false,
+							0,
+							GameType.SURVIVAL,
+							null,
+							null
+						);
+					} else {
+						entry = reflectionUtils.clientboundPlayerInfoUpdatePacketEntryConstructor.newInstance(
+							entityUUID,
+							gameprofile,
+							false,
+							0,
+							GameType.SURVIVAL,
+							null,
+							0,
+							null
+						);
+					}
 					reflectionUtils.clientboundPlayerInfoUpdatePacketEntriesField.set(playerInfoUpdatePacket, Collections.singletonList(entry));
 				} else {
 					playerInfoUpdatePacket = reflectionUtils.clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)reflectionUtils.enumPlayerInfoActionClass, "ADD_PLAYER"), new ServerPlayer[]{entity});
@@ -134,24 +147,33 @@ public class PlayerNPC {
 	}
 	
 	public void teleport(double x, double y, double z, float yaw, float pitch, Player... viewers) {
+		String bukkitVersion = Bukkit.getBukkitVersion();
+
 		try {
 			reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, yaw, pitch);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
-			return;
-		}
 
-		for (Player p : viewers) {
-			try {
+			final Packet<?> teleportEntityPacket;
+			if (bukkitVersion.compareTo("1.21.1-R0.1-SNAPSHOT") <= 0) {
+				teleportEntityPacket = (Packet<?>)reflectionUtils.clientboundTeleportEntityPacketConstructor.newInstance(entity);
+			} else {
+				teleportEntityPacket = (Packet<?>)reflectionUtils.clientboundTeleportEntityPacketConstructor.newInstance(
+					getEntityId(),
+					reflectionUtils.positionMoveRotationOfMethod.invoke(null, entity),
+					Set.of(),
+					false
+				);
+			}
+
+			for (Player p : viewers) {
 				ServerGamePacketListenerImpl playerConnection = reflectionUtils.playerGetConnection(p);
-				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, new ClientboundTeleportEntityPacket(entity));
+				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, teleportEntityPacket);
 				float var0 = (yaw * 256.0F / 360.0F);
 		        int var1 = (int)var0;
 		        byte headYaw = (byte)((var0 < var1) ? (var1 - 1) : var1);
 				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, new ClientboundRotateHeadPacket(entity, headYaw));
-			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-				e.printStackTrace();
 			}
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+			e.printStackTrace();
 		}
 	}
 	

@@ -15,10 +15,10 @@ import com.mojang.datafixers.util.Pair;
 
 import filip.bedwars.BedwarsPlugin;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
-import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
@@ -92,19 +92,27 @@ public class ArmorStandItemNPC {
 	}
 	
 	public void teleport(double x, double y, double z, Player... viewers) {
+		String bukkitVersion = Bukkit.getBukkitVersion();
+
 		try {
 			reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, 0f, 0f);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
-			return;
-		}
 
-		for (Player p : viewers) {
-			try {
-				reflectionUtils.playerSendPacket(p, new ClientboundTeleportEntityPacket(entity));
-			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-				e.printStackTrace();
+			final Packet<?> teleportEntityPacket;
+			if (bukkitVersion.compareTo("1.21.1-R0.1-SNAPSHOT") <= 0) {
+				teleportEntityPacket = (Packet<?>)reflectionUtils.clientboundTeleportEntityPacketConstructor.newInstance(entity);
+			} else {
+				teleportEntityPacket = (Packet<?>)reflectionUtils.clientboundTeleportEntityPacketConstructor.newInstance(
+					getEntityId(),
+					reflectionUtils.positionMoveRotationOfMethod.invoke(null, entity),
+					Set.of(),
+					false
+				);
 			}
+
+			for (Player p : viewers)
+				reflectionUtils.playerSendPacket(p, teleportEntityPacket);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+			e.printStackTrace();
 		}
 	}
 	

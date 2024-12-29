@@ -23,7 +23,6 @@ import org.bukkit.util.Vector;
 import filip.bedwars.BedwarsPlugin;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
-import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
@@ -223,9 +222,22 @@ public class EnderDragonController {
 	}
 	
 	private void updateLocation() {
+		String bukkitVersion = Bukkit.getBukkitVersion();
 		Iterator<Player> iter = viewers.keySet().iterator();
-		
+
 		try {
+			final Packet<?> teleportEntityPacket;
+			if (bukkitVersion.compareTo("1.21.1-R0.1-SNAPSHOT") <= 0) {
+				teleportEntityPacket = (Packet<?>)reflectionUtils.clientboundTeleportEntityPacketConstructor.newInstance(dragon);
+			} else {
+				teleportEntityPacket = (Packet<?>)reflectionUtils.clientboundTeleportEntityPacketConstructor.newInstance(
+					getEntityId(),
+					reflectionUtils.positionMoveRotationOfMethod.invoke(null, dragon),
+					Set.of(),
+					false
+				);
+			}
+
 			while (iter.hasNext()) {
 				Player p = iter.next();
 
@@ -251,9 +263,9 @@ public class EnderDragonController {
 					}
 				}
 
-				reflectionUtils.playerSendPacket(p, new ClientboundTeleportEntityPacket(dragon));
+				reflectionUtils.playerSendPacket(p, teleportEntityPacket);
 			}
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
 			e.printStackTrace();
 		}
 	}
