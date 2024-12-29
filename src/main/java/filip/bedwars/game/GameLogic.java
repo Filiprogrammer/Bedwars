@@ -62,6 +62,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -499,14 +500,14 @@ public class GameLogic implements Listener {
 				NamespacedKey namespacedKey = new NamespacedKey(BedwarsPlugin.getInstance(), "bedwars-fireball");
 				ItemMeta itemMeta = event.getItem().getItemMeta();
 
-				if (itemMeta != null && itemMeta.getPersistentDataContainer().has(namespacedKey)) {
+				if (itemMeta != null && itemMeta.getPersistentDataContainer().has(namespacedKey, PersistentDataType.INTEGER)) {
 					boolean shouldLaunchFireball = false;
 
 					if (event.getHand() == EquipmentSlot.HAND) {
 						ItemStack offHandItemStack = player.getInventory().getItemInOffHand();
 						ItemMeta offHandItemMeta = offHandItemStack.getItemMeta();
 
-						if (!(offHandItemMeta != null && offHandItemMeta.getPersistentDataContainer().has(namespacedKey))) {
+						if (!(offHandItemMeta != null && offHandItemMeta.getPersistentDataContainer().has(namespacedKey, PersistentDataType.INTEGER))) {
 							shouldLaunchFireball = true;
 						}
 					} else {
@@ -640,7 +641,7 @@ public class GameLogic implements Listener {
 		ItemMeta itemMeta = event.getItemInHand().getItemMeta();
 		NamespacedKey namespacedKey = new NamespacedKey(BedwarsPlugin.getInstance(), "bedwars-blast-proof");
 
-		if (itemMeta != null && itemMeta.getPersistentDataContainer().has(namespacedKey))
+		if (itemMeta != null && itemMeta.getPersistentDataContainer().has(namespacedKey, PersistentDataType.INTEGER))
 			block.setMetadata("bedwars_blast_proof", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
 		else
 			block.removeMetadata("bedwars_blast_proof", BedwarsPlugin.getInstance());
