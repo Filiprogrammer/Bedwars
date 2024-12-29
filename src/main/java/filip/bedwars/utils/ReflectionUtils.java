@@ -239,6 +239,17 @@ public class ReflectionUtils {
 					net.minecraft.network.chat.Component.class,
 					net.minecraft.network.chat.RemoteChatSession.Data.class
 				);
+			} else if (bukkitVersion.compareTo("1.21.3-R0.1-SNAPSHOT") <= 0) {
+				clientboundPlayerInfoUpdatePacketEntryConstructor = clientboundPlayerInfoUpdatePacketEntryClass.getConstructor(
+					UUID.class,
+					GameProfile.class,
+					boolean.class,
+					int.class,
+					net.minecraft.world.level.GameType.class,
+					net.minecraft.network.chat.Component.class,
+					int.class,
+					net.minecraft.network.chat.RemoteChatSession.Data.class
+				);
 			} else {
 				clientboundPlayerInfoUpdatePacketEntryConstructor = clientboundPlayerInfoUpdatePacketEntryClass.getConstructor(
 					UUID.class,
@@ -247,6 +258,7 @@ public class ReflectionUtils {
 					int.class,
 					net.minecraft.world.level.GameType.class,
 					net.minecraft.network.chat.Component.class,
+					boolean.class,
 					int.class,
 					net.minecraft.network.chat.RemoteChatSession.Data.class
 				);

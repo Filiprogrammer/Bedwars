@@ -87,6 +87,17 @@ public class PlayerNPC {
 							null,
 							null
 						);
+					} else if (bukkitVersion.compareTo("1.21.3-R0.1-SNAPSHOT") <= 0) {
+						entry = reflectionUtils.clientboundPlayerInfoUpdatePacketEntryConstructor.newInstance(
+							entityUUID,
+							gameprofile,
+							false,
+							0,
+							GameType.SURVIVAL,
+							null,
+							0,
+							null
+						);
 					} else {
 						entry = reflectionUtils.clientboundPlayerInfoUpdatePacketEntryConstructor.newInstance(
 							entityUUID,
@@ -95,6 +106,7 @@ public class PlayerNPC {
 							0,
 							GameType.SURVIVAL,
 							null,
+							false,
 							0,
 							null
 						);
