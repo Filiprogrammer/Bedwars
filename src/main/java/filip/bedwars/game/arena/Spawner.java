@@ -61,7 +61,7 @@ public class Spawner implements Cloneable {
      * Spawn the item at the location.
      */
     private void spawnItem(World world) {
-    	world.dropItemNaturally(location, itemStack).setTicksLived(3000);
+		world.dropItem(location, itemStack).setTicksLived(3000);
     }
     
     public Spawner clone() {
