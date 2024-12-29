@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
@@ -104,7 +104,6 @@ import filip.bedwars.world.GameWorldManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.minecraft.nbt.CompoundTag;
 
 public class GameLogic implements Listener {
 
@@ -497,53 +496,31 @@ public class GameLogic implements Listener {
 		
 		if (event.hasItem()) {
 			if (event.getAction() == org.bukkit.event.block.Action.RIGHT_CLICK_AIR || event.getAction() == org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK) {
-				try {
-					net.minecraft.world.item.ItemStack nmsItemStack = (net.minecraft.world.item.ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, event.getItem());
-					//net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(event.getItem());
-					//Object nmsItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, event.getItem());
-					//boolean hasTag = nmsItemStack.hasTag();
-					boolean hasTag = (boolean) BedwarsPlugin.getInstance().reflectionUtils.itemStackHasTagMethod.invoke(nmsItemStack);
-					boolean hasKey = false;
-					if (hasTag) {
-						CompoundTag nbtTagCompound = (CompoundTag)BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsItemStack);
-						hasKey = (boolean)BedwarsPlugin.getInstance().reflectionUtils.compoundTagHasKeyMethod.invoke(nbtTagCompound, "bedwars-fireball");
-						//hasKey = nmsItemStack.getTag().contains("bedwars-fireball");
-					}
+				NamespacedKey namespacedKey = new NamespacedKey(BedwarsPlugin.getInstance(), "bedwars-fireball");
+				ItemMeta itemMeta = event.getItem().getItemMeta();
 
-					if (hasTag && hasKey) {
-						boolean shouldLaunchFireball = false;
-						
-						if (event.getHand() == EquipmentSlot.HAND) {
-							net.minecraft.world.item.ItemStack nmsOffHandItemStack = (net.minecraft.world.item.ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, player.getInventory().getItemInOffHand());
-							//net.minecraft.world.item.ItemStack nmsOffHandItemStack = CraftItemStack.asNMSCopy(player.getInventory().getItemInOffHand());
-							//Object nmsOffHandItemStack = BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, player.getInventory().getItemInOffHand());
+				if (itemMeta != null && itemMeta.getPersistentDataContainer().has(namespacedKey)) {
+					boolean shouldLaunchFireball = false;
 
-							//hasTag = nmsOffHandItemStack.hasTag();
-							hasTag = (boolean) BedwarsPlugin.getInstance().reflectionUtils.itemStackHasTagMethod.invoke(nmsOffHandItemStack);
-							if (hasTag) {
-								CompoundTag nbtTagCompound = (CompoundTag)BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsOffHandItemStack);
-								hasKey = (boolean)BedwarsPlugin.getInstance().reflectionUtils.compoundTagHasKeyMethod.invoke(nbtTagCompound, "bedwars-fireball");
-								//hasKey = nmsOffHandItemStack.getTag().contains("bedwars-fireball");
-								//hasKey = (boolean) BedwarsPlugin.getInstance().reflectionUtils.compoundTagHasKeyMethod.invoke(nmsOffHandItemStack.getTag(), "bedwars-fireball");
-							}
+					if (event.getHand() == EquipmentSlot.HAND) {
+						ItemStack offHandItemStack = player.getInventory().getItemInOffHand();
+						ItemMeta offHandItemMeta = offHandItemStack.getItemMeta();
 
-							if (!(hasTag && hasKey))
-								shouldLaunchFireball = true;
-						} else {
+						if (!(offHandItemMeta != null && offHandItemMeta.getPersistentDataContainer().has(namespacedKey))) {
 							shouldLaunchFireball = true;
 						}
-						
-						if (shouldLaunchFireball) {
-							Fireball fireball = (Fireball) gameWorld.getWorld().spawnEntity(player.getLocation().clone().add(player.getLocation().getDirection()).add(0, 1, 0), EntityType.FIREBALL);
-							fireball.setVelocity(player.getLocation().getDirection());
-							fireball.setYield(3);
-							event.setCancelled(true);
-							event.getItem().subtract();
-							SoundPlayer.playSound("fireball-shoot", player);
-						}
+					} else {
+						shouldLaunchFireball = true;
 					}
-				} catch (IllegalArgumentException | SecurityException | IllegalAccessException | InvocationTargetException e) {
-					e.printStackTrace();
+
+					if (shouldLaunchFireball) {
+						Fireball fireball = (Fireball) gameWorld.getWorld().spawnEntity(player.getLocation().clone().add(player.getLocation().getDirection()).add(0, 1, 0), EntityType.FIREBALL);
+						fireball.setVelocity(player.getLocation().getDirection());
+						fireball.setYield(3);
+						event.setCancelled(true);
+						event.getItem().subtract();
+						SoundPlayer.playSound("fireball-shoot", player);
+					}
 				}
 			}
 		}
@@ -659,39 +636,15 @@ public class GameLogic implements Listener {
 				return;
 			}
 		}
-		
-		//String serverVersion = BedwarsPlugin.getInstance().getServerVersion();
-		try {
-			//Class<?> craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".inventory.CraftItemStack");
-			//Method asNMSCopyMethod = craftItemStackClass.getMethod("asNMSCopy", ItemStack.class);
-			//Class<?> nmsItemStackClass = Class.forName("net.minecraft.server." + serverVersion + ".ItemStack");
-			//Method hasTagMethod = nmsItemStackClass.getMethod("hasTag");
-			//Method getTagMethod = nmsItemStackClass.getMethod("getTag");
-			//Class<?> nbtTagCompoundClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagCompound");
-			//Method hasKeyMethod = nbtTagCompoundClass.getMethod("hasKey", String.class);
 
-			net.minecraft.world.item.ItemStack nmsItemStack = (net.minecraft.world.item.ItemStack) BedwarsPlugin.getInstance().reflectionUtils.craftItemStackAsNMSCopyMethod.invoke(null, event.getItemInHand());
-			//net.minecraft.world.item.ItemStack nmsItemStack = CraftItemStack.asNMSCopy(event.getItemInHand());
-			//Object nmsItemStack = asNMSCopyMethod.invoke(null, event.getItemInHand());
-			
-			//boolean hasTag = nmsItemStack.hasTag();
-			boolean hasTag = (boolean) BedwarsPlugin.getInstance().reflectionUtils.itemStackHasTagMethod.invoke(nmsItemStack);
-			boolean hasKey = false;
-			if (hasTag) {
-				CompoundTag nbtTagCompound = (CompoundTag)BedwarsPlugin.getInstance().reflectionUtils.itemStackGetOrCreateTagMethod.invoke(nmsItemStack);
-				hasKey = (boolean)BedwarsPlugin.getInstance().reflectionUtils.compoundTagHasKeyMethod.invoke(nbtTagCompound, "bedwars-blast-proof");
-				//hasKey = nmsItemStack.getTag().contains("bedwars-blast-proof");
-				//hasKey = (boolean) hasKeyMethod.invoke(getTagMethod.invoke(nmsItemStack), "bedwars-blast-proof");
-			}
+		ItemMeta itemMeta = event.getItemInHand().getItemMeta();
+		NamespacedKey namespacedKey = new NamespacedKey(BedwarsPlugin.getInstance(), "bedwars-blast-proof");
 
-			if (hasTag && hasKey)
-				block.setMetadata("bedwars_blast_proof", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
-			else
-				block.removeMetadata("bedwars_blast_proof", BedwarsPlugin.getInstance());
-		} catch (IllegalArgumentException | SecurityException | IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
-		}
-		
+		if (itemMeta != null && itemMeta.getPersistentDataContainer().has(namespacedKey))
+			block.setMetadata("bedwars_blast_proof", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
+		else
+			block.removeMetadata("bedwars_blast_proof", BedwarsPlugin.getInstance());
+
 		block.setMetadata("bedwars_placed", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
 	}
 	

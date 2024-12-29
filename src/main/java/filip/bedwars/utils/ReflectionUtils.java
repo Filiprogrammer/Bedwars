@@ -23,7 +23,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.mojang.authlib.GameProfile;
 
-import filip.bedwars.BedwarsPlugin;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.Packet;
@@ -184,16 +183,19 @@ public class ReflectionUtils {
 
 	public ReflectionUtils() throws ClassNotFoundException, NoSuchMethodException, SecurityException, NoSuchFieldException {
 		String bukkitVersion = Bukkit.getBukkitVersion();
-		String serverVersion = BedwarsPlugin.getInstance().getServerVersion();
+		String craftbukkitPackageName = "org.bukkit.craftbukkit";
+		if (bukkitVersion.compareTo("1.20.4-R0.1-SNAPSHOT") <= 0) {
+			craftbukkitPackageName += "." + Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+		}
 
 		// org.bukkit.craftbukkit - classes
-		craftEntityClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".entity.CraftEntity");
-		craftInventoryClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".inventory.CraftInventory");
-		craftItemStackClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".inventory.CraftItemStack");
-		craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".entity.CraftPlayer");
-		craftServerClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".CraftServer");
-		craftWorldClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".CraftWorld");
-		minecraftInventoryClass = Class.forName("org.bukkit.craftbukkit." + serverVersion + ".inventory.CraftInventoryCustom$MinecraftInventory");
+		craftEntityClass = Class.forName(craftbukkitPackageName + ".entity.CraftEntity");
+		craftInventoryClass = Class.forName(craftbukkitPackageName + ".inventory.CraftInventory");
+		craftItemStackClass = Class.forName(craftbukkitPackageName + ".inventory.CraftItemStack");
+		craftPlayerClass = Class.forName(craftbukkitPackageName + ".entity.CraftPlayer");
+		craftServerClass = Class.forName(craftbukkitPackageName + ".CraftServer");
+		craftWorldClass = Class.forName(craftbukkitPackageName + ".CraftWorld");
+		minecraftInventoryClass = Class.forName(craftbukkitPackageName + ".inventory.CraftInventoryCustom$MinecraftInventory");
 
 		// net.minecraft.network.protocol - classes
 		packetClass = Class.forName("net.minecraft.network.protocol.Packet");
@@ -406,23 +408,27 @@ public class ReflectionUtils {
 		}
 		entityGetBukkitEntityMethod = entityClass.getMethod("getBukkitEntity");
 		for (Method method : entityClass.getMethods()) {
+			if (!method.getReturnType().equals(Void.TYPE))
+				continue;
+
 			if (method.getParameterCount() != 1)
 				continue;
 
 			if (method.getParameterTypes()[0] != net.minecraft.network.chat.Component.class)
 				continue;
 
-			if (method.getParameterAnnotations()[0][0].annotationType() == Nullable.class) {
+			Annotation[] annotations = method.getParameterAnnotations()[0];
+			if (annotations.length >= 1 && annotations[0].annotationType() == Nullable.class) {
 				entitySetCustomNameMethod = method;
 				break;
 			}
 		}
-		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0) {
+		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0 || bukkitVersion.compareTo("1.20.5-R0.1-SNAPSHOT") >= 0) {
 			entitySetCustomNameVisibleMethod = entityClass.getMethod("setCustomNameVisible", boolean.class);
 		} else {
 			entitySetCustomNameVisibleMethod = entityClass.getMethod("n", boolean.class);
 		}
-		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0) {
+		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0 || bukkitVersion.compareTo("1.20.5-R0.1-SNAPSHOT") >= 0) {
 			entitySetInvisibleMethod = entityClass.getMethod("setInvisible", boolean.class);
 		} else {
 			entitySetInvisibleMethod = entityClass.getMethod("j", boolean.class);

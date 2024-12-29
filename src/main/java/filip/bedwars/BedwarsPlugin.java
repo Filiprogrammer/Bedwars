@@ -262,12 +262,5 @@ public class BedwarsPlugin extends JavaPlugin {
     public MultiverseCore getMultiverse() {
     	return mv;
     }
-    
-    public String getServerVersion() {
-    	if (serverVersion == null)
-    		serverVersion = getServer().getClass().getPackage().getName().split("\\.")[3];
-    	
-    	return serverVersion;
-    }
-    
+
 }
