@@ -16,9 +16,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
 import filip.bedwars.BedwarsPlugin;
-import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
-import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ClientInformation;
@@ -28,22 +26,21 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.level.GameType;
 
-public class PlayerNPC {
-
-	private final ReflectionUtils reflectionUtils;
-	private ServerPlayer entity;
+public class PlayerNPC extends NPC {
+	private UUID entityUUID;
+	private GameProfile gameprofile;
 	private ServerLevel nmsWorld;
+	private Location location;
 
 	public PlayerNPC(Location location, String customName, Player... viewers) {
-		reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
-
-		spawn(location, customName, viewers);
+		this.location = location;
+		spawn(customName, viewers);
 	}
 
-	private void spawn(Location location, String customName, Player[] viewers) {
+	private void spawn(String customName, Player[] viewers) {
 		String bukkitVersion = Bukkit.getBukkitVersion();
-		UUID entityUUID = UUID.randomUUID();
-		GameProfile gameprofile = new GameProfile(entityUUID, "Spawn-Point");
+		entityUUID = UUID.randomUUID();
+		gameprofile = new GameProfile(entityUUID, "Spawn-Point");
 
 		try {
 			nmsWorld = reflectionUtils.worldToNMSWorld(location.getWorld());
@@ -64,9 +61,16 @@ public class PlayerNPC {
 			reflectionUtils.gameProfileNameField.set(gameprofile, customName);
 
 			reflectionUtils.entitySetLocationMethod.invoke(entity, location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+
+			respawn(viewers);
 		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException | SecurityException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void respawn(Player... viewers) {
+		String bukkitVersion = Bukkit.getBukkitVersion();
 
 		for (Player p : viewers) {
 			try {
@@ -113,7 +117,7 @@ public class PlayerNPC {
 					}
 					reflectionUtils.clientboundPlayerInfoUpdatePacketEntriesField.set(playerInfoUpdatePacket, Collections.singletonList(entry));
 				} else {
-					playerInfoUpdatePacket = reflectionUtils.clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)reflectionUtils.enumPlayerInfoActionClass, "ADD_PLAYER"), new ServerPlayer[]{entity});
+					playerInfoUpdatePacket = reflectionUtils.clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)reflectionUtils.enumPlayerInfoActionClass, "ADD_PLAYER"), new ServerPlayer[]{(ServerPlayer)entity});
 				}
 
 				reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, playerInfoUpdatePacket);
@@ -144,7 +148,7 @@ public class PlayerNPC {
 						if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") >= 0) {
 							playerInfoRemovePacket = new ClientboundPlayerInfoRemovePacket(List.of(entityUUID));
 						} else {
-							playerInfoRemovePacket = reflectionUtils.clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)reflectionUtils.enumPlayerInfoActionClass, "REMOVE_PLAYER"), new ServerPlayer[]{entity});
+							playerInfoRemovePacket = reflectionUtils.clientboundPlayerInfoPacketConstructor.newInstance(Enum.valueOf((Class<Enum>)reflectionUtils.enumPlayerInfoActionClass, "REMOVE_PLAYER"), new ServerPlayer[]{(ServerPlayer)entity});
 						}
 
 						reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, playerInfoRemovePacket);
@@ -157,52 +161,4 @@ public class PlayerNPC {
 			}
         }
 	}
-	
-	public void teleport(double x, double y, double z, float yaw, float pitch, Player... viewers) {
-		String bukkitVersion = Bukkit.getBukkitVersion();
-
-		try {
-			reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, yaw, pitch);
-
-			final Packet<?> teleportEntityPacket;
-			if (bukkitVersion.compareTo("1.21.1-R0.1-SNAPSHOT") <= 0) {
-				teleportEntityPacket = (Packet<?>)reflectionUtils.clientboundTeleportEntityPacketConstructor.newInstance(entity);
-			} else {
-				teleportEntityPacket = (Packet<?>)reflectionUtils.clientboundTeleportEntityPacketConstructor.newInstance(
-					getEntityId(),
-					reflectionUtils.positionMoveRotationOfMethod.invoke(null, entity),
-					Set.of(),
-					false
-				);
-			}
-
-			for (Player p : viewers) {
-				ServerGamePacketListenerImpl playerConnection = reflectionUtils.playerGetConnection(p);
-				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, teleportEntityPacket);
-				float var0 = (yaw * 256.0F / 360.0F);
-		        int var1 = (int)var0;
-		        byte headYaw = (byte)((var0 < var1) ? (var1 - 1) : var1);
-				reflectionUtils.playerConnectionSendPacketMethod.invoke(playerConnection, new ClientboundRotateHeadPacket(entity, headYaw));
-			}
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void despawn(Player... viewers) {
-		for (Player p : viewers) {
-			try {
-				reflectionUtils.playerSendPacket(p, new ClientboundRemoveEntitiesPacket(getEntityId()));
-			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public int getEntityId() {
-		// .hashCode() does the same thing as .getId()
-		// We do not use .getId() because the method name is obfuscated on some nms version.
-		return entity.hashCode();
-	}
-	
 }

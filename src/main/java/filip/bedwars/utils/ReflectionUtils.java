@@ -65,9 +65,6 @@ public class ReflectionUtils {
 	// com.mojang.authlib
 	public final Field gameProfileNameField;
 
-	// net.minecraft.network
-	public Field connectionChannelField;
-
 	// net.minecraft.network.chat
 	public Method componentNullToEmptyMethod;
 	public Method mutableComponentAppendMethod;
@@ -77,7 +74,6 @@ public class ReflectionUtils {
 	public final Class<?> clientboundRemoveEntitiesPacketClass;
 	public final Class<?> clientboundTeleportEntityPacketClass;
 	public final Constructor<?> clientboundTeleportEntityPacketConstructor;
-	//public Class<?> packetPlayOutSpawnEntityLivingClass;
 	public final Class<?> clientboundPlayerInfoPacketClass;
 	public final Constructor<?> clientboundPlayerInfoPacketConstructor;
 	public Method clientboundPlayerInfoPacketEntriesMethod;
@@ -89,8 +85,6 @@ public class ReflectionUtils {
 	public final Constructor<?> clientboundPlayerInfoUpdatePacketEntryConstructor;
 	public final Class<?> clientboundAddPlayerPacketClass;
 	public final Constructor<?> clientboundAddPlayerPacketConstructor;
-	//public Constructor<?> clientboundRemoveEntitiesPacketConstructor;
-	//public Constructor<?> packetPlayOutNamedEntitySpawnConstructor;
 	public Method clientboundUpdateAttributesPacketGetEntityIdMethod;
 	public Method clientboundSetEquipmentPacketGetEntityIdMethod;
 	public Method clientboundSetEntityDataPacketIdMethod;
@@ -112,7 +106,6 @@ public class ReflectionUtils {
 
 	// net.minecraft.world
 	public final Class<?> dragonControllerPhaseClass;
-	public final Class<?> dragonStrafePlayerPhaseClass;
 	public final Class<?> dragonChargePlayerPhaseClass;
 	public final Class<?> enderDragonPhaseManagerClass;
 	public final Class<?> entityEnderDragonClass;
@@ -141,51 +134,17 @@ public class ReflectionUtils {
 	public final Method mobTickMethod;
 	public final Method levelGetWorldMethod;
 	public Method playerConnectionSendPacketMethod;
-	public Field playerConnectionConnectionField;
 	public Method entityEnderDragonGetPhaseManagerMethod;
 	public Method dragonPhaseManagerSetPhaseMethod;
 	public Method dragonPhaseManagerGetCurrentPhaseMethod;
-	public Method dragonStrafePlayerPhaseSetTargetMethod;
 	public Method dragonChargePlayerPhaseSetTargetMethod;
-	public Method itemStackGetOrCreateTagMethod;
-	public Method itemStackSetTagMethod;
-	public final Method itemStackHasTagMethod;
-	//public Method itemStackGetTagMethod;
 	public final Method entityArmorStandSetSmallMethod;
 	public Method combatTrackerGetDeathMessageMethod;
 	public final Class<?> positionMoveRotationClass;
 	public final Method positionMoveRotationOfMethod;
 
-	// net.minecraft.nbt
-	public final Method compoundTagHasKeyMethod;
-	public Method compoundTagPutIntMethod;
-
-	//public Class<?> itemStackClass;
-	//public Class<?> nbtTagCompoundClass;
-	//public Class<?> nbtTagIntClass;
-	//public Class<?> nbtBaseClass;
-	//public final Class<?> iChatBaseComponentClass;
-	//public Class<?> chatComponentTextClass;
-	//public final Class<?> villagerDataClass;
-	//public Class<?> damageSourceClass;
-	//public Class<?> combatTrackerClass;
-
-	//public Method damageSourceDamageEntityMethod;
-	//public Method iChatBaseComponentAddSiblingMethod;
-	//public Method entityPlayerGetCombatTrackerMethod;
-	//public Method entityPlayerSendMessageMethod;
-	//public Field entityTypesEnderDragonField;
-	//public Field dragonControllerPhaseStrafePlayerField;
-	//public Field dragonControllerPhaseHoldingPatternField;
-	//public Field dragonControllerPhaseChargingPlayerField;
-	//public Field dragonControllerPhaseLandingField;
-	//public Field dragonControllerPhaseLandingApproachField;
-	//public Constructor<?> nbtTagIntConstructor;
-	//public Constructor<?> chatComponentConstructor;
-	//public final Constructor<?> villagerDataConstructor;
-
 	public ReflectionUtils() throws ClassNotFoundException, NoSuchMethodException, SecurityException, NoSuchFieldException {
-		String bukkitVersion = Bukkit.getBukkitVersion();
+		final String bukkitVersion = Bukkit.getBukkitVersion();
 		String craftbukkitPackageName = "org.bukkit.craftbukkit";
 		if (bukkitVersion.compareTo("1.20.4-R0.1-SNAPSHOT") <= 0) {
 			craftbukkitPackageName += "." + Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
@@ -204,7 +163,6 @@ public class ReflectionUtils {
 		packetClass = Class.forName("net.minecraft.network.protocol.Packet");
 		clientboundRemoveEntitiesPacketClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy");
 		clientboundTeleportEntityPacketClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport");
-		//packetPlayOutSpawnEntityLivingClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving");
 		if (bukkitVersion.compareTo("1.19.2-R0.1-SNAPSHOT") <= 0) {
 			clientboundPlayerInfoPacketClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo");
 			enumPlayerInfoActionClass = Class.forName("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
@@ -276,7 +234,6 @@ public class ReflectionUtils {
 
 		// net.minecraft.world - classes
 		dragonControllerPhaseClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerPhase");
-		dragonStrafePlayerPhaseClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerStrafe");
 		dragonChargePlayerPhaseClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerCharge");
 		enderDragonPhaseManagerClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager");
 		entityEnderDragonClass = Class.forName("net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon");
@@ -513,61 +470,12 @@ public class ReflectionUtils {
 				break;
 			}
 		}
-		for (Method method : dragonStrafePlayerPhaseClass.getMethods()) {
-			if (method.getParameterCount() == 1 && method.getParameterTypes()[0] == entityLivingClass) {
-				dragonStrafePlayerPhaseSetTargetMethod = method;
-				break;
-			}
-		}
 		for (Method method : dragonChargePlayerPhaseClass.getMethods()) {
 			if (method.getParameterCount() == 1 && method.getParameterTypes()[0] == vec3DClass) {
 				dragonChargePlayerPhaseSetTargetMethod = method;
 				break;
 			}
 		}
-		for (Method method : net.minecraft.world.item.ItemStack.class.getMethods()) {
-			if (method.getReturnType() != net.minecraft.nbt.CompoundTag.class)
-				continue;
-
-			if (method.getParameterCount() != 0)
-				continue;
-
-			if (method.getAnnotationsByType(Nullable.class).length == 0) {
-				itemStackGetOrCreateTagMethod = method;
-				break;
-			}
-		}
-		for (Method method : net.minecraft.world.item.ItemStack.class.getMethods()) {
-			if (!method.getReturnType().equals(Void.TYPE))
-				continue;
-
-			if (method.getParameterCount() != 1)
-				continue;
-
-			if (method.getParameterTypes()[0] != net.minecraft.nbt.CompoundTag.class)
-				continue;
-
-			Annotation[][] paramAnnotations = method.getParameterAnnotations();
-			if (paramAnnotations[0].length != 1)
-				continue;
-
-			if (paramAnnotations[0][0].annotationType() == Nullable.class) {
-				itemStackSetTagMethod = method;
-				break;
-			}
-		}
-		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0) {
-			itemStackHasTagMethod = net.minecraft.world.item.ItemStack.class.getMethod("hasTag");
-		} else if (bukkitVersion.compareTo("1.18.1-R0.1-SNAPSHOT") <= 0) {
-			itemStackHasTagMethod = net.minecraft.world.item.ItemStack.class.getMethod("r");
-		} else if (bukkitVersion.compareTo("1.18.2-R0.1-SNAPSHOT") <= 0) {
-			itemStackHasTagMethod = net.minecraft.world.item.ItemStack.class.getMethod("s");
-		} else if (bukkitVersion.compareTo("1.19.4-R0.1-SNAPSHOT") <= 0) {
-			itemStackHasTagMethod = net.minecraft.world.item.ItemStack.class.getMethod("t");
-		} else {
-			itemStackHasTagMethod = net.minecraft.world.item.ItemStack.class.getMethod("u");
-		}
-		//itemStackGetTagMethod = itemStackClass.getMethod("getTag");
 		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0 || bukkitVersion.compareTo("1.20.5-R0.1-SNAPSHOT") >= 0) {
 			entityArmorStandSetSmallMethod = net.minecraft.world.entity.decoration.ArmorStand.class.getMethod("setSmall", boolean.class);
 		} else if (bukkitVersion.compareTo("1.19.3-R0.1-SNAPSHOT") <= 0) {
@@ -587,26 +495,6 @@ public class ReflectionUtils {
 			positionMoveRotationOfMethod = positionMoveRotationClass.getMethod("of", entityClass);
 		}
 
-		// net.minecraft.nbt - methods
-		if (bukkitVersion.compareTo("1.17.1-R0.1-SNAPSHOT") <= 0) {
-			compoundTagHasKeyMethod = net.minecraft.nbt.CompoundTag.class.getMethod("hasKey", String.class);
-		} else {
-			compoundTagHasKeyMethod = net.minecraft.nbt.CompoundTag.class.getMethod("e", String.class);
-		}
-		for (Method method : net.minecraft.nbt.CompoundTag.class.getMethods()) {
-			if (!method.getReturnType().equals(Void.TYPE))
-				continue;
-
-			if (method.getParameterCount() != 2)
-				continue;
-
-			Class<?>[] parameterTypes = method.getParameterTypes();
-			if (parameterTypes[0] == String.class && parameterTypes[1] == int.class) {
-				compoundTagPutIntMethod = method;
-				break;
-			}
-		}
-
 		// net.minecraft.network.protocol - constructors
 		if (bukkitVersion.compareTo("1.21.1-R0.1-SNAPSHOT") <= 0) {
 			clientboundTeleportEntityPacketConstructor = clientboundTeleportEntityPacketClass.getConstructor(entityClass);
@@ -623,7 +511,6 @@ public class ReflectionUtils {
 		} else {
 			clientboundPlayerInfoPacketConstructor = null;
 		}
-		//clientboundRemoveEntitiesPacketConstructor = clientboundRemoveEntitiesPacketClass.getConstructor(new int[0].getClass());
 		if (bukkitVersion.compareTo("1.20.2-R0.1-SNAPSHOT") >= 0) {
 			clientboundAddPlayerPacketConstructor = null;
 		} else {
@@ -657,19 +544,15 @@ public class ReflectionUtils {
 		gameProfileNameField = GameProfile.class.getDeclaredField("name");
 		gameProfileNameField.setAccessible(true);
 
-		// net.minecraft.network - fields
-		for (Field field : net.minecraft.network.Connection.class.getFields()) {
-			if (field.getType() == io.netty.channel.Channel.class && Modifier.isPublic(field.getModifiers())) {
-				connectionChannelField = field;
-				break;
-			}
-		}
+		// net.minecraft.server - fields
 		for (Field field : entityPlayerClass.getFields()) {
 			if (field.getType() == ServerGamePacketListenerImpl.class) {
 				entityPlayerPlayerConnectionField = field;
 				break;
 			}
 		}
+
+		// net.minecraft.world - fields
 		for (Field field : entityTypesClass.getFields()) {
 			int modifiers = field.getModifiers();
 
@@ -685,42 +568,6 @@ public class ReflectionUtils {
 				break;
 			}
 		}
-		for (Field field : playerConnectionClass.getFields()) {
-			int modifiers = field.getModifiers();
-
-			if (!Modifier.isPublic(modifiers) || !Modifier.isFinal(modifiers))
-				continue;
-
-			if (field.getType() == net.minecraft.network.Connection.class) {
-				playerConnectionConnectionField = field;
-				break;
-			}
-		}
-
-		//iChatBaseComponentClass = Class.forName("net.minecraft.network.chat.IChatBaseComponent");
-		//chatComponentTextClass = Class.forName("net.minecraft.server." + serverVersion + ".ChatComponentText");
-		//villagerDataClass = Class.forName("net.minecraft.world.entity.npc.VillagerData");
-		//damageSourceClass = Class.forName("net.minecraft.server." + serverVersion + ".DamageSource");
-		//combatTrackerClass = Class.forName("net.minecraft.server." + serverVersion + ".CombatTracker");
-		//damageSourceDamageEntityMethod = entityPlayerClass.getMethod("damageEntity", damageSourceClass, float.class);
-		//iChatBaseComponentAddSiblingMethod = iChatBaseComponentClass.getMethod("addSibling", iChatBaseComponentClass);
-		//entityPlayerGetCombatTrackerMethod = entityPlayerClass.getMethod("getCombatTracker");
-		//entityPlayerSendMessageMethod = entityPlayerClass.getMethod("sendMessage", iChatBaseComponentClass);
-		//entityTypesEnderDragonField = entityTypesClass.getField("ENDER_DRAGON");
-		//dragonControllerPhaseStrafePlayerField = dragonControllerPhaseClass.getField("STRAFE_PLAYER");
-		//dragonControllerPhaseHoldingPatternField = dragonControllerPhaseClass.getField("HOLDING_PATTERN");
-		//dragonControllerPhaseChargingPlayerField = dragonControllerPhaseClass.getField("CHARGING_PLAYER");
-		//dragonControllerPhaseLandingField = dragonControllerPhaseClass.getField("LANDING");
-		//dragonControllerPhaseLandingApproachField = dragonControllerPhaseClass.getField("LANDING_APPROACH");
-		//itemStackClass = Class.forName("net.minecraft.server." + serverVersion + ".ItemStack");
-		//nbtTagCompoundClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagCompound");
-		//nbtTagIntClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTTagInt");
-		//nbtBaseClass = Class.forName("net.minecraft.server." + serverVersion + ".NBTBase");
-		//nbtTagIntConstructor = nbtTagIntClass.getDeclaredConstructor(int.class);
-		//nbtTagIntConstructor.setAccessible(true);
-		//nbtTagCompoundSetMethod = nbtTagCompoundClass.getMethod("set", String.class, nbtBaseClass);
-		//chatComponentConstructor = chatComponentTextClass.getConstructor(String.class);
-		//villagerDataConstructor = villagerDataClass.getConstructor(villagerTypeClass, villagerProfessionClass, int.class);
 	}
 
 	public ServerPlayer playerToNMSPlayer(Player player) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
