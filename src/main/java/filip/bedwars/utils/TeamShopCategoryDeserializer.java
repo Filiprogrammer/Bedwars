@@ -26,20 +26,22 @@ public class TeamShopCategoryDeserializer {
 	public static ShopCategory deserializeCategory(Object serializedCategory) {
 		Map<String, Object> mapOfElements = (Map<String, Object>) serializedCategory;
 		
-		String categoryName = ((String) mapOfElements.get("name")).replace('&', '§');
-		
-		if (categoryName == null) {
-			MessageSender.sendWarning("A Shop Category does not have a name");
+		final String categoryName;
+		try {
+			categoryName = ((String) mapOfElements.get("name")).replace('&', '§');
+		} catch (ClassCastException | NullPointerException e) {
+			MessageSender.sendWarning("A Shop Category does not have a valid name");
 			return null;
 		}
-		
-		Material categoryMaterial = Material.valueOf((String) mapOfElements.get("material"));
-		
-		if (categoryMaterial == null) {
+
+		final Material categoryMaterial;
+		try {
+			categoryMaterial = Material.valueOf((String) mapOfElements.get("material"));
+		} catch (ClassCastException | IllegalArgumentException | NullPointerException e) {
 			MessageSender.sendWarning("§eThe Shop Category §6\"" + categoryName + "\" §edoes not have a valid material");
 			return null;
 		}
-		
+
 		List<Map<String, Object>> shopEntriesList = (List<Map<String, Object>>) mapOfElements.get("shopentries");
 		List<ShopEntry> shopEntries = new ArrayList<ShopEntry>();
 		

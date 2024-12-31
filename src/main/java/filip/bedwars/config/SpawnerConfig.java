@@ -47,31 +47,32 @@ public class SpawnerConfig extends SingleConfig{
 			List<Object> serializedSpawners = (List<Object>) config.getList("spawner");
 			
 			for (Object serializedSpawner : serializedSpawners) {
-				Map<String, Object> mapOfElements = (Map<String, Object>) serializedSpawner;
-				
-				String spawnerName = ((String) mapOfElements.get("name")).replace('&', '§');
-				
-				if(spawnerName == null) {
+				final Map<String, Object> mapOfElements = (Map<String, Object>) serializedSpawner;
+
+				final String spawnerName;
+				try {
+					spawnerName = ((String) mapOfElements.get("name")).replace('&', '§');
+				} catch (ClassCastException | NullPointerException e) {
 					MessageSender.sendWarning("One Spawner could not be loaded! The Spawner-name is invalid! Please check your spawner.yml!");
 					continue;
 				}
-				
-				Material spawnerMaterial = Material.valueOf((String) mapOfElements.get("material"));
-				
-				if(spawnerMaterial == null) {
+
+				final Material spawnerMaterial;
+				try {
+					spawnerMaterial = Material.valueOf((String) mapOfElements.get("material"));
+				} catch (ClassCastException | IllegalArgumentException | NullPointerException e) {
 					MessageSender.sendWarning("§6" + spawnerName + "-Spawner §ecould not be loaded! Spawner-Material is invalid! Please check your spawner.yml!");
 					continue;
 				}
-				
-				int spawnerDefaultTicksPerSpawn = 0;
-				
+
+				final int spawnerDefaultTicksPerSpawn;
 				try {
 					spawnerDefaultTicksPerSpawn = (int) mapOfElements.get("defaultTicksPerSpawn");
-				} catch(Exception e) {
+				} catch (ClassCastException | NullPointerException e) {
 					MessageSender.sendWarning("§6" + spawnerName + "-Spawner §ecould not be loaded! defaultTicksPerSpawn is invalid! Please check your spawner.yml!");
 					continue;
 				}
-				
+
 				spawnerTypes.add(new SpawnerType(spawnerMaterial, spawnerName, spawnerDefaultTicksPerSpawn));
 			}
 		}
