@@ -44,8 +44,6 @@ public class GameWorld {
         Path targetRegionDirectory = Paths.get(worldContainerPath + File.separator + gameWorldName + File.separator + "region");
 		Path sourceLevelDat = Paths.get(worldContainerPath + File.separator + loadFrom.getName() + File.separator + "level.dat");
         Path targetLevelDat = Paths.get(worldContainerPath + File.separator + gameWorldName + File.separator + "level.dat");
-        Path sourceSessionLock = Paths.get(worldContainerPath + File.separator + loadFrom.getName() + File.separator + "session.lock");
-        Path targetSessionLock = Paths.get(worldContainerPath + File.separator + gameWorldName + File.separator + "session.lock");
         
         // Create the directory of the game world
         // If it already exists, delete it first
@@ -84,15 +82,7 @@ public class GameWorld {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-        
-		// TODO: Do we really need to copy the "session.lock" file?
-        // Copy the "session.lock" file to the game world
-        try {
-			Files.copy(sourceSessionLock, targetSessionLock, StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-        
+
         // Make the world load pretty much instantly
         WorldInitHandler worldInitHandler = new WorldInitHandler() {
 			@Override
