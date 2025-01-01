@@ -22,7 +22,7 @@ import com.onarandombox.MultiverseCore.MultiverseCore;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.config.MainConfig;
-import filip.bedwars.listener.player.WorldInitHandler;
+import filip.bedwars.listener.world.WorldInitHandler;
 
 public class GameWorld {
 

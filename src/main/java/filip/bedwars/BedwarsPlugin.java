@@ -37,8 +37,8 @@ import filip.bedwars.listener.player.BlockPlaceListener;
 import filip.bedwars.listener.player.PlayerChangedWorldListener;
 import filip.bedwars.listener.player.PlayerInteractListener;
 import filip.bedwars.listener.player.PlayerQuitListener;
-import filip.bedwars.listener.player.WorldInitHandler;
-import filip.bedwars.listener.player.WorldInitListener;
+import filip.bedwars.listener.world.WorldInitHandler;
+import filip.bedwars.listener.world.WorldInitListener;
 import filip.bedwars.sign.GameJoinSignListener;
 import filip.bedwars.utils.ReflectionUtils;
 
