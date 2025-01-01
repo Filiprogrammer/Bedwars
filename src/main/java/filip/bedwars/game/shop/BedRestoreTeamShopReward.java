@@ -3,6 +3,7 @@ package filip.bedwars.game.shop;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.GamePlayer;
@@ -15,12 +16,12 @@ import filip.bedwars.utils.TeamColorConverter;
 
 public class BedRestoreTeamShopReward extends TeamShopReward {
 
-	public BedRestoreTeamShopReward(int maxLevel, int[] priceCounts, Material[] priceMaterials) {
+	public BedRestoreTeamShopReward(final int maxLevel, @NotNull final int[] priceCounts, @NotNull final Material[] priceMaterials) {
 		super(TeamUpgradeType.BED_RESTORE, maxLevel, priceCounts, priceMaterials);
 	}
 
 	@Override
-	public ItemStack getDisplayItem(Team team) {
+	public ItemStack getDisplayItem(@NotNull Team team) {
 		// TODO: Read the messages from a config file
 		if (team.hasBed()) {
 			return new ItemBuilder()
@@ -36,7 +37,7 @@ public class BedRestoreTeamShopReward extends TeamShopReward {
 	}
 	
 	@Override
-	public boolean reward(Team team) {
+	public boolean reward(@NotNull Team team) {
 		if (team.getMembers().size() == 0)
 			return false;
 		
@@ -63,7 +64,7 @@ public class BedRestoreTeamShopReward extends TeamShopReward {
 			return;
 		
 		for (Player p : team.getMembers().get(0).getPlayer().getWorld().getPlayers()) {
-			String colorStr = TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale());
+			final String colorStr = TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale());
 			
 			MessageSender.sendMessage(p,
 					MessagesConfig.getInstance().getStringValue(p.getLocale(), "bed-restored")

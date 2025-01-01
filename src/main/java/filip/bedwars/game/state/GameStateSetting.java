@@ -16,7 +16,7 @@ public class GameStateSetting {
 	public final List<Action> actionsStart;
 	public final List<Action> actionsEnd;
 	
-	public GameStateSetting(String name, int durationSeconds, @Nullable String countdownMsgKey, @Nullable String countdownOneMinMsgKey, @Nullable List<Action> actionsStart, @Nullable List<Action> actionsEnd) {
+	public GameStateSetting(final String name, final int durationSeconds, @Nullable final String countdownMsgKey, @Nullable final String countdownOneMinMsgKey, @Nullable final List<Action> actionsStart, @Nullable final List<Action> actionsEnd) {
 		this.name = name;
 		this.durationSeconds = durationSeconds;
 		this.countdownMsgKey = countdownMsgKey;

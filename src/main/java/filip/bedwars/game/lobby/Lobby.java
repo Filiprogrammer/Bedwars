@@ -20,6 +20,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.config.MainConfig;
@@ -41,15 +42,15 @@ import filip.bedwars.utils.TeamColorConverter;
 
 public class Lobby {
 	
-	private Location spawnPoint;
+	private final Location spawnPoint;
 	private Countdown countdown;
 	private Game game;
 	private List<IClickable> clickables = new ArrayList<>();
 	private List<IUsable> usables = new ArrayList<>();
 	private Map<UUID, BossBar> bossbars = new HashMap<>();
-	private boolean showBossbar = MainConfig.getInstance().getLobbyBossBar();
+	private final boolean showBossbar = MainConfig.getInstance().getLobbyBossBar();
 	
-	public Lobby(Location spawnPoint, Game game) {
+	public Lobby(@NotNull final Location spawnPoint, @NotNull Game game) {
 		this.spawnPoint = spawnPoint;
 		this.game = game;
 		
@@ -69,7 +70,7 @@ public class Lobby {
 					return;
 				}
 				
-				int secondsLeft = getSecondsLeft();
+				final int secondsLeft = getSecondsLeft();
 				
 				if (secondsLeft == 0)
 					return;
@@ -145,7 +146,8 @@ public class Lobby {
 	public Countdown getCountdown() {
 		return countdown;
 	}
-	
+
+	@NotNull
 	public Location getSpawnPoint() {
 		return spawnPoint;
 	}
@@ -154,7 +156,7 @@ public class Lobby {
 	 * Teleport player into the lobby.
 	 * @param uuid player UUID
 	 */
-	public void joinPlayer(Player player) {
+	public void joinPlayer(@NotNull Player player) {
 		player.teleport(spawnPoint);
 		PlayerUtils.playerReset(player);
 		
@@ -180,9 +182,9 @@ public class Lobby {
 		
 		IClickable clickable = new ClickableInventory(Bukkit.createInventory(null, 9 * 2, MessagesConfig.getInstance().getStringValue(player.getLocale(), "item-select-team")), player) {
 			{
-				for (Team team : game.getTeams()) {
-					TeamColor teamColor = team.getBase().getTeamColor();
-					ItemStack itemStack = new ItemBuilder()
+				for (final Team team : game.getTeams()) {
+					final TeamColor teamColor = team.getBase().getTeamColor();
+					final ItemStack itemStack = new ItemBuilder()
 							.setMaterial(Material.valueOf(teamColor.toString() + "_WOOL"))
 							.setName(TeamColorConverter.convertTeamColorToStringForMessages(teamColor, player.getLocale()))
 							.build();
@@ -200,12 +202,12 @@ public class Lobby {
 				if (p != player)
 					return;
 				
-				int slot = event.getSlot();
+				final int slot = event.getSlot();
 				
 				if (slot >= game.getTeams().size())
 					return;
 				
-				UUID puuid = p.getUniqueId();
+				final UUID puuid = p.getUniqueId();
 				Team newTeam = game.getTeams().get(slot);
 				
 				if (newTeam.getMembers().size() < game.getArena().getPlayersPerTeam()) {
@@ -296,12 +298,13 @@ public class Lobby {
 					BookMeta bookMeta = (BookMeta) bookTutorial.getItemMeta();
 					bookMeta.setTitle("Tutorial");
 					bookMeta.setAuthor("Bedwars");
-					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(player.getLocale(), "tutorial-book-page-1").replace("\\n", "\n"));
-					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(player.getLocale(), "tutorial-book-page-2").replace("\\n", "\n"));
-					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(player.getLocale(), "tutorial-book-page-3").replace("\\n", "\n"));
-					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(player.getLocale(), "tutorial-book-page-4").replace("\\n", "\n"));
-					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(player.getLocale(), "tutorial-book-page-5").replace("\\n", "\n"));
-					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(player.getLocale(), "tutorial-book-page-6").replace("\\n", "\n"));
+					final String locale = player.getLocale();
+					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(locale, "tutorial-book-page-1").replace("\\n", "\n"));
+					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(locale, "tutorial-book-page-2").replace("\\n", "\n"));
+					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(locale, "tutorial-book-page-3").replace("\\n", "\n"));
+					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(locale, "tutorial-book-page-4").replace("\\n", "\n"));
+					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(locale, "tutorial-book-page-5").replace("\\n", "\n"));
+					bookMeta.addPage(MessagesConfig.getInstance().getStringValue(locale, "tutorial-book-page-6").replace("\\n", "\n"));
 					bookTutorial.setItemMeta(bookMeta);
 					player.openBook(bookTutorial);
 				}
@@ -374,7 +377,7 @@ public class Lobby {
 		}
 	}
 	
-	public void skipLobbyCountdown(Player player) {
+	public void skipLobbyCountdown(@NotNull Player player) {
 		if (!countdown.isRunning() || countdown.getSecondsLeft() <= MainConfig.getInstance().getLobbySkipCountdown()) {
 			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "countdown-cannot-skip"));
 			SoundPlayer.playSound("error", player);

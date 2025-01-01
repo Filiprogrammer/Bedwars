@@ -32,7 +32,7 @@ public class ActionSummonDragons extends Action {
 				}
 			}
 			
-			int dragonCount = 1 + team.upgrades.get(TeamUpgradeType.EXTRA_DRAGONS);
+			final int dragonCount = 1 + team.upgrades.get(TeamUpgradeType.EXTRA_DRAGONS);
 			
 			for (int i = 0; i < dragonCount; ++i) {
 				// TODO: Clean this shit up

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.arena.Arena;
@@ -17,7 +18,8 @@ public class GameManager {
 	private List<Game> games = new ArrayList<Game>();
 	
 	private GameManager() {}
-	
+
+	@NotNull
 	public static GameManager getInstance() {
 		if (instance == null)
 			instance = new GameManager();
@@ -31,9 +33,9 @@ public class GameManager {
 	 * @param players
 	 * @return the game or null if the arena does not fit that many players, or if one of the players is already in a game
 	 */
-	public Game joinGame(Arena arena, Player... players) {
-		int maxPlayers = arena.getBases().size() * arena.getPlayersPerTeam();
-		int playerCount = players.length;
+	public Game joinGame(@NotNull Arena arena, Player... players) {
+		final int maxPlayers = arena.getBases().size() * arena.getPlayersPerTeam();
+		final int playerCount = players.length;
 		
 		// Arena does not fit that many players
 		if (playerCount > maxPlayers) {
@@ -83,7 +85,7 @@ public class GameManager {
 		return games;
 	}
 	
-	public Game getGameOfPlayer(Player player) {
+	public Game getGameOfPlayer(@NotNull Player player) {
 		for (Game game : games)
 			if (game.containsPlayer(player.getUniqueId()))
 				return game;

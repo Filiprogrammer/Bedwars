@@ -2,6 +2,7 @@ package filip.bedwars.commands;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
@@ -13,7 +14,7 @@ import filip.bedwars.utils.SoundPlayer;
 public class SkipCountdownCommand implements ICommand {
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(@NotNull CommandSender sender, @NotNull final String[] args) {
 		if (args.length != getArguments().length)
 			return false;
 		
@@ -23,7 +24,7 @@ public class SkipCountdownCommand implements ICommand {
 		}
 		
 		Player player = (Player) sender;
-		String locale = player.getLocale();
+		final String locale = player.getLocale();
 		Game game = GameManager.getInstance().getGameOfPlayer(player);
 		
 		if(game == null) {
@@ -43,16 +44,22 @@ public class SkipCountdownCommand implements ICommand {
 		return true;
 	}
 
+	@Override
+	@NotNull
 	public String getPermission() {
 		return "lobby.skip";
 	}
 
+	@Override
+	@NotNull
 	public String getName() {
 		return "start";
 	}
-	
+
+	@Override
+	@NotNull
 	public String[] getArguments() {
 		return new String[0];
 	}
-	
+
 }

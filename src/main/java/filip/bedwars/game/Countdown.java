@@ -77,7 +77,7 @@ public abstract class Countdown {
 		return secondsLeft;
 	}
 	
-	public void setSecondsLeft(int secondsLeft) {
+	public void setSecondsLeft(final int secondsLeft) {
 		this.secondsLeft = secondsLeft;
 	}
 	

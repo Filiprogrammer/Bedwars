@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import filip.bedwars.inventory.ItemBuilder;
 
@@ -16,8 +17,8 @@ public class Spawner implements Cloneable {
     
     private int currentTick;
     
-    public Spawner(@NotNull Location location, int ticksPerSpawn, @NotNull Material material, @NotNull String name) {
-    	this.name = name;
+	public Spawner(@NotNull final Location location, final int ticksPerSpawn, @NotNull final Material material, @NotNull final String name) {
+		this.name = name;
     	this.location = location;
     	this.ticksPerSpawn = ticksPerSpawn;
     	this.itemStack = new ItemBuilder()
@@ -25,19 +26,22 @@ public class Spawner implements Cloneable {
     			.setName(name)
     			.build();
     }
-    
-    public Location getLocation(World world) {
+
+	@NotNull
+	public Location getLocation(@Nullable World world) {
     	return new Location(world, location.getX(), location.getY(), location.getZ());
     }
     
     public int getTicksPerSpawn() {
     	return ticksPerSpawn;
     }
-    
+
+	@NotNull
     public ItemStack getItemStack() {
     	return itemStack;
     }
-    
+
+	@NotNull
     public String getItemName() {
     	return name;
     }
@@ -45,7 +49,7 @@ public class Spawner implements Cloneable {
     /**
      * Execute one tick and if ticksPerSpawn is reached spawn the item.
      */
-    public void update(World world) {
+	public void update(@NotNull World world) {
         currentTick++;
         if (currentTick > ticksPerSpawn) {
             spawnItem(world);
@@ -53,14 +57,14 @@ public class Spawner implements Cloneable {
         }
     }
     
-    public void setTicksPerSpawn(int ticksPerSpawn) {
+	public void setTicksPerSpawn(final int ticksPerSpawn) {
     	this.ticksPerSpawn = ticksPerSpawn;
     }
     
     /**
      * Spawn the item at the location.
      */
-    private void spawnItem(World world) {
+	private void spawnItem(@NotNull World world) {
 		world.dropItem(location, itemStack).setTicksLived(3000);
     }
     

@@ -2,21 +2,21 @@ package filip.bedwars.commands;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.config.ArenaConfig;
 import filip.bedwars.config.MainConfig;
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.utils.MessageSender;
 
-
 public class ListArenasCommand implements ICommand {
 	
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(@NotNull CommandSender sender, @NotNull final String[] args) {
 		if (args.length != getArguments().length)
 			return false;
 		
-		String locale;
+		final String locale;
 		
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
@@ -44,14 +44,20 @@ public class ListArenasCommand implements ICommand {
 		return true;
 	}
 
+	@Override
+	@NotNull
 	public String getPermission() {
 		return "base";
 	}
 
+	@Override
+	@NotNull
 	public String getName() {
 		return "listarenas";
 	}
 
+	@Override
+	@NotNull
 	public String[] getArguments() {
 		return new String[0];
 	}

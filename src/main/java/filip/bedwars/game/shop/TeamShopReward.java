@@ -3,6 +3,7 @@ package filip.bedwars.game.shop;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.GamePlayer;
 import filip.bedwars.game.Team;
@@ -15,7 +16,7 @@ public abstract class TeamShopReward {
 	protected final int[] priceCounts;
 	protected final Material[] priceMaterials;
 	
-	public TeamShopReward(TeamUpgradeType type, int maxLevel, int[] priceCounts, Material[] priceMaterials) {
+	public TeamShopReward(final TeamUpgradeType type, final int maxLevel, @NotNull final int[] priceCounts, @NotNull final Material[] priceMaterials) {
 		this.type = type;
 		this.maxLevel = maxLevel;
 		// TODO: Add argument checks
@@ -23,7 +24,7 @@ public abstract class TeamShopReward {
 		this.priceMaterials = priceMaterials;
 	}
 	
-	public int getPriceCount(Team team) {
+	public int getPriceCount(@NotNull Team team) {
 		int level = team.upgrades.get(type);
 		
 		if (level >= maxLevel)
@@ -32,7 +33,7 @@ public abstract class TeamShopReward {
 		return priceCounts[level];
 	}
 	
-	public Material getPriceMaterial(Team team) {
+	public Material getPriceMaterial(@NotNull Team team) {
 		int level = team.upgrades.get(type);
 		
 		if (level >= maxLevel)
@@ -45,7 +46,7 @@ public abstract class TeamShopReward {
 		int amount = 0;
 		
 		for (int i = 0; i < 36; ++i) {
-			ItemStack itemStack = inv.getItem(i);
+			final ItemStack itemStack = inv.getItem(i);
 			
 			if (itemStack == null)
 				continue;
@@ -58,12 +59,12 @@ public abstract class TeamShopReward {
 		return amount;
 	}
 	
-	public abstract ItemStack getDisplayItem(Team team);
+	public abstract ItemStack getDisplayItem(@NotNull Team team);
 	
-	public boolean canBuy(GamePlayer gamePlayer) {
+	public boolean canBuy(@NotNull GamePlayer gamePlayer) {
 		Team team = gamePlayer.getTeam();
 		Inventory inv = gamePlayer.getPlayer().getInventory();
-		int amount = getPriceItemCount(inv, getPriceMaterial(team));
+		final int amount = getPriceItemCount(inv, getPriceMaterial(team));
 		
 		if(amount >= getPriceCount(team))
 			return true;
@@ -71,7 +72,7 @@ public abstract class TeamShopReward {
 		return false;
 	}
 	
-	public boolean reward(Team team) {
+	public boolean reward(@NotNull Team team) {
 		int level = team.upgrades.get(type);
 		
 		if (level >= maxLevel)

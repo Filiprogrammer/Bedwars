@@ -5,11 +5,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class SpawnerType {
 
-private final int defaultTicksPerSpawn;
-private final Material material;
-private final String name;
+	private final int defaultTicksPerSpawn;
+	private final Material material;
+	private final String name;
 
-	public SpawnerType(@NotNull Material material, @NotNull String name, int defaultTicksPerSpawn) {
+	public SpawnerType(@NotNull final Material material, @NotNull final String name, final int defaultTicksPerSpawn) {
 		this.name = name;
 		this.material = material;
 		this.defaultTicksPerSpawn = defaultTicksPerSpawn;
@@ -22,7 +22,8 @@ private final String name;
 	public Material getMaterial() {
 		return material;
 	}
-	
+
+	@NotNull
 	public String getName() {
 		return name;
 	}

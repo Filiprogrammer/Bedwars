@@ -7,6 +7,8 @@ import java.util.Set;
 
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.SoundSetting;
@@ -21,22 +23,25 @@ public class SoundsConfig extends SingleConfig {
 		super("sounds.yml");
 		reloadConfig();
 	}
-	
-	public SoundSetting getSoundValue(String key) {
+
+	@Nullable
+	public SoundSetting getSoundValue(final String key) {
 		return soundValues.get(key);
 	}
 	
-	public void setSoundValue(String key, SoundSetting value) {
+	public void setSoundValue(final String key, final SoundSetting value) {
 		soundValues.put(key, value);
 	}
-	
+
+	@NotNull
 	public static SoundsConfig getInstance() {
 		if (instance == null)
 			instance = new SoundsConfig();
 		
 		return instance;
 	}
-	
+
+	@Override
 	public boolean saveConfig() {
 		if (!createAndLoadConfigFileIfNotExistent(true))
 			return false;
@@ -58,29 +63,30 @@ public class SoundsConfig extends SingleConfig {
 		
 		return true;
 	}
-	
+
+	@Override
 	public void reloadConfig() {
 		createAndLoadConfigFileIfNotExistent(false);
 		
 		Set<String> keys = config.getKeys(false);
 		
-		for (String key : keys) {
-			ConfigurationSection section = config.getConfigurationSection(key);
+		for (final String key : keys) {
+			final ConfigurationSection section = config.getConfigurationSection(key);
 			
 			Sound sound = null;
 			
 			try {
-				String soundStr = section.getString("sound", null);
+				final String soundStr = section.getString("sound", null);
 				
 				if (soundStr != null)
-					sound = Sound.valueOf(section.getString("sound")); // if no sound is specified in the config, then play no sound
+					sound = Sound.valueOf(soundStr); // if no sound is specified in the config, then play no sound
 			} catch(Exception e) {
 				// if the inputted sound IS NOT a sound, print a warning in the console
 				MessageSender.sendWarning("The inputted sound for §c" + key + " §ewas not found! Please check your sounds.yml! Be sure to only use the correct minecraft-spigot-sounds from this page: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html");
 			}
 			
-			float pitch = (float) section.getDouble("pitch", 1.0);
-			float volume = (float) section.getDouble("volume", 1.0);
+			final float pitch = (float) section.getDouble("pitch", 1.0);
+			final float volume = (float) section.getDouble("volume", 1.0);
 			soundValues.put(key, new SoundSetting(sound, pitch, volume));
 		}
 	}

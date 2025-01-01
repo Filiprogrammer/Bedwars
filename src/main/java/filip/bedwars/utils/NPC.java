@@ -38,8 +38,8 @@ public abstract class NPC {
 		}
 	}
 
-	public void teleport(double x, double y, double z, Player... viewers) {
-		String bukkitVersion = Bukkit.getBukkitVersion();
+	public void teleport(final double x, final double y, final double z, final Player... viewers) {
+		final String bukkitVersion = Bukkit.getBukkitVersion();
 
 		try {
 			reflectionUtils.entitySetLocationMethod.invoke(entity, x, y, z, 0f, 0f);

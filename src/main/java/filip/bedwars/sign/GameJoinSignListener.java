@@ -49,7 +49,7 @@ public class GameJoinSignListener implements Listener {
 		if (event.getAction() != Action.RIGHT_CLICK_BLOCK)
 			return;
 		
-		Block block = event.getClickedBlock();
+		final Block block = event.getClickedBlock();
 		Player player = event.getPlayer();
 		
 		if (!player.hasPermission("filip.bedwars.play.sign"))
@@ -77,7 +77,7 @@ public class GameJoinSignListener implements Listener {
 	
 	@EventHandler
 	public void onSignBreak(BlockBreakEvent event) {
-		Block block = event.getBlock();
+		final Block block = event.getBlock();
 		
 		if (!(block.getState() instanceof Sign))
 			return;

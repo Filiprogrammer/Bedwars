@@ -12,8 +12,7 @@ import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.arena.Spawner;
 
 public class ArenaSerializer {
-	
-	@SuppressWarnings("serial")
+
 	public static Map<String, Object> serializeArena(Arena arena) {
 		Map<String, Object> ret = new HashMap<String, Object>();
 		ret.put("mapName", arena.getMapName());

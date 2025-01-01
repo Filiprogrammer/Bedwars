@@ -3,15 +3,16 @@ package filip.bedwars.sign;
 import org.bukkit.Location;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.config.MainConfig;
 
 public class GameJoinSign {
 
-	Location location;
-	String mapName;
+	private final Location location;
+	private final String mapName;
 	
-	public GameJoinSign(Location location, String mapName) {
+	public GameJoinSign(@NotNull final Location location, final String mapName) {
 		this.location = location;
 		this.mapName = mapName;
 		

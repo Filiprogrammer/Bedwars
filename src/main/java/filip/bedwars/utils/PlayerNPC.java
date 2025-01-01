@@ -38,7 +38,7 @@ public class PlayerNPC extends NPC {
 	}
 
 	private void spawn(String customName, Player[] viewers) {
-		String bukkitVersion = Bukkit.getBukkitVersion();
+		final String bukkitVersion = Bukkit.getBukkitVersion();
 		entityUUID = UUID.randomUUID();
 		gameprofile = new GameProfile(entityUUID, "Spawn-Point");
 
@@ -70,7 +70,7 @@ public class PlayerNPC extends NPC {
 
 	@Override
 	public void respawn(Player... viewers) {
-		String bukkitVersion = Bukkit.getBukkitVersion();
+		final String bukkitVersion = Bukkit.getBukkitVersion();
 
 		for (Player p : viewers) {
 			try {

@@ -209,7 +209,7 @@ public class BedwarsPlugin extends JavaPlugin {
     			return SetupArenaResponse.ARENA_IN_WORLD_ALREADY_SETTING_UP;
     	}
     	
-    	if(ArenaConfig.getInstance().getArena(mapName) != null)
+		if (ArenaConfig.getInstance().getArena(mapName) != null)
     		// There is already an arena with the same name
     		return SetupArenaResponse.ARENA_WITH_THAT_NAME_ALREADY_EXISTS;
     	

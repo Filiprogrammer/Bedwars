@@ -10,6 +10,8 @@ import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import filip.bedwars.utils.MessageSender;
 
@@ -41,6 +43,7 @@ public class MainConfig extends SingleConfig {
 		reloadConfig();
 	}
 
+	@NotNull
 	public String getLanguage() {
 		return language;
 	}
@@ -56,7 +59,8 @@ public class MainConfig extends SingleConfig {
 	public int getGameLobbyCountdown() {
 		return gameLobbyCountdown;
 	}
-	
+
+	@NotNull
 	public String getGameWorldPrefix() {
 		return gameWorldPrefix;
 	}
@@ -64,20 +68,24 @@ public class MainConfig extends SingleConfig {
 	public boolean getHunger() {
 		return hunger;
 	}
-	
+
+	@NotNull
 	public String getItemShopName() {
 		return itemShopName;
 	}
-	
+
+	@NotNull
 	public String getTeamShopName() {
 		return teamShopName;
 	}
-	
+
+	@NotNull
 	public String getBaseSpawnPointName() {
 		return baseSpawnPointName;
 	}
-	
-	public String getJoinSignLine(int line) {
+
+	@Nullable
+	public String getJoinSignLine(final int line) {
 		if(line < 0 || line > joinSignLines.length - 1)
 			return null;
 		
@@ -237,19 +245,19 @@ public class MainConfig extends SingleConfig {
 		if (mainLobbySection == null)
 			mainLobbySection = config.createSection("main-lobby");
 		
-		String mainLobbyWorld = mainLobbySection.getString("w", "world");
-		double mainLobbyX = mainLobbySection.getDouble("x", 0.0);
-		double mainLobbyY = mainLobbySection.getDouble("y", 65.0);
-		double mainLobbyZ = mainLobbySection.getDouble("z", 0.0);
-		float mainLobbyYaw = (float) mainLobbySection.getDouble("yaw", 0.0);
-		float mainLobbyPitch = (float) mainLobbySection.getDouble("pitch", 0.0);
+		final String mainLobbyWorld = mainLobbySection.getString("w", "world");
+		final double mainLobbyX = mainLobbySection.getDouble("x", 0.0);
+		final double mainLobbyY = mainLobbySection.getDouble("y", 65.0);
+		final double mainLobbyZ = mainLobbySection.getDouble("z", 0.0);
+		final float mainLobbyYaw = (float) mainLobbySection.getDouble("yaw", 0.0);
+		final float mainLobbyPitch = (float) mainLobbySection.getDouble("pitch", 0.0);
 		mainLobby = new Location(Bukkit.getWorld(mainLobbyWorld), mainLobbyX, mainLobbyY, mainLobbyZ, mainLobbyYaw, mainLobbyPitch);
 		
 		ConfigurationSection gameLobbySection = config.getConfigurationSection("game-lobby");
 		
 		if (gameLobbySection == null)
 			gameLobbySection = config.createSection("game-lobby");
-			
+
 		String gameLobbyWorldName = gameLobbySection.getString("w", "world");
 		World gameLobbyWorld = Bukkit.getWorld(gameLobbyWorldName);
 
@@ -265,7 +273,8 @@ public class MainConfig extends SingleConfig {
 		float gameLobbyPitch = (float) gameLobbySection.getDouble("pitch", 0.0);
 		gameLobby = new Location(gameLobbyWorld, gameLobbyX, gameLobbyY, gameLobbyZ, gameLobbyYaw, gameLobbyPitch);
 	}
-	
+
+	@NotNull
 	public static MainConfig getInstance() {
 		if (instance == null)
 			instance = new MainConfig();

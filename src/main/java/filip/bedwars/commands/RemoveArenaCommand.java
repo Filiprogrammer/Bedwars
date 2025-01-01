@@ -2,6 +2,7 @@ package filip.bedwars.commands;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.config.ArenaConfig;
 import filip.bedwars.config.MainConfig;
@@ -12,11 +13,11 @@ import filip.bedwars.utils.SoundPlayer;
 public class RemoveArenaCommand implements ICommand {
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(@NotNull CommandSender sender, @NotNull final String[] args) {
 		if (args.length != getArguments().length)
 			return false;
 		
-		String locale;
+		final String locale;
 		Player player = null;
 		
 		if(sender instanceof Player) {
@@ -39,18 +40,24 @@ public class RemoveArenaCommand implements ICommand {
 			if(player != null)
 				SoundPlayer.playSound("error", player);
 		}
-			
+
 		return true;
 	}
 
+	@Override
+	@NotNull
 	public String getPermission() {
 		return "setup";
 	}
 
+	@Override
+	@NotNull
 	public String getName() {
 		return "removearena";
 	}
-		
+
+	@Override
+	@NotNull
 	public String[] getArguments() {
 		return new String[] { "arenaname" };
 	}

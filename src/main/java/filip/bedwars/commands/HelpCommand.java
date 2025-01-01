@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.config.MainConfig;
@@ -13,8 +14,8 @@ import filip.bedwars.utils.MessageSender;
 public class HelpCommand implements ICommand {
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		String locale;
+	public boolean execute(@NotNull CommandSender sender, @NotNull final String[] args) {
+		final String locale;
 		
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
@@ -31,7 +32,7 @@ public class HelpCommand implements ICommand {
 				StringBuilder sb = new StringBuilder();
 				sb.append("/bw " + command.getName());
 				
-				String[] arguments = command.getArguments();
+				final String[] arguments = command.getArguments();
 				for (String argument : arguments) {
 					sb.append(" <");
 					sb.append(argument);
@@ -45,14 +46,20 @@ public class HelpCommand implements ICommand {
 		return true;
 	}
 
+	@Override
+	@NotNull
 	public String getPermission() {
 		return "base";
 	}
 
+	@Override
+	@NotNull
 	public String getName() {
 		return "";
 	}
 
+	@Override
+	@NotNull
 	public String[] getArguments() {
 		return new String[0];
 	}

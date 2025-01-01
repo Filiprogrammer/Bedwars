@@ -2,6 +2,7 @@ package filip.bedwars.commands;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.BedwarsPlugin.SetupArenaResponse;
@@ -13,7 +14,7 @@ import filip.bedwars.utils.SoundPlayer;
 public class AddArenaCommand implements ICommand {
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(@NotNull CommandSender sender, @NotNull final String[] args) {
 		if (args.length != 3)
 			return false;
 		
@@ -25,11 +26,12 @@ public class AddArenaCommand implements ICommand {
 		int minPlayersToStart = 0;
 		int playersPerTeam = 0;
 		Player player = (Player) sender;
+		final String locale = player.getLocale();
 		
 		try {
 			minPlayersToStart = Integer.parseInt(args[1]);
 		} catch (NumberFormatException e) {
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "min-start-player-must-be-number"));
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "min-start-player-must-be-number"));
 			SoundPlayer.playSound("error", player);
 			return true;
 		}
@@ -37,44 +39,44 @@ public class AddArenaCommand implements ICommand {
 		try {
 			playersPerTeam = Integer.parseInt(args[2]);
 		} catch (NumberFormatException e) {
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "player-per-team-must-be-number"));
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "player-per-team-must-be-number"));
 			SoundPlayer.playSound("error", player);
 			return true;
 		}
 		
 		if (minPlayersToStart < 2) {
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "min-start-player-at-least-two"));
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "min-start-player-at-least-two"));
 			SoundPlayer.playSound("error", player);
 			return true;
 		}
 		
 		if (playersPerTeam < 1) {
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "player-per-team-at-least-one"));
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "player-per-team-at-least-one"));
 			SoundPlayer.playSound("error", player);
 			return true;
 		}
 		
-		SetupArenaResponse setupArenaResponse = BedwarsPlugin.getInstance().setupArena(args[0], minPlayersToStart, playersPerTeam, (Player) sender);
+		SetupArenaResponse setupArenaResponse = BedwarsPlugin.getInstance().setupArena(args[0], minPlayersToStart, playersPerTeam, player);
 		
 		switch (setupArenaResponse) {
 		case ARENA_IN_WORLD_ALREADY_SETTING_UP:
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-in-world-already-setting-up"));
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "arena-in-world-already-setting-up"));
 			SoundPlayer.playSound("error", player);
 			break;
 		case ALREADY_SETTING_UP_ARENA:
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-already-setting-up"));
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "arena-already-setting-up"));
 			SoundPlayer.playSound("error", player);
 			break;
 		case ARENA_IN_WORLD_ALREADY_EXISTS:
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "world-has-arena"));
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "world-has-arena"));
 			SoundPlayer.playSound("error", player);
 			break;
 		case ARENA_WITH_THAT_NAME_ALREADY_EXISTS:
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-name-already-exists"));
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "arena-name-already-exists"));
 			SoundPlayer.playSound("error", player);
 			break;
 		case SUCCESS:
-			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-setup-started").replace("%mapname%", args[0]));
+			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "arena-setup-started").replace("%mapname%", args[0]));
 			SoundPlayer.playSound("success", player);
 			break;
 		}
@@ -82,14 +84,20 @@ public class AddArenaCommand implements ICommand {
 		return true;
 	}
 
+	@Override
+	@NotNull
 	public String getPermission() {
 		return "setup";
 	}
 
+	@Override
+	@NotNull
 	public String getName() {
 		return "addarena";
 	}
-	
+
+	@Override
+	@NotNull
 	public String[] getArguments() {
 		return new String[] { "mapname", "minPlayersToStart", "playersPerTeam" };
 	}

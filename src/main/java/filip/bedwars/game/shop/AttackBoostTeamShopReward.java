@@ -16,8 +16,8 @@ public class AttackBoostTeamShopReward extends TeamShopReward {
 	}
 
 	@Override
-	public ItemStack getDisplayItem(Team team) {
-		int level = team.upgrades.get(type);
+	public ItemStack getDisplayItem(final Team team) {
+		final int level = team.upgrades.get(type);
 		StringBuilder lore = new StringBuilder();
 		
 		int i;
@@ -26,8 +26,7 @@ public class AttackBoostTeamShopReward extends TeamShopReward {
 		
 		for (; i < maxLevel; ++i)
 			lore.append("§l§7[]");
-		
-		@SuppressWarnings("serial")
+
 		ItemBuilder itemBuilder = new ItemBuilder().setLore(new ArrayList<String>() {{ add(lore.toString()); }});
 		
 		// TODO: Read the messages from a config file

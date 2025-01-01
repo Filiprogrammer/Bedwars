@@ -17,7 +17,7 @@ public abstract class SingleConfig implements IConfig {
 		this.configFileName = configFileName;
 	}
 	
-	protected boolean createAndLoadConfigFileIfNotExistent(boolean empty) {
+	protected boolean createAndLoadConfigFileIfNotExistent(final boolean empty) {
 		File dataFolder = BedwarsPlugin.getInstance().getDataFolder();
 		
 		if (!dataFolder.exists())

@@ -3,6 +3,8 @@ package filip.bedwars.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
+
 import filip.bedwars.game.shop.Shop;
 import filip.bedwars.game.shop.ShopCategory;
 import filip.bedwars.utils.TeamShopCategoryDeserializer;
@@ -44,7 +46,8 @@ public class TeamShopConfig extends SingleConfig{
 		}
 		
 	}
-	
+
+	@NotNull
 	public static TeamShopConfig getInstance() {
 		if (instance == null)
 			instance = new TeamShopConfig();

@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -278,7 +276,7 @@ public class ReflectionUtils {
 			if (method.getParameterTypes()[0] != String.class)
 				continue;
 
-			if (method.getParameterAnnotations()[0][0].annotationType() == Nullable.class) {
+			if (method.getParameterAnnotations()[0][0].annotationType() == javax.annotation.Nullable.class) {
 				componentNullToEmptyMethod = method;
 				break;
 			}
@@ -408,7 +406,7 @@ public class ReflectionUtils {
 				continue;
 
 			Annotation[] annotations = method.getParameterAnnotations()[0];
-			if (annotations.length >= 1 && annotations[0].annotationType() == Nullable.class) {
+			if (annotations.length >= 1 && annotations[0].annotationType() == javax.annotation.Nullable.class) {
 				entitySetCustomNameMethod = method;
 				break;
 			}
@@ -639,7 +637,7 @@ public class ReflectionUtils {
 	}
 
 	public void nmsPlayerSendSystemMessage(ServerPlayer nmsPlayer, Component message) {
-		String bukkitVersion = Bukkit.getBukkitVersion();
+		final String bukkitVersion = Bukkit.getBukkitVersion();
 
 		try {
 			if (bukkitVersion.compareTo("1.18.2-R0.1-SNAPSHOT") <= 0)

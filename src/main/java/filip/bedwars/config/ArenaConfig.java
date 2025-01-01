@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import filip.bedwars.game.arena.Arena;
 import filip.bedwars.game.arena.Base;
@@ -18,30 +20,33 @@ public class ArenaConfig extends SingleConfig {
 
 	private static ArenaConfig instance = null;
 	
-	List<Arena> arenas = new ArrayList<Arena>();
+	private List<Arena> arenas = new ArrayList<Arena>();
 	
 	private ArenaConfig() {
 		super("arenas.yml");
 		reloadConfig();
 	}
 
-	public Arena getArena(String mapName) {
+	@Nullable
+	public Arena getArena(@Nullable final String mapName) {
 		for (Arena arena : arenas)
 			if (arena.getMapName().equals(mapName))
 				return arena;
 		
 		return null;
 	}
-	
-	public Arena getArena(World world) {
+
+	@Nullable
+	public Arena getArena(@NotNull final World world) {
 		for (Arena arena : arenas)
 			if (arena.getWorld().getName().equals(world.getName()))
 				return arena;
 		
 		return null;
 	}
-	
-	public Arena getArena(int index) {
+
+	@NotNull
+	public Arena getArena(final int index) {
 		return arenas.get(index);
 	}
 	
@@ -49,7 +54,7 @@ public class ArenaConfig extends SingleConfig {
 		return arenas.size();
 	}
 	
-	public void addArena(Arena arena) {
+	public void addArena(@NotNull Arena arena) {
 		arenas.add(arena);
 	}
 	
@@ -57,7 +62,7 @@ public class ArenaConfig extends SingleConfig {
 		return arenas.remove(arena);
 	}
 	
-	public boolean removeArena(String mapName) {
+	public boolean removeArena(@Nullable final String mapName) {
 		Arena arena = getArena(mapName);
 		
 		if (arena == null)
@@ -65,15 +70,17 @@ public class ArenaConfig extends SingleConfig {
 		
 		return arenas.remove(arena);
 	}
-	
+
+	@NotNull
 	public static ArenaConfig getInstance() {
 		if (instance == null)
 			instance = new ArenaConfig();
 		
 		return instance;
 	}
-	
+
 	@SuppressWarnings("unchecked")
+	@Override
 	public void reloadConfig() {
 		createAndLoadConfigFileIfNotExistent(true);
 		
@@ -90,7 +97,8 @@ public class ArenaConfig extends SingleConfig {
 			}
 		}
 	}
-	
+
+	@Override
 	public boolean saveConfig() {
 		createAndLoadConfigFileIfNotExistent(true);
 		
@@ -115,7 +123,7 @@ public class ArenaConfig extends SingleConfig {
 	 * @param arena Arena to check
 	 * @return true if arena is valid; false if arena is not valid
 	 */
-	private boolean isArenaValid(Arena arena) {
+	private boolean isArenaValid(@NotNull Arena arena) {
 		boolean ret = true;
 		String mapName = arena.getMapName();
 		

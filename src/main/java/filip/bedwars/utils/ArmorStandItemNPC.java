@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
@@ -22,21 +23,21 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.decoration.ArmorStand;
 
 public class ArmorStandItemNPC extends NPC {
-	private Material material;
+	private final Material material;
 
-	public ArmorStandItemNPC(Location location, String customName, Material material, Player... viewers) {
+	public ArmorStandItemNPC(@NotNull final Location location, final String customName, final Material material, Player... viewers) {
 		this.material = material;
 		spawn(location, customName, viewers);
 	}
 
-	private void spawn(Location location, String customName, Player[] viewers) {
+	private void spawn(final Location location, final String customName, final Player[] viewers) {
 		try {
 			nmsWorld = reflectionUtils.worldToNMSWorld(location.getWorld());
 			entity = new ArmorStand(nmsWorld, location.getX(), location.getY(), location.getZ());
 			// entity.setSmall(true);
 			reflectionUtils.entityArmorStandSetSmallMethod.invoke(entity, true);
 			// entity.setCustomName(Component.literal(customName));
-			Component component = (Component)reflectionUtils.componentNullToEmptyMethod.invoke(null, customName);
+			final Component component = (Component)reflectionUtils.componentNullToEmptyMethod.invoke(null, customName);
 			reflectionUtils.entitySetCustomNameMethod.invoke(entity, component);
 			// entity.setCustomNameVisible(true);
 			reflectionUtils.entitySetCustomNameVisibleMethod.invoke(entity, true);
@@ -50,8 +51,8 @@ public class ArmorStandItemNPC extends NPC {
 	}
 
 	@Override
-	public void respawn(Player... viewers) {
-		String bukkitVersion = Bukkit.getBukkitVersion();
+	public void respawn(final Player... viewers) {
+		final String bukkitVersion = Bukkit.getBukkitVersion();
 
 		for (Player p : viewers) {
 			try {

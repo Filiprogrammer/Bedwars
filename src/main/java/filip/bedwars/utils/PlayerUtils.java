@@ -19,7 +19,7 @@ import net.minecraft.server.level.ServerPlayer;
 public class PlayerUtils {
 
 	public static void damagePlayerVoid(Player player, float amount) {
-		String bukkitVersion = Bukkit.getBukkitVersion();
+		final String bukkitVersion = Bukkit.getBukkitVersion();
 
 		if (bukkitVersion.compareTo("1.20.4-R0.1-SNAPSHOT") >= 0) {
 			player.damage(amount, DamageSource.builder(DamageType.OUT_OF_WORLD).build());

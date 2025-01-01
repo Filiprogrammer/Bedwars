@@ -16,6 +16,7 @@ import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.event.world.WorldInitEvent;
+import org.jetbrains.annotations.NotNull;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
 
@@ -29,7 +30,7 @@ public class GameWorld {
 	
 	private World world;
 	
-	public GameWorld(World loadFrom) {
+	public GameWorld(@NotNull World loadFrom) {
 		loadWorld(loadFrom);
 	}
 	

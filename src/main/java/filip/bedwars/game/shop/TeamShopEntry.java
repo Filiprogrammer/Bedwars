@@ -3,6 +3,7 @@ package filip.bedwars.game.shop;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.GamePlayer;
@@ -15,22 +16,26 @@ public class TeamShopEntry extends ShopEntry {
 
 	private final TeamShopReward reward;
 	
-	public TeamShopEntry(TeamShopReward reward) {
+	public TeamShopEntry(@NotNull final TeamShopReward reward) {
 		this.reward = reward;
 	}
 
+	@Override
 	public int getPriceCount(Team team) {
 		return reward.getPriceCount(team);
 	}
-	
+
+	@Override
 	public Material getPriceMaterial(Team team) {
 		return reward.getPriceMaterial(team);
 	}
-	
+
+	@Override
 	public ItemStack getDisplayItem(Team team) {
 		return reward.getDisplayItem(team);
 	}
 
+	@Override
 	public boolean buy(GamePlayer gamePlayer, boolean fullStack) {
 		Player player = gamePlayer.getPlayer();
 		Team team = gamePlayer.getTeam();

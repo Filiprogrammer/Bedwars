@@ -3,14 +3,15 @@ package filip.bedwars.game.shop;
 import java.util.List;
 
 import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
 
 public class ShopCategory {
 	
-	private String name;
-	private Material material;
+	private final String name;
+	private final Material material;
 	private List<ShopEntry> shopEntries;
 	
-	public ShopCategory(String name, Material material, List<ShopEntry> shopEntries) {
+	public ShopCategory(final String name, final Material material, @NotNull List<ShopEntry> shopEntries) {
 		this.name = name;
 		this.material = material;
 		this.shopEntries = shopEntries;

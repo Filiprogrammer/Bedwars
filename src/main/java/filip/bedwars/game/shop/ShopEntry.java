@@ -2,6 +2,7 @@ package filip.bedwars.game.shop;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.GamePlayer;
 import filip.bedwars.game.Team;
@@ -20,6 +21,6 @@ public abstract class ShopEntry {
      * @param fullStack whether a full stack should be bought or not
      * @return whether the shop inventory should be refreshed or not
 	 */
-	public abstract boolean buy(GamePlayer gamePlayer, boolean fullStack);
+	public abstract boolean buy(@NotNull GamePlayer gamePlayer, boolean fullStack);
 
 }

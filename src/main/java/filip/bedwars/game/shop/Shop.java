@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import filip.bedwars.game.GamePlayer;
 import filip.bedwars.game.Team;
@@ -21,26 +23,28 @@ public class Shop {
 	 */
 	private final Inventory categoryListInventory;
     
-    public Shop(String title, ShopCategory[] categories) {
+	public Shop(@NotNull final String title, @NotNull final ShopCategory[] categories) {
     	this.title = title;
     	this.categories = categories;
         this.categoryListInventory = Bukkit.createInventory(null, 9 * 2, title);
     	
         addCategoryListToInv(this.categoryListInventory);
     }
-    
+
+	@NotNull
     public Inventory getCategoryListInventory() {
     	return categoryListInventory;
     }
-    
-    public Inventory getCategoryInventory(int categoryIndex, Team team) {
+
+	@Nullable
+	public Inventory getCategoryInventory(final int categoryIndex, Team team) {
     	if (categoryIndex >= categories.length || categoryIndex < 0)
     		return null;
     	
     	return createInventory(categories[categoryIndex], title, team);
     }
     
-	public int handleClick(int shopCategoryIndex, InventoryClickEvent event, GamePlayer gamePlayer) {
+	public int handleClick(final int shopCategoryIndex, @NotNull final InventoryClickEvent event, @NotNull GamePlayer gamePlayer) {
 		if (!(event.getWhoClicked() instanceof Player))
 			return shopCategoryIndex;
 		
@@ -78,7 +82,7 @@ public class Shop {
      * @param title the title of the inventory
      * @param team the team that opened the shop
      */
-    private Inventory createInventory(ShopCategory category, String title, Team team) {
+	private Inventory createInventory(ShopCategory category, final String title, Team team) {
     	// Create a new inventory and put it into the inventories field
     	Inventory thisCategoryInv = Bukkit.createInventory(null, 9 * 4, title);
     	

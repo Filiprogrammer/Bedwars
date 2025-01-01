@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import filip.bedwars.game.arena.SpawnerType;
 import filip.bedwars.utils.MessageSender;
@@ -14,14 +16,16 @@ public class SpawnerConfig extends SingleConfig{
 	private static SpawnerConfig instance = null;
 	
 	private List<SpawnerType> spawnerTypes = new ArrayList<SpawnerType>();
-	
-	public SpawnerType getSpawnerType(int index) {
+
+	@Nullable
+	public SpawnerType getSpawnerType(final int index) {
 		if (index >= spawnerTypes.size())
 			return null;
 		
 		return spawnerTypes.get(index);
 	}
-	
+
+	@NotNull
 	public List<SpawnerType> getSpawnerTypes(){
 		return spawnerTypes;
 	}
@@ -77,7 +81,8 @@ public class SpawnerConfig extends SingleConfig{
 			}
 		}
 	}
-	
+
+	@NotNull
 	public static SpawnerConfig getInstance() {
 		if (instance == null)
 			instance = new SpawnerConfig();

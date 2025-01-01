@@ -31,7 +31,7 @@ public class ScoreboardManager {
 			update(p);
 	}
 	
-	public void update(Player p) {
+	public void update(@NotNull Player p) {
 		String scoreboardTitle = MessagesConfig.getInstance().getStringValue(p.getLocale(), "scoreboard-title");
 		
 		if(scoreboardTitle == null) {
@@ -46,15 +46,14 @@ public class ScoreboardManager {
 		int lineCount = 4 + game.getTeams().size();
 		
 		objective.getScore(" ").setScore(lineCount--);
-		
-		String nextGameStateName;
-		GameState nextGameState;
-		
+
+		final GameState nextGameState;
 		if (gameLogic.getLastGameEndGameState() == gameLogic.getGameState())
 			nextGameState = gameLogic.getGameState();
 		else
 			nextGameState = gameLogic.getNextGameState();
-		
+
+		final String nextGameStateName;
 		if (nextGameState == null)
 			nextGameStateName = "";
 		else
@@ -76,8 +75,7 @@ public class ScoreboardManager {
 				scoreboardTeam.addEntry(gp.getPlayer().getName());
 			
 			int teamMemberCount = team.getMembers().size();
-			String msgKey = null;
-			
+			final String msgKey;
 			if (team.hasBed())
 				msgKey = "scoreboard-team-has-bed";
 			else
@@ -98,7 +96,7 @@ public class ScoreboardManager {
 		p.setScoreboard(scoreboard);
 	}
 	
-	public void reset(Player p) {
+	public void reset(@NotNull Player p) {
 		p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 	}
 	

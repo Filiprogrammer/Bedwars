@@ -60,7 +60,7 @@ public class VillagerNPC extends NPC {
 
 	@Override
 	public void respawn(Player... viewers) {
-		String bukkitVersion = Bukkit.getBukkitVersion();
+		final String bukkitVersion = Bukkit.getBukkitVersion();
 
 		for (Player p : viewers) {
 			try {

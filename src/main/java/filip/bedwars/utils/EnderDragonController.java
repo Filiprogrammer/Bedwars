@@ -19,6 +19,7 @@ import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.BedwarsPlugin;
 import net.minecraft.network.protocol.Packet;
@@ -46,7 +47,7 @@ public class EnderDragonController {
 	private final Location spawnLoc;
 	private ServerLevel nmsWorld;
 	
-	public EnderDragonController(Location loc, List<Entity> targetEntities, Set<Player> viewers) {
+	public EnderDragonController(@NotNull final Location loc, @NotNull List<Entity> targetEntities, @NotNull Set<Player> viewers) {
 		reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
 		
 		this.targetEntities = targetEntities;
@@ -162,7 +163,7 @@ public class EnderDragonController {
 	}
 	
 	public void respawn(Player... viewers) {
-		String bukkitVersion = Bukkit.getBukkitVersion();
+		final String bukkitVersion = Bukkit.getBukkitVersion();
 
 		for (Player p : viewers) {
 			try {
@@ -210,7 +211,7 @@ public class EnderDragonController {
 		return !task.isCancelled();
 	}
 	
-	private void spawn(Location loc) {
+	private void spawn(final Location loc) {
 		try {
 			nmsWorld = reflectionUtils.worldToNMSWorld(loc.getWorld());
 			dragon = new EnderDragon(net.minecraft.world.entity.EntityType.ENDER_DRAGON, nmsWorld);
@@ -222,7 +223,7 @@ public class EnderDragonController {
 	}
 	
 	private void updateLocation() {
-		String bukkitVersion = Bukkit.getBukkitVersion();
+		final String bukkitVersion = Bukkit.getBukkitVersion();
 		Iterator<Player> iter = viewers.keySet().iterator();
 
 		try {

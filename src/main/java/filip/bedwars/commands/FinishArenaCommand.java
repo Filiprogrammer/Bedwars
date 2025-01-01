@@ -2,6 +2,7 @@ package filip.bedwars.commands;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.BedwarsPlugin.FinishArenaSetupResponse;
@@ -13,7 +14,7 @@ import filip.bedwars.utils.SoundPlayer;
 public class FinishArenaCommand implements ICommand {
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(@NotNull CommandSender sender, @NotNull final String[] args) {
 		if (args.length != getArguments().length)
 			return false;
 		
@@ -23,19 +24,20 @@ public class FinishArenaCommand implements ICommand {
 		}
 		
 		Player player = (Player) sender;
-		FinishArenaSetupResponse finishArenaSetupResponse = BedwarsPlugin.getInstance().finishArenaSetup(player);
-		
+		final FinishArenaSetupResponse finishArenaSetupResponse = BedwarsPlugin.getInstance().finishArenaSetup(player);
+		final String locale = player.getLocale();
+
 		switch (finishArenaSetupResponse) {
 		case ARENA_CREATED:
-			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-setup-finish"));
+			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(locale, "arena-setup-finish"));
 			SoundPlayer.playSound("arena-setup", player);
 			break;
 		case NO_ARENA_SETTING_UP:
-			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-you-were-not-setup"));
+			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(locale, "arena-you-were-not-setup"));
 			SoundPlayer.playSound("error", player);
 			break;
 		case NOT_ENOUGH_BASES:
-			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-not-enough-bases"));
+			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(locale, "arena-not-enough-bases"));
 			SoundPlayer.playSound("error", player);
 			break;
 		}
@@ -43,14 +45,20 @@ public class FinishArenaCommand implements ICommand {
 		return true;
 	}
 
+	@Override
+	@NotNull
 	public String getPermission() {
 		return "setup";
 	}
 
+	@Override
+	@NotNull
 	public String getName() {
 		return "finisharena";
 	}
-	
+
+	@Override
+	@NotNull
 	public String[] getArguments() {
 		return new String[0];
 	}

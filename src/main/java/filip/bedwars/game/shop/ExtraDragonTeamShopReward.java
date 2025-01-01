@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.Team;
 import filip.bedwars.game.Team.TeamUpgradeType;
@@ -11,13 +12,13 @@ import filip.bedwars.inventory.ItemBuilder;
 
 public class ExtraDragonTeamShopReward extends TeamShopReward {
 
-	public ExtraDragonTeamShopReward(int maxLevel, int[] priceCounts, Material[] priceMaterials) {
+	public ExtraDragonTeamShopReward(final int maxLevel, @NotNull final int[] priceCounts, @NotNull final Material[] priceMaterials) {
 		super(TeamUpgradeType.EXTRA_DRAGONS, maxLevel, priceCounts, priceMaterials);
 	}
 
 	@Override
-	public ItemStack getDisplayItem(Team team) {
-		int level = team.upgrades.get(type);
+	public ItemStack getDisplayItem(@NotNull final Team team) {
+		final int level = team.upgrades.get(type);
 		StringBuilder lore = new StringBuilder();
 		
 		int i;
@@ -26,8 +27,7 @@ public class ExtraDragonTeamShopReward extends TeamShopReward {
 		
 		for (; i < maxLevel; ++i)
 			lore.append("§l§7[]");
-		
-		@SuppressWarnings("serial")
+
 		ItemBuilder itemBuilder = new ItemBuilder().setLore(new ArrayList<String>() {{ add(lore.toString()); }});
 		
 		// TODO: Read the messages from a config file

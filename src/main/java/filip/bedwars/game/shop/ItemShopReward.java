@@ -15,11 +15,11 @@ public class ItemShopReward {
 		this.item = item;
 	}
 	
-	public void reward(GamePlayer gamePlayer, int amount) {
+	public void reward(GamePlayer gamePlayer, final int amount) {
 		Player player = gamePlayer.getPlayer();
-		HashMap<Integer, ItemStack> didNotFit = player.getInventory().addItem(item.asQuantity(item.getAmount() * amount));
+		final HashMap<Integer, ItemStack> didNotFit = player.getInventory().addItem(item.asQuantity(item.getAmount() * amount));
 		
-		for (ItemStack is : didNotFit.values())
+		for (final ItemStack is : didNotFit.values())
     		player.getWorld().dropItemNaturally(player.getLocation(), is).setVelocity(player.getLocation().getDirection().multiply(0.5));
 	}
 	

@@ -5,34 +5,35 @@ import java.util.HashMap;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.GamePlayer;
 import filip.bedwars.utils.TeamColorConverter;
 
 public class ColoredWoolItemShopReward extends ItemShopReward {
 
-	private int woolAmount;
+	private final int woolAmount;
 	
-	public ColoredWoolItemShopReward(ItemStack item) {
+	public ColoredWoolItemShopReward(@NotNull final ItemStack item) {
 		super(createWoolItem(item));
 		this.woolAmount = item.getAmount();
 	}
 	
-	private static ItemStack createWoolItem(ItemStack item) {
+	private static ItemStack createWoolItem(final ItemStack item) {
 		ItemStack itemStack = item.clone();
 		itemStack.setType(Material.WHITE_WOOL);
 		return itemStack;
 	}
 	
 	@Override
-	public void reward(GamePlayer gamePlayer, int amount) {
+	public void reward(@NotNull final GamePlayer gamePlayer, final int amount) {
 		Player player = gamePlayer.getPlayer();
 		ItemStack itemStack = item.clone();
 		itemStack.setType(TeamColorConverter.convertTeamColorToWoolMaterial(gamePlayer.getTeam().getBase().getTeamColor()));
 		itemStack.setAmount(woolAmount * amount);
-		HashMap<Integer, ItemStack> didNotFit = player.getInventory().addItem(itemStack);
+		final HashMap<Integer, ItemStack> didNotFit = player.getInventory().addItem(itemStack);
 		
-		for (ItemStack is : didNotFit.values())
+		for (final ItemStack is : didNotFit.values())
     		player.getWorld().dropItemNaturally(player.getLocation(), is).setVelocity(player.getLocation().getDirection().multiply(0.5));
 	}
 

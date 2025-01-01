@@ -8,14 +8,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 public class MessagesConfig extends MultipleConfig {
 
 	private static MessagesConfig instance = null;
 	
 	private Map<String, Map<String, String>> messages = new HashMap<String, Map<String, String>>();
-	
-	@SuppressWarnings("serial")
+
 	private final static Map<String, String> configFileNames = new HashMap<String, String>() {{
 		put("en_au", "messages-en.yml");
 		put("en_ca", "messages-en.yml");
@@ -35,7 +35,8 @@ public class MessagesConfig extends MultipleConfig {
 		super(configFileNames);
 		reloadConfig();
 	}
-	
+
+	@NotNull
 	public String getStringValue(String language, String key) {
 		Map<String, String> msgs = messages.get(language);
 		String ret = null;
@@ -50,14 +51,16 @@ public class MessagesConfig extends MultipleConfig {
 		
 		return ret;
 	}
-	
+
+	@NotNull
 	public static MessagesConfig getInstance() {
 		if (instance == null)
 			instance = new MessagesConfig();
 		
 		return instance;
 	}
-	
+
+	@Override
 	public void reloadConfig() {
 		createAndLoadConfigFileIfNotExistent(false);
 		
@@ -65,11 +68,11 @@ public class MessagesConfig extends MultipleConfig {
 			Map<String, String> msgs = new HashMap<String, String>();
 			messages.put(langKey, msgs);
 			
-			YamlConfiguration config = configs.get(langKey);
-			Set<String> keys = config.getKeys(false);
+			final YamlConfiguration config = configs.get(langKey);
+			final Set<String> keys = config.getKeys(false);
 			
 			for (String key : keys) {
-				String msg = config.getString(key).replace('&', '§');
+				final String msg = config.getString(key).replace('&', '§');
 				String msgOut = msg;
 		        Matcher matcher = Pattern.compile("\\\\u\\d{1,4}").matcher(msg);
 				
@@ -83,7 +86,8 @@ public class MessagesConfig extends MultipleConfig {
 			}
 		}
 	}
-	
+
+	@Override
 	public boolean saveConfig() {
 		if (!createAndLoadConfigFileIfNotExistent(true))
 			return false;
@@ -91,10 +95,10 @@ public class MessagesConfig extends MultipleConfig {
 		for (String langKey : messages.keySet()) {
 			Map<String, String> msgs = messages.get(langKey);
 			
-			Set<String> keys = msgs.keySet();
+			final Set<String> keys = msgs.keySet();
 			YamlConfiguration config = configs.get(langKey);
 			
-			for (String key : keys)
+			for (final String key : keys)
 				config.set(key, msgs.get(key));
 			
 			try {

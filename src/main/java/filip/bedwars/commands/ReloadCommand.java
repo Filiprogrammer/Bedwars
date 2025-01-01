@@ -2,6 +2,7 @@ package filip.bedwars.commands;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.config.ArenaConfig;
 import filip.bedwars.config.GameStatesConfig;
@@ -18,7 +19,7 @@ import filip.bedwars.utils.SoundPlayer;
 public class ReloadCommand implements ICommand {
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(@NotNull CommandSender sender, @NotNull final String[] args) {
 		if (args.length != getArguments().length)
 			return false;
 		
@@ -43,16 +44,22 @@ public class ReloadCommand implements ICommand {
 		return true;
 	}
 
+	@Override
+	@NotNull
 	public String getPermission() {
 		return "reload";
 	}
 
+	@Override
+	@NotNull
 	public String getName() {
 		return "reload";
 	}
-	
+
+	@Override
+	@NotNull
 	public String[] getArguments() {
 		return new String[0];
 	}
-	
+
 }

@@ -9,6 +9,8 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import filip.bedwars.sign.GameJoinSign;
 
@@ -16,20 +18,22 @@ public class JoinSignConfig extends SingleConfig {
 
 	private static JoinSignConfig instance = null;
 	
-	List<GameJoinSign> joinSigns = new ArrayList<GameJoinSign>();
+	private List<GameJoinSign> joinSigns = new ArrayList<GameJoinSign>();
 	
 	private JoinSignConfig() {
 		super("joinsigns.yml");
 		reloadConfig();
 	}
 
+	@NotNull
 	public List<GameJoinSign> getGameJoinSigns() {
 		return joinSigns;
 	}
-	
-	public GameJoinSign getGameJoinSignAt(Location joinSignLoc) {
+
+	@Nullable
+	public GameJoinSign getGameJoinSignAt(@NotNull final Location joinSignLoc) {
 		for (GameJoinSign js : joinSigns) {
-			Location jsLoc = js.getLocation();
+			final Location jsLoc = js.getLocation();
 			
 			if (jsLoc.getBlockX() == joinSignLoc.getBlockX()
 			 && jsLoc.getBlockY() == joinSignLoc.getBlockY()
@@ -42,22 +46,24 @@ public class JoinSignConfig extends SingleConfig {
 		return null;
 	}
 	
-	public void addJoinSign(GameJoinSign gameJoinSign) {
+	public void addJoinSign(@NotNull final GameJoinSign gameJoinSign) {
 		joinSigns.add(gameJoinSign);
 	}
 	
-	public boolean removeJoinSign(GameJoinSign gameJoinSign) {
+	public boolean removeJoinSign(final GameJoinSign gameJoinSign) {
 		return joinSigns.remove(gameJoinSign);
 	}
-	
+
+	@NotNull
 	public static JoinSignConfig getInstance() {
 		if (instance == null)
 			instance = new JoinSignConfig();
 		
 		return instance;
 	}
-	
+
 	@SuppressWarnings("unchecked")
+	@Override
 	public void reloadConfig() {
 		createAndLoadConfigFileIfNotExistent(true);
 		
@@ -67,9 +73,9 @@ public class JoinSignConfig extends SingleConfig {
 			List<Map<String, Object>> serializedJoinSigns = (List<Map<String, Object>>) config.getList("joinsigns");
 			
 			for (Map<String, Object> serializedJoinSign : serializedJoinSigns) {
-				String mapName = (String) serializedJoinSign.get("mapName");
-				Map<String, Object> serializedLocation = (Map<String, Object>) serializedJoinSign.get("location");
-				Location location = new Location(
+				final String mapName = (String) serializedJoinSign.get("mapName");
+				final Map<String, Object> serializedLocation = (Map<String, Object>) serializedJoinSign.get("location");
+				final Location location = new Location(
 						Bukkit.getWorld((String) serializedLocation.get("w")),
 						(int) serializedLocation.get("x"),
 						(int) serializedLocation.get("y"),
@@ -82,7 +88,8 @@ public class JoinSignConfig extends SingleConfig {
 			saveConfig();
 		}
 	}
-	
+
+	@Override
 	public boolean saveConfig() {
 		createAndLoadConfigFileIfNotExistent(true);
 		

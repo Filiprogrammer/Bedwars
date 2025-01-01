@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class GamePlayer {
 
@@ -13,15 +14,17 @@ public class GamePlayer {
 	public final Game game;
 	private Countdown countdown;
 	
-	public GamePlayer(UUID uuid, Game game) {
+	public GamePlayer(@NotNull UUID uuid, @NotNull Game game) {
 		this.uuid = uuid;
 		this.game = game;
 	}
-	
+
+	@Nullable
 	public Player getPlayer() {
 		return Bukkit.getPlayer(uuid);
 	}
-	
+
+	@Nullable
 	public Team getTeam() {
 		List<Team> teams = game.getTeams();
 		

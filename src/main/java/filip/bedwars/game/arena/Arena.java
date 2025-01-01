@@ -10,10 +10,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class Arena implements Cloneable {
 	
-	private List<Spawner> spawner = new ArrayList<Spawner>();
-	private List<Base> bases = new ArrayList<Base>();
+	private final List<Spawner> spawner;
+	private final List<Base> bases;
 	private final String mapName;	
-	private World world;
+	private final World world;
 	private final int minPlayersToStart;
 	private final int playersPerTeam;
 	private final Location spectatorSpawn;
@@ -27,26 +27,31 @@ public class Arena implements Cloneable {
 		this.world = world;
 		this.spectatorSpawn = spectatorSpawn;
 	}
-	
+
+	@Nullable
 	public Base getBase(int id) {
         if (id < bases.size())
             return bases.get(id); //only if id is one of the bases
         
         return null;
     }
-	
+
+	@NotNull
 	public List<Base> getBases() {
 		return bases;
 	}
-	
+
+	@NotNull
 	public List<Spawner> getSpawner() {
 		return spawner;
 	}
-	
+
+	@NotNull
 	public World getWorld() {
 		return world;
 	}
-	
+
+	@NotNull
 	public String getMapName() {
 		return mapName;
 	}
@@ -58,8 +63,9 @@ public class Arena implements Cloneable {
 	public int getPlayersPerTeam() {
 		return playersPerTeam;
 	}
-	
-	public Location getSpectatorSpawn(World world) {
+
+	@Nullable
+	public Location getSpectatorSpawn(@Nullable World world) {
 		if (spectatorSpawn == null)
 			return null;
 		

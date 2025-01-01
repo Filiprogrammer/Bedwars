@@ -6,6 +6,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.game.GamePlayer;
@@ -21,17 +23,19 @@ public class ItemShopEntry extends ShopEntry {
 	private final List<ItemShopReward> rewards;
 	private final ItemStack displayItem;
 	
-	public ItemShopEntry(Material priceMaterial, int priceCount, List<ItemShopReward> rewards, ItemStack displayItem) {
+	public ItemShopEntry(final Material priceMaterial, final int priceCount, @NotNull final List<ItemShopReward> rewards, @Nullable final ItemStack displayItem) {
 		this.priceMaterial = priceMaterial;
 		this.priceCount = priceCount;
 		this.rewards = rewards;
 		this.displayItem = displayItem;
 	}
-	
+
+	@Override
 	public Material getPriceMaterial(Team team) {
 		return priceMaterial;
 	}
-	
+
+	@Override
 	public int getPriceCount(Team team) {
 		return priceCount;
 	}
@@ -110,7 +114,7 @@ public class ItemShopEntry extends ShopEntry {
 	}
 
 	@Override
-	public boolean buy(GamePlayer gamePlayer, boolean fullStack) {
+	public boolean buy(@NotNull GamePlayer gamePlayer, final boolean fullStack) {
 		Player player = gamePlayer.getPlayer();
 		
 		if (canBuy(player)) {

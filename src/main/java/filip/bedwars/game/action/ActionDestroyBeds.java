@@ -23,7 +23,8 @@ public class ActionDestroyBeds extends Action {
 			
 			for (GamePlayer gamePlayer : team.getMembers()) {
 				Player p = gamePlayer.getPlayer();
-				Title title = new Title(MessagesConfig.getInstance().getStringValue(p.getLocale(), "your-bed-destroyed"), MessagesConfig.getInstance().getStringValue(p.getLocale(), "you-cant-respawn-anymore"));
+				final String locale = p.getLocale();
+				final Title title = new Title(MessagesConfig.getInstance().getStringValue(locale, "your-bed-destroyed"), MessagesConfig.getInstance().getStringValue(locale, "you-cant-respawn-anymore"));
 				p.sendTitle(title);
 			}
 		}

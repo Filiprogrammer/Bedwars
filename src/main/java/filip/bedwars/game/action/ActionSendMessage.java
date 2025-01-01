@@ -14,7 +14,7 @@ public class ActionSendMessage extends Action {
 	private final String message;
 	private final boolean includeSpectators;
 	
-	public ActionSendMessage(@NotNull String message, @NotNull Boolean includeSpectators) {
+	public ActionSendMessage(@NotNull final String message, @NotNull final Boolean includeSpectators) {
 		this.message = message;
 		this.includeSpectators = includeSpectators;
 	}

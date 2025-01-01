@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.config.MainConfig;
@@ -112,7 +113,8 @@ public class Game implements Listener {
 	public boolean isRunning() {
 		return (gameLogic != null);
 	}
-	
+
+	@Nullable
 	public Team isOver() {
 		List<Team> aliveTeams = new ArrayList<Team>();
 		
@@ -130,7 +132,7 @@ public class Game implements Listener {
 	
 	// TODO: Add reconnect function
 	
-	public void joinPlayer(Player player) {
+	public void joinPlayer(@NotNull Player player) {
 		if (containsPlayer(player.getUniqueId())) {
 			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "already-in-this-game"));
 			SoundPlayer.playSound("error", player);
@@ -207,7 +209,8 @@ public class Game implements Listener {
 		
 		return false;
 	}
-	
+
+	@NotNull
 	public Arena getArena() {
 		return arena;
 	}
@@ -228,13 +231,13 @@ public class Game implements Listener {
 		return gameLogic;
 	}
 	
-	public boolean containsPlayer(UUID uuid) {
+	public boolean containsPlayer(final UUID uuid) {
 		synchronized (players) {
 			return players.stream().anyMatch(gp -> gp.uuid.equals(uuid));
 		}
 	}
 	
-	public GamePlayer getGamePlayer(UUID uuid) {
+	public GamePlayer getGamePlayer(final UUID uuid) {
 		synchronized (players) {
 			Optional<GamePlayer> optionalGamePlayer = players.stream().filter(gp -> gp.uuid.equals(uuid)).findFirst();
 			
@@ -245,7 +248,7 @@ public class Game implements Listener {
 		}
 	}
 	
-	public Team getTeamOfPlayer(UUID uuid) {
+	public Team getTeamOfPlayer(final UUID uuid) {
 		GamePlayer gamePlayer = getGamePlayer(uuid);
 		
 		if (gamePlayer != null)

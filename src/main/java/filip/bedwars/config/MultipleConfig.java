@@ -19,7 +19,7 @@ public abstract class MultipleConfig implements IConfig {
 		this.configFileNames = configFileNames;
 	}
 	
-	protected boolean createAndLoadConfigFileIfNotExistent(boolean empty) {
+	protected boolean createAndLoadConfigFileIfNotExistent(final boolean empty) {
 		File dataFolder = BedwarsPlugin.getInstance().getDataFolder();
 		
 		if (!dataFolder.exists())

@@ -2,6 +2,7 @@ package filip.bedwars.game.shop;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import filip.bedwars.game.GamePlayer;
 
@@ -12,12 +13,11 @@ public class ArmorItemShopReward extends ItemShopReward {
 	}
 	
 	@Override
-	public void reward(GamePlayer gamePlayer, int amount) {
+	public void reward(@NotNull GamePlayer gamePlayer, final int amount) {
 		Player player = gamePlayer.getPlayer();
 		
-		String typeString = item.getType().toString();
-		ItemStack previousItem;
-		
+		final String typeString = item.getType().toString();
+		final ItemStack previousItem;
 		if (typeString.endsWith("_CHESTPLATE") || typeString.equals("ELYTRA")) {
 			previousItem = player.getInventory().getChestplate();
 			player.getInventory().setChestplate(item.clone());
