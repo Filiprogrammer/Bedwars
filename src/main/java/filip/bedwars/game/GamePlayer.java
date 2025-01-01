@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class GamePlayer {
 
@@ -33,10 +34,10 @@ public class GamePlayer {
 		return null;
 	}
 	
-	public void scheduleCountdown(Countdown countdown) {
-		if (countdown != null)
-			countdown.cancel();
-		
+	public void scheduleCountdown(@NotNull Countdown countdown) {
+		if (this.countdown != null)
+			this.countdown.cancel();
+
 		this.countdown = countdown;
 		countdown.start();
 	}
