@@ -34,7 +34,7 @@ public class ColoredGlassItemShopReward extends ItemShopReward {
 		final HashMap<Integer, ItemStack> didNotFit = player.getInventory().addItem(itemStack);
 		
 		for (final ItemStack is : didNotFit.values())
-    		player.getWorld().dropItemNaturally(player.getLocation(), is).setVelocity(player.getLocation().getDirection().multiply(0.5));
+			player.getWorld().dropItem(player.getLocation(), is).setVelocity(player.getLocation().getDirection().multiply(0.5));
 	}
 
 }

@@ -33,7 +33,7 @@ public class ArmorItemShopReward extends ItemShopReward {
 		}
 		
 		if (previousItem != null)
-			player.getWorld().dropItemNaturally(player.getLocation(), previousItem).setVelocity(player.getLocation().getDirection().multiply(0.5));
+			player.getWorld().dropItem(player.getLocation(), previousItem).setVelocity(player.getLocation().getDirection().multiply(0.5));
 	}
 
 }

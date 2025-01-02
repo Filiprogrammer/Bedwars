@@ -847,7 +847,7 @@ public class GameLogic implements Listener {
 									HashMap<Integer, ItemStack> didNotFit = killer.getInventory().addItem(itemStack);
 									
 									for (ItemStack is : didNotFit.values())
-							    		killer.getWorld().dropItemNaturally(killer.getLocation(), is).setVelocity(killer.getLocation().getDirection().multiply(0.5));
+										killer.getWorld().dropItem(killer.getLocation(), is).setVelocity(killer.getLocation().getDirection().multiply(0.5));
 								}
 							}
 						}

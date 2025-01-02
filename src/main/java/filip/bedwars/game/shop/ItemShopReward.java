@@ -20,7 +20,7 @@ public class ItemShopReward {
 		final HashMap<Integer, ItemStack> didNotFit = player.getInventory().addItem(item.asQuantity(item.getAmount() * amount));
 		
 		for (final ItemStack is : didNotFit.values())
-    		player.getWorld().dropItemNaturally(player.getLocation(), is).setVelocity(player.getLocation().getDirection().multiply(0.5));
+			player.getWorld().dropItem(player.getLocation(), is).setVelocity(player.getLocation().getDirection().multiply(0.5));
 	}
 	
 	public int getMaxAmountAtOnce() {
