@@ -6,6 +6,7 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 
 import filip.bedwars.game.TeamColor;
 import filip.bedwars.game.arena.Arena;
@@ -23,8 +24,11 @@ public class ArenaDeserializer {
 		arenaBuilder.setMapName((String) mapOfElements.get("mapName"));
 		arenaBuilder.setMinPlayersToStart((int) mapOfElements.get("minPlayersToStart"));
 		arenaBuilder.setPlayersPerTeam((int) mapOfElements.get("playersPerTeam"));
-		arenaBuilder.setWorld(Bukkit.getWorld((String) mapOfElements.get("world")));
-		
+		World world = Bukkit.getWorld((String) mapOfElements.get("world"));
+		if (world == null)
+			return null;
+		arenaBuilder.setWorld(world);
+
 		Map<String, Double> serializedSpectatorSpawn = (Map<String, Double>) mapOfElements.get("spectatorSpawn");
 		
 		if (serializedSpectatorSpawn != null) {

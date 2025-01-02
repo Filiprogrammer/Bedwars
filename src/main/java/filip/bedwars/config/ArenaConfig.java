@@ -92,7 +92,7 @@ public class ArenaConfig extends SingleConfig {
 			for (Object serializedArena : serializedArenas) {
 				Arena arena = ArenaDeserializer.deserializeArena(serializedArena);
 				
-				if(isArenaValid(arena))
+				if(arena != null && isArenaValid(arena))
 					arenas.add(arena); // add the arena to the list only if it is valid
 			}
 		}
