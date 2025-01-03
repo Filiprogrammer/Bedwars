@@ -37,18 +37,20 @@ public class Game implements Listener {
 	private Arena arena;
 	private GameLogic gameLogic;
 	private List<GamePlayer> players = Collections.synchronizedList(new ArrayList<GamePlayer>());
-	private List<Team> teams = Collections.synchronizedList(new ArrayList<Team>());
+	private final List<Team> teams;
 	private boolean isStarting = false;
 	
 	public Game(@NotNull Arena arena) {
 		this.arena = arena.clone();
 		this.lobby = new Lobby(MainConfig.getInstance().getGameLobby(), this);
-		
+
+		List<Team> teams = new ArrayList<Team>();
 		for (int i = 0; i < arena.getBases().size(); ++i) {
 			Base base = arena.getBase(i);
 			teams.add(new Team(i, base));
 		}
-		
+		this.teams = Collections.unmodifiableList(teams);
+
 		BedwarsPlugin.getInstance().getServer().getPluginManager().registerEvents(this, BedwarsPlugin.getInstance());
 	}
 	

@@ -36,7 +36,7 @@ public abstract class Countdown {
 					if (secondsLeft == 0) {
 						if (onFinish()) {
 							secondsLeft = totalSeconds;
-						} else {
+						} else if (isRunning()) {
 							bukkitRunnable.cancel();
 							task.cancel();
 							task = null;

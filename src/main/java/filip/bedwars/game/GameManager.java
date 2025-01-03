@@ -1,7 +1,7 @@
 package filip.bedwars.game;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -14,8 +14,8 @@ import filip.bedwars.utils.SoundPlayer;
 public class GameManager {
 
 	private static GameManager instance = null;
-	
-	private List<Game> games = new ArrayList<Game>();
+
+	private List<Game> games = new CopyOnWriteArrayList<Game>();
 	
 	private GameManager() {}
 

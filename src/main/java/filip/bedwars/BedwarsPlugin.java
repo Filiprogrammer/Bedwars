@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
 
+import filip.bedwars.api.AdminAPI;
 import filip.bedwars.commands.AddArenaCommand;
 import filip.bedwars.commands.CancelArenaSetupCommand;
 import filip.bedwars.commands.FinishArenaCommand;
@@ -24,6 +25,7 @@ import filip.bedwars.commands.SetGameLobbyCommand;
 import filip.bedwars.commands.SetMainLobbyCommand;
 import filip.bedwars.commands.SkipCountdownCommand;
 import filip.bedwars.config.ArenaConfig;
+import filip.bedwars.config.MainConfig;
 import filip.bedwars.game.Game;
 import filip.bedwars.game.GameManager;
 import filip.bedwars.game.arena.Arena;
@@ -40,6 +42,7 @@ import filip.bedwars.listener.player.PlayerQuitListener;
 import filip.bedwars.listener.world.WorldInitHandler;
 import filip.bedwars.listener.world.WorldInitListener;
 import filip.bedwars.sign.GameJoinSignListener;
+import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.ReflectionUtils;
 
 public class BedwarsPlugin extends JavaPlugin {
@@ -47,7 +50,6 @@ public class BedwarsPlugin extends JavaPlugin {
 	private static BedwarsPlugin plugin;
 	
 	private MultiverseCore mv;
-	private String serverVersion;
 	
 	private List<IClickable> clickables = new ArrayList<IClickable>();
 	private List<IUsable> usables = new ArrayList<IUsable>();
@@ -56,6 +58,7 @@ public class BedwarsPlugin extends JavaPlugin {
 	private ICommand helpCommand;
 	private List<ArenaSetup> arenaSetups = new ArrayList<ArenaSetup>();
 	private WorldInitListener worldInitListener;
+	private AdminAPI adminApi;
 
 	public ReflectionUtils reflectionUtils;
 
@@ -92,12 +95,23 @@ public class BedwarsPlugin extends JavaPlugin {
 		commands.add(new LeaveCommand());
 		commands.add(new SkipCountdownCommand());
 		helpCommand = new HelpCommand();
+
+		if (MainConfig.getInstance().getAdminApi() != null) {
+			adminApi = new AdminAPI();
+			adminApi.start();
+			MessageSender.sendMessage(getServer().getConsoleSender(), "Admin-API started listening");
+		}
 	}
 	
 	@Override
 	public void onDisable() {
 		for (Game game : new ArrayList<Game>(GameManager.getInstance().getGames()))
 			game.endGame();
+
+		if (adminApi != null) {
+			adminApi.stop();
+			MessageSender.sendMessage(getServer().getConsoleSender(), "Admin-API stopped listening");
+		}
 	}
 	
 	public static BedwarsPlugin getInstance() {

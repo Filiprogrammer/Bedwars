@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -19,9 +20,9 @@ import filip.bedwars.utils.MessageSender;
 public class ArenaConfig extends SingleConfig {
 
 	private static ArenaConfig instance = null;
-	
-	private List<Arena> arenas = new ArrayList<Arena>();
-	
+
+	private List<Arena> arenas = new CopyOnWriteArrayList<Arena>();
+
 	private ArenaConfig() {
 		super("arenas.yml");
 		reloadConfig();

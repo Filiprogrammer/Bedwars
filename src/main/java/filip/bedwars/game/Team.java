@@ -1,9 +1,11 @@
 package filip.bedwars.game;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -21,7 +23,7 @@ import filip.bedwars.utils.TeamColorConverter;
 public class Team {
     private final int id;
     private final Base base;
-    private final List<GamePlayer> members = new ArrayList<GamePlayer>();
+	private final List<GamePlayer> members = new CopyOnWriteArrayList<GamePlayer>();
     private boolean hasBed = true;
     private Inventory teamChestInventory = Bukkit.createInventory(null, 3 * 9, "Team Chest");
     private List<Trap> traps = new ArrayList<>();
@@ -61,7 +63,7 @@ public class Team {
     }
     
     public List<GamePlayer> getMembers() {
-    	return members;
+		return Collections.unmodifiableList(members);
     }
     
     public Inventory getTeamChestInventory() {

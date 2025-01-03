@@ -376,18 +376,26 @@ public class Lobby {
 			}
 		}
 	}
-	
+
+	public boolean skipLobbyCountdown() {
+		final int lobbySkipCountdown = MainConfig.getInstance().getLobbySkipCountdown();
+
+		if (!countdown.isRunning() || countdown.getSecondsLeft() <= lobbySkipCountdown)
+			return false;
+
+		countdown.setSecondsLeft(lobbySkipCountdown);
+		return true;
+	}
+
 	public void skipLobbyCountdown(@NotNull Player player) {
-		if (!countdown.isRunning() || countdown.getSecondsLeft() <= MainConfig.getInstance().getLobbySkipCountdown()) {
+		if (!skipLobbyCountdown()) {
 			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "countdown-cannot-skip"));
 			SoundPlayer.playSound("error", player);
 			return;
 		}
-		
-		countdown.setSecondsLeft(MainConfig.getInstance().getLobbySkipCountdown());
-		
+
 		for(GamePlayer gamePlayer : game.getPlayers())
 			MessageSender.sendMessage(gamePlayer.getPlayer(), MessagesConfig.getInstance().getStringValue(gamePlayer.getPlayer().getLocale(), "countdown-skipped").replace("%seconds%", String.valueOf(game.getLobby().getCountdown().getSecondsLeft())).replace("%player%", player.getDisplayName()));
 	}
-	
+
 }

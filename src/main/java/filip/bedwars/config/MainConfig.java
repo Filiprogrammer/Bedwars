@@ -1,6 +1,10 @@
 package filip.bedwars.config;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +41,7 @@ public class MainConfig extends SingleConfig {
 	private boolean bedwarsChat = true;
 	private int lobbySkipCountdown = 5;
 	private List<ItemStack> spawnItems;
+	private InetSocketAddress adminApi = new InetSocketAddress(InetAddress.getLoopbackAddress(), 18080);
 	
 	protected MainConfig() {
 		super("config.yml");
@@ -123,6 +128,11 @@ public class MainConfig extends SingleConfig {
 	public List<ItemStack> getSpawnItems() {
 		return spawnItems;
 	}
+
+	@Nullable
+	public InetSocketAddress getAdminApi() {
+		return adminApi;
+	}
 	
 	public void setMainLobby(Location loc) {
 		mainLobby = loc;
@@ -155,7 +165,10 @@ public class MainConfig extends SingleConfig {
 		config.set("bedwars-chat", bedwarsChat);
 		config.set("lobby-skip-countdown", lobbySkipCountdown);
 		config.set("spawn-items", spawnItems);
-		
+
+		if (adminApi != null)
+			config.set("admin-api", adminApi.getHostString() + ":" + adminApi.getPort());
+
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
 		
 		if (mainLobbySection == null)
@@ -220,7 +233,23 @@ public class MainConfig extends SingleConfig {
 		} catch (IllegalArgumentException e) {
 			MessageSender.sendWarning("lobby-bossbar-color has an invalid value.");
 		}
-		
+
+		final String adminApiString = config.getString("admin-api");
+		adminApi = null;
+		if (adminApiString != null) {
+			try {
+				URI uri = new URI("tcp://" + adminApiString);
+				String host = uri.getHost();
+				int port = uri.getPort();
+
+				if (host != null && port != -1)
+					adminApi = new InetSocketAddress(host, port);
+			} catch (URISyntaxException e) {}
+
+			if (adminApi == null)
+				MessageSender.sendWarning("admin-api has an invalid value.");
+		}
+
 		hunger = config.getBoolean("hunger", false);
 		dropOnlySpawnerResourcesOnDeath = config.getBoolean("drop-only-spawner-resources-on-death", true);
 		hunger = config.getBoolean("attack-cooldown", false);

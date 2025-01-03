@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -112,7 +112,7 @@ public class GameLogic implements Listener {
 	private Arena arena;
 	private GameWorld gameWorld;
 	private GameState gameState;
-	private ArrayDeque<GameState> gameStates = new ArrayDeque<GameState>();
+	private ConcurrentLinkedDeque<GameState> gameStates = new ConcurrentLinkedDeque<GameState>();
 	private BukkitRunnable gameTicker;
 	private List<VillagerNPC> itemShopNPCs = new ArrayList<VillagerNPC>();
 	private List<VillagerNPC> teamShopNPCs = new ArrayList<VillagerNPC>();
@@ -432,11 +432,16 @@ public class GameLogic implements Listener {
 	}
 	
 	public void initiateNextGameState() {
+		if (gameState == gameStates.getLast())
+			// The Game is already over
+			return;
+
+		if (gameState != null)
+			gameState.getCountdown().cancel();
+
 		if (gameStates.peek() == gameStates.getLast()) {
 			// Initiate game end state
 			initiateLastGameEndState();
-		} else if (gameState == gameStates.getLast()) {
-			// The Game is already over
 		} else {
 			// Initiate next game state
 			gameState = gameStates.remove();
