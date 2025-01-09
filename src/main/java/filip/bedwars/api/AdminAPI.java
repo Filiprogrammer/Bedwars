@@ -14,6 +14,7 @@ import filip.bedwars.api.requests.AdminAPIExecuteActionRequest;
 import filip.bedwars.api.requests.AdminAPIGetArenaInfoRequest;
 import filip.bedwars.api.requests.AdminAPIGetGameInfoRequest;
 import filip.bedwars.api.requests.AdminAPIInitNextGameStateRequest;
+import filip.bedwars.api.requests.AdminAPIListArenasRequest;
 import filip.bedwars.api.requests.AdminAPIListGamesRequest;
 import filip.bedwars.api.requests.AdminAPISkipLobbyCountdownRequest;
 import filip.bedwars.api.requests.IAdminAPIRequest;
@@ -93,6 +94,9 @@ public class AdminAPI implements Runnable {
 					break;
 				case 5:
 					request = new AdminAPIExecuteActionRequest();
+					break;
+				case 6:
+					request = new AdminAPIListArenasRequest();
 					break;
 			}
 
