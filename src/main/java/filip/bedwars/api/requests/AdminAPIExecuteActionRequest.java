@@ -8,6 +8,9 @@ import java.io.ObjectInputStream;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
+
+import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.game.Game;
 import filip.bedwars.game.GameManager;
 import filip.bedwars.game.action.Action;
@@ -39,7 +42,6 @@ public class AdminAPIExecuteActionRequest implements IAdminAPIRequest {
         try (ObjectInputStream objectStream = new ObjectInputStream(byteStream)) {
             @SuppressWarnings("unchecked")
 			Map<String, Object> serializedAction = (Map<String, Object>) objectStream.readObject();
-			System.out.println(serializedAction);
 			action = ActionDeserializer.deserializeAction(serializedAction);
         } catch (ClassCastException | ClassNotFoundException e) {}
 
@@ -73,7 +75,7 @@ public class AdminAPIExecuteActionRequest implements IAdminAPIRequest {
 			return;
 		}
 
-		action.execute(game, game.getGameLogic());
+		Bukkit.getScheduler().runTask(BedwarsPlugin.getInstance(), () -> action.execute(game, game.getGameLogic()));
 		out.writeByte(0);
 	}
 
