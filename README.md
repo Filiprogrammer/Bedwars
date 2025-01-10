@@ -33,6 +33,35 @@ Features
 * Various other customizations
 * Bedwars specific events to be used by other plugins
 
+Config Files
+------------
+
+The plugin comes with several configuration files that allow you to customize various aspects of the game.
+
+* **config.yml**: Main configuration file for general settings.
+* **gamestates.yml**: Defines the different game states and their behaviors.
+* **itemshop.yml**: Configures the items available for purchase in the item shop.
+* **teamshop.yml**: Configures team-specific upgrades and items available for purchase in the team shop.
+* **messages-*.yml**: Contains customizable messages for different languages (e.g., messages-en.yml, messages-de.yml).
+* **sounds.yml**: Defines sound effects for various game events.
+* **spawner.yml**: Configures the spawners used in the game.
+
+Commands
+--------
+
+* `/bw` - List available commands
+* `/bw addarena <mapname> <minPlayersToStart> <playersPerTeam>` - Add a new arena in the world you are currently in
+* `/bw finisharena` - Finish adding the new arena
+* `/bw cancelarenasetup` - Cancel adding the new arena
+* `/bw reload` - Reload the config files
+* `/bw joingame <mapname>` - Join a game
+* `/bw setmainlobby` - Set the main lobby
+* `/bw setgamelobby` - Set the game lobby
+* `/bw removearena <arenaname>` - Remove an arena
+* `/bw listarenas` - List all arenas
+* `/bw leave` - Leave a game
+* `/bw start` - Skip the lobby countdown
+
 Get started with the Bedwars Plugin
 -----------------------------------
 
