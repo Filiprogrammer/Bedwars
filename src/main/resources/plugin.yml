@@ -39,7 +39,7 @@ commands:
     usage: /<command>
     permission: filip.bedwars.setup
   bw removearena:
-    description: Removes an arena
+    description: Remove an arena
     usage: /<command> [mapName]
     permission: filip.bedwars.setup
   bw listarenas:
@@ -56,20 +56,20 @@ commands:
     permission: filip.bedwars.lobby.skip
 permissions:
   filip.bedwars.base:
-    description: hj
+    description: Base permission for Bedwars
     default: true
   filip.bedwars.play.command:
-    description: hj
+    description: Permission to join a game via command
     default: true
   filip.bedwars.play.sign:
-    description: hj
+    description: Permission to join a game through a join sign
     default: true
   filip.bedwars.setup:
-    description: aho
+    description: Permission to set up arenas
     default: op
   filip.bedwars.reload:
-    description: hablydably
+    description: Permission to reload the config files
     default: op
   filip.bedwars.lobby.skip:
-    description: Skip the lobby countdown
+    description: Permission to skip the lobby countdown
     default: op
