@@ -187,7 +187,7 @@ public class ArenaSetup implements Listener {
 				Block block = event.getBlockPlaced();
 				
 				if (block != null) {
-					spawnerBuilder.setLocation(block.getLocation());
+					spawnerBuilder.setLocation(block.getLocation().add(0.5, 0, 0.5));
 					player.openInventory(spawnerSelector.getInventory());
 				}
 			}
