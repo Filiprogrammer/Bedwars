@@ -9,33 +9,33 @@ import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.utils.ReflectionUtils;
 
 public abstract class ClickableInventory implements IClickable {
-	
+
 	protected final Inventory inventory;
 	protected final Player player;
-	
+
 	public ClickableInventory(Inventory inventory, Player player) {
-        this.inventory = inventory;
-        this.player = player;
-        registerClickable();
-    }
-	
+		this.inventory = inventory;
+		this.player = player;
+		registerClickable();
+	}
+
 	@Override
 	public Inventory getInventory() {
 		return inventory;
 	}
-	
+
 	@Override
 	public Player getPlayer() {
 		return player;
 	}
-	
+
 	@Override
 	public boolean matches(Inventory inventory, Player player) {
 		String invTitle = inventoryGetTitle(inventory);
-		
+
 		if (invTitle == null)
 			return false;
-		
+
 		return (this.player == player) && invTitle.equals(inventoryGetTitle(this.inventory));
 	}
 
@@ -64,5 +64,5 @@ public abstract class ClickableInventory implements IClickable {
 		}
 
 		return null;
-    }
+	}
 }

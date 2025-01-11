@@ -18,18 +18,18 @@ public class ActionPlaceBeds extends Action {
 		for (Team team : game.getTeams()) {
 			team.restoreBed(gameLogic.getGameWorld().getWorld());
 			gameLogic.scoreboardManager.update();
-			
+
 			for (GamePlayer gamePlayer : team.getMembers()) {
 				Player p = gamePlayer.getPlayer();
 				p.sendTitle(MessagesConfig.getInstance().getStringValue(p.getLocale(), "your-bed-restored"), "", 10, 70, 20);
 			}
 		}
-		
+
 		for (Player p : gameLogic.getGameWorld().getWorld().getPlayers()) {
 			MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "all-beds-restored"));
 			SoundPlayer.playSound("bed-restored", p);
 		}
-		
+
 		gameLogic.allBedsPermDestroyed = false;
 	}
 

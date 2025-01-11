@@ -10,25 +10,25 @@ public class BedwarsKillEvent extends Event {
 
 	private Player killer;
 	private Player victim;
-	
+
 	public BedwarsKillEvent(Player killer, Player victim) {
 		this.killer = killer;
 		this.victim = victim;
 	}
-	
+
 	public Player getKiller() {
 		return killer;
 	}
-	
+
 	public Player getVictim() {
 		return victim;
 	}
-	
+
 	@Override
 	public HandlerList getHandlers() {
 		return handlers;
 	}
-	
+
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}

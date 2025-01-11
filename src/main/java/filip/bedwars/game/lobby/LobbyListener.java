@@ -21,29 +21,29 @@ public class LobbyListener implements Listener {
 	public LobbyListener(JavaPlugin plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
-	
+
 	@EventHandler
 	public void onPlayerDamage(EntityDamageEvent event) {
 		if (!(event.getEntity() instanceof Player))
 			return;
-		
+
 		Player player = (Player) event.getEntity();
-		
+
 		if (player.getWorld().getName().equals(MainConfig.getInstance().getGameLobby().getWorld().getName()))
 			event.setCancelled(true);
 	}
-	
+
 	@EventHandler
 	public void onFoodLevelChange(FoodLevelChangeEvent event) {
 		if (!(event.getEntity() instanceof Player))
 			return;
-		
+
 		Player player = (Player) event.getEntity();
-		
+
 		if (player.getWorld().getName().equals(MainConfig.getInstance().getGameLobby().getWorld().getName()))
 			event.setCancelled(true);
 	}
-	
+
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event) {
 		World world = event.getTo().getWorld();
@@ -53,49 +53,49 @@ public class LobbyListener implements Listener {
 				event.setTo(MainConfig.getInstance().getGameLobby());
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
-		
+
 		if (player.getGameMode() != GameMode.CREATIVE) {
 			if (player.getWorld().getName().equals(MainConfig.getInstance().getGameLobby().getWorld().getName())) {
 				event.setCancelled(true);
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerDropItem(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
-		
+
 		if (player.getGameMode() != GameMode.CREATIVE) {
 			if (player.getWorld().getName().equals(MainConfig.getInstance().getGameLobby().getWorld().getName())) {
 				event.setCancelled(true);
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-		
+
 		if (player.getGameMode() != GameMode.CREATIVE) {
 			if (player.getWorld().getName().equals(MainConfig.getInstance().getGameLobby().getWorld().getName())) {
 				event.setCancelled(true);
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
 		Player player = event.getPlayer();
-		
+
 		if (player.getGameMode() != GameMode.CREATIVE) {
 			if (player.getWorld().getName().equals(MainConfig.getInstance().getGameLobby().getWorld().getName())) {
 				event.setCancelled(true);
 			}
 		}
 	}
-	
+
 }

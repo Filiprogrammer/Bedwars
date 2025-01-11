@@ -13,7 +13,7 @@ public class GamePlayer {
 	public final UUID uuid;
 	public final Game game;
 	private Countdown countdown;
-	
+
 	public GamePlayer(@NotNull UUID uuid, @NotNull Game game) {
 		this.uuid = uuid;
 		this.game = game;
@@ -27,16 +27,16 @@ public class GamePlayer {
 	@Nullable
 	public Team getTeam() {
 		List<Team> teams = game.getTeams();
-		
+
 		synchronized (teams) {
 			for (Team team : teams)
 				if (team.containsMember(uuid))
 					return team;
 		}
-		
+
 		return null;
 	}
-	
+
 	public void scheduleCountdown(@NotNull Countdown countdown) {
 		if (this.countdown != null)
 			this.countdown.cancel();
@@ -44,12 +44,12 @@ public class GamePlayer {
 		this.countdown = countdown;
 		countdown.start();
 	}
-	
+
 	public void cleanup() {
 		if (countdown != null) {
 			countdown.cancel();
 			countdown = null;
 		}
 	}
-	
+
 }

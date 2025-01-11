@@ -17,17 +17,17 @@ public class AddArenaCommand implements ICommand {
 	public boolean execute(@NotNull CommandSender sender, @NotNull final String[] args) {
 		if (args.length != 3)
 			return false;
-		
+
 		if (!(sender instanceof Player)) {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(MainConfig.getInstance().getLanguage(), "you-must-be-player"));
 			return true;
 		}
-		
+
 		int minPlayersToStart = 0;
 		int playersPerTeam = 0;
 		Player player = (Player) sender;
 		final String locale = player.getLocale();
-		
+
 		try {
 			minPlayersToStart = Integer.parseInt(args[1]);
 		} catch (NumberFormatException e) {
@@ -35,7 +35,7 @@ public class AddArenaCommand implements ICommand {
 			SoundPlayer.playSound("error", player);
 			return true;
 		}
-		
+
 		try {
 			playersPerTeam = Integer.parseInt(args[2]);
 		} catch (NumberFormatException e) {
@@ -43,21 +43,21 @@ public class AddArenaCommand implements ICommand {
 			SoundPlayer.playSound("error", player);
 			return true;
 		}
-		
+
 		if (minPlayersToStart < 2) {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "min-start-player-at-least-two"));
 			SoundPlayer.playSound("error", player);
 			return true;
 		}
-		
+
 		if (playersPerTeam < 1) {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "player-per-team-at-least-one"));
 			SoundPlayer.playSound("error", player);
 			return true;
 		}
-		
+
 		SetupArenaResponse setupArenaResponse = BedwarsPlugin.getInstance().setupArena(args[0], minPlayersToStart, playersPerTeam, player);
-		
+
 		switch (setupArenaResponse) {
 		case ARENA_IN_WORLD_ALREADY_SETTING_UP:
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "arena-in-world-already-setting-up"));
@@ -80,7 +80,7 @@ public class AddArenaCommand implements ICommand {
 			SoundPlayer.playSound("success", player);
 			break;
 		}
-		
+
 		return true;
 	}
 
@@ -101,5 +101,5 @@ public class AddArenaCommand implements ICommand {
 	public String[] getArguments() {
 		return new String[] { "mapname", "minPlayersToStart", "playersPerTeam" };
 	}
-	
+
 }

@@ -17,7 +17,7 @@ public class ActionSendTitle extends Action {
 	private final int fadeIn;
 	private final int stay;
 	private final int fadeOut;
-	
+
 	public ActionSendTitle(@Nullable final String titleKey, @Nullable final String subtitleKey, @Nullable final Integer fadeIn, @Nullable final Integer stay, @Nullable final Integer fadeOut, @NotNull final Boolean includeSpectators) {
 		this.titleKey = titleKey;
 		this.subtitleKey = subtitleKey;
@@ -31,7 +31,7 @@ public class ActionSendTitle extends Action {
 	public void execute(@NotNull Game game, @NotNull GameLogic gameLogic) {
 		if(titleKey == null && subtitleKey == null)
 			return;
-		
+
 		if (includeSpectators) {
 			for (Player p : gameLogic.getGameWorld().getWorld().getPlayers()) {
 				final String title;
@@ -45,16 +45,16 @@ public class ActionSendTitle extends Action {
 					subtitle = "";
 				else
 					subtitle = MessagesConfig.getInstance().getStringValue(p.getLocale(), subtitleKey);
-				
+
 				p.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
 			}
 		} else {
 			for (GamePlayer gamePlayer : game.getPlayers()) {
 				Player p = gamePlayer.getPlayer();
-				
+
 				if (p == null)
 					continue;
-				
+
 				final String title;
 				if (titleKey == null)
 					title = "";
@@ -66,7 +66,7 @@ public class ActionSendTitle extends Action {
 					subtitle = "";
 				else
 					subtitle = MessagesConfig.getInstance().getStringValue(p.getLocale(), subtitleKey);
-				
+
 				p.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
 			}
 		}

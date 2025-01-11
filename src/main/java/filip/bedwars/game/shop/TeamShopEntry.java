@@ -15,7 +15,7 @@ import filip.bedwars.utils.SoundPlayer;
 public class TeamShopEntry extends ShopEntry {
 
 	private final TeamShopReward reward;
-	
+
 	public TeamShopEntry(@NotNull final TeamShopReward reward) {
 		this.reward = reward;
 	}
@@ -39,27 +39,27 @@ public class TeamShopEntry extends ShopEntry {
 	public boolean buy(GamePlayer gamePlayer, boolean fullStack) {
 		Player player = gamePlayer.getPlayer();
 		Team team = gamePlayer.getTeam();
-		
+
 		if (reward.canBuy(gamePlayer)) {
 			Material priceMaterial = reward.getPriceMaterial(team);
 			int priceCount = reward.getPriceCount(team);
-			
+
 			if (reward.reward(team)) {
 				InventoryUtils.removeItems(player.getInventory(), priceMaterial, priceCount);
 				SoundPlayer.playSound("buy-item", player);
-				
+
 				for (GamePlayer gp : team.getMembers()) {
 					Player p = gp.getPlayer();
 					String msg = MessagesConfig.getInstance().getStringValue(player.getLocale(), "upgrade-" + reward.type.toString().toLowerCase().replace('_', '-'))
 							.replace("%player%", player.getName())
 							.replace("%level%", "" + team.upgrades.get(reward.type));
-					
+
 					if (reward instanceof TrapTeamShopReward)
 						msg = msg.replace("%trap%", ((TrapTeamShopReward) reward).getTrap().getName());
-					
+
 					MessageSender.sendMessage(p, msg);
 				}
-				
+
 				return true;
 			} else {
 				MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "upgrade-cannot-be-bought"));
@@ -69,7 +69,7 @@ public class TeamShopEntry extends ShopEntry {
 			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "cant-afford-item"));
 			SoundPlayer.playSound("cant-afford-item", player);
 		}
-		
+
 		return false;
 	}
 

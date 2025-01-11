@@ -16,17 +16,17 @@ public class GameManager {
 	private static GameManager instance = null;
 
 	private List<Game> games = new CopyOnWriteArrayList<Game>();
-	
+
 	private GameManager() {}
 
 	@NotNull
 	public static GameManager getInstance() {
 		if (instance == null)
 			instance = new GameManager();
-		
+
 		return instance;
 	}
-	
+
 	/**
 	 * Tries to find a game for the given parameters.
 	 * @param arena
@@ -36,7 +36,7 @@ public class GameManager {
 	public Game joinGame(@NotNull Arena arena, Player... players) {
 		final int maxPlayers = arena.getBases().size() * arena.getPlayersPerTeam();
 		final int playerCount = players.length;
-		
+
 		// Arena does not fit that many players
 		if (playerCount > maxPlayers) {
 			for (Player player : players) {
@@ -45,7 +45,7 @@ public class GameManager {
 			}
 			return null;
 		}
-		
+
 		for (Game game : games)
 			for (Player player : players) {
 				if (game.containsPlayer(player.getUniqueId())) {
@@ -53,44 +53,44 @@ public class GameManager {
 					return null; // One of the players is already in a game
 				}
 			}
-		
+
 		for (Game game : games) {
 			// Check if the game has the arena we are looking for
 			if (!game.getArena().getWorld().getName().equals(arena.getWorld().getName()))
 				continue;
-			
+
 			// Check if the game is not already running
 			if (game.isRunning())
 				continue;
-			
+
 			// Check if the game has enough space for the new players
 			if ((game.getPlayers().size() + playerCount) <= maxPlayers) {
 				game.joinPlayers(players);
 				return game;
 			}
 		}
-		
+
 		// if no game was found, create a new one
 		Game game = new Game(arena);
 		games.add(game);
 		game.joinPlayers(players);
 		return game;
 	}
-	
+
 	public void removeGame(Game game) {
 		games.remove(game);
 	}
-	
+
 	public List<Game> getGames() {
 		return games;
 	}
-	
+
 	public Game getGameOfPlayer(@NotNull Player player) {
 		for (Game game : games)
 			if (game.containsPlayer(player.getUniqueId()))
 				return game;
-		
+
 		return null;
 	}
-	
+
 }

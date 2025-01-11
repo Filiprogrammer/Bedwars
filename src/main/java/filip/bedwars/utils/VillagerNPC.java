@@ -23,7 +23,7 @@ public class VillagerNPC extends NPC {
 	private VillagerType villagerType;
 	private VillagerProfession villagerProfession;
 	private ServerLevel nmsWorld;
-	
+
 	public VillagerNPC(Location location, String villagerType, String villagerProfession, String customName, Player... viewers) {
 		this.villagerType = reflectionUtils.parseVillagerType(villagerType);
 		if (this.villagerType == null)

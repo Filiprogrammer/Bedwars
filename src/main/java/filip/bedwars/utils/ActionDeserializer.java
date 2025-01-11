@@ -29,22 +29,22 @@ public class ActionDeserializer {
 		put("SET_MAX_HEALTH", ActionSetMaxHealth.class);
 		put("SPAWNER_CHANGE", ActionSpawnerChange.class);
 	}};
-	
+
 	public static Action deserializeAction(Map<String, Object> serializedAction) {
 		String actionStr = (String) serializedAction.get("action");
-		
+
 		if (actionStr == null) {
 			MessageSender.sendWarning("An action needs to have a specified type");
 			return null;
 		}
-		
+
 		Class<?> actionClass = actionMap.get(actionStr);
-		
+
 		if (actionClass == null) {
 			MessageSender.sendWarning("Action " + actionStr + " is unknown. Skipping it...");
 			return null;
 		}
-		
+
 		Constructor<?> actionConstructor = actionClass.getConstructors()[0];
 		String[] parameterNames = null;
 		try {
@@ -54,36 +54,36 @@ public class ActionDeserializer {
 		}
 		Parameter[] actionConstructorParameters = actionConstructor.getParameters();
 		Object[] initArgs = new Object[actionConstructorParameters.length];
-		
+
 		for (int i = 0; i < initArgs.length; ++i) {
 			Parameter parameter = actionConstructorParameters[i];
-			
+
 			Object arg = serializedAction.get(parameterNames[i]);
-			
+
 			if (arg == null) {
 				MessageSender.sendWarning("Missing parameter " + parameterNames[i] + " for action " + actionStr + ". Skipping it...");
 				return null;
 			}
-			
+
 			if (!arg.getClass().isAssignableFrom(parameter.getType())) {
 				MessageSender.sendWarning("Invalid parameter " + parameterNames[i] + " for action " + actionStr + ". Skipping it...");
 				return null;
 			}
-			
+
 			if (arg instanceof String)
 				arg = ((String) arg).replace('&', '§');
-			
+
 			initArgs[i] = arg;
 		}
-		
+
 		Action action = null;
 		try {
 			action = (Action) actionConstructor.newInstance(initArgs);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return action;
 	}
-	
+
 }

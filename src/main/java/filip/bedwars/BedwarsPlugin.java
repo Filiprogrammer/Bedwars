@@ -48,9 +48,9 @@ import filip.bedwars.utils.ReflectionUtils;
 public class BedwarsPlugin extends JavaPlugin {
 
 	private static BedwarsPlugin plugin;
-	
+
 	private MultiverseCore mv;
-	
+
 	private List<IClickable> clickables = new ArrayList<IClickable>();
 	private List<IUsable> usables = new ArrayList<IUsable>();
 	private List<IPlacable> placables = new ArrayList<IPlacable>();
@@ -102,7 +102,7 @@ public class BedwarsPlugin extends JavaPlugin {
 			MessageSender.sendMessage(getServer().getConsoleSender(), "Admin-API started listening");
 		}
 	}
-	
+
 	@Override
 	public void onDisable() {
 		for (Game game : new ArrayList<Game>(GameManager.getInstance().getGames()))
@@ -113,168 +113,168 @@ public class BedwarsPlugin extends JavaPlugin {
 			MessageSender.sendMessage(getServer().getConsoleSender(), "Admin-API stopped listening");
 		}
 	}
-	
+
 	public static BedwarsPlugin getInstance() {
 		return plugin;
 	}
-	
+
 	/**
-     * Get a clickable.
-     *
-     * @param inventory
-     * @return clickable
-     */
-    public IClickable getClickable(Inventory inventory, Player player) {
-        for (int i = 0; i < clickables.size(); i++) {
-            if (clickables.get(i).matches(inventory, player)) {
-                return clickables.get(i);
-            }
-        }
-        
-        return null;
-    }
-    
-    public void addClickable(IClickable clickable) {
-    	clickables.add(clickable);
-    }
-    
-    public void removeClickable(IClickable clickable) {
-    	clickables.remove(clickable);
-    }
-    
-    /**
-     * Get a usable.
-     *
-     * @param inventory
-     * @return usable
-     */
-    public IUsable getUsable(ItemStack itemStack, Player player) {
-        for (int i = 0; i < usables.size(); i++) {
-            if (usables.get(i).matches(itemStack, player)) {
-                return usables.get(i);
-            }
-        }
-        
-        return null;
-    }
-    
-    public void addUsable(IUsable usable) {
-    	usables.add(usable);
-    }
-    
-    public void removeUsable(IUsable usable) {
-    	usables.remove(usable);
-    }
-    
-    public IPlacable getPlacable(ItemStack itemStack, Player player) {
-    	for (int i = 0; i < placables.size(); i++) {
-            if (placables.get(i).matches(itemStack, player)) {
-                return placables.get(i);
-            }
-        }
-        
-        return null;
-    }
-    
-    public void addPlacable(IPlacable placable) {
-    	placables.add(placable);
-    }
-    
-    public void removePlacable(IPlacable placable) {
-    	placables.remove(placable);
-    }
-	
-    public List<ICommand> getCommands() {
-    	return commands;
-    }
-    
-    public ICommand getHelpCommand() {
-    	return helpCommand;
-    }
-    
-    public ArenaSetup getArenaSetup(Player setuper) {
-    	for (ArenaSetup arenaSetup : arenaSetups)
-    		if (arenaSetup.getSetuper().getUniqueId().equals(setuper.getUniqueId()))
-    			return arenaSetup;
-    	
-    	return null;
-    }
-    
-    public enum SetupArenaResponse {
-    	ARENA_IN_WORLD_ALREADY_SETTING_UP,
-    	ALREADY_SETTING_UP_ARENA,
-    	ARENA_IN_WORLD_ALREADY_EXISTS,
-    	ARENA_WITH_THAT_NAME_ALREADY_EXISTS,
-    	SUCCESS
-    };
-    
-    public SetupArenaResponse setupArena(String mapName, int minPlayersToStart, int playersPerTeam, Player setuper) {
-    	if (ArenaConfig.getInstance().getArena(setuper.getWorld()) != null)
+	 * Get a clickable.
+	 *
+	 * @param inventory
+	 * @return clickable
+	 */
+	public IClickable getClickable(Inventory inventory, Player player) {
+		for (int i = 0; i < clickables.size(); i++) {
+			if (clickables.get(i).matches(inventory, player)) {
+				return clickables.get(i);
+			}
+		}
+
+		return null;
+	}
+
+	public void addClickable(IClickable clickable) {
+		clickables.add(clickable);
+	}
+
+	public void removeClickable(IClickable clickable) {
+		clickables.remove(clickable);
+	}
+
+	/**
+	 * Get a usable.
+	 *
+	 * @param inventory
+	 * @return usable
+	 */
+	public IUsable getUsable(ItemStack itemStack, Player player) {
+		for (int i = 0; i < usables.size(); i++) {
+			if (usables.get(i).matches(itemStack, player)) {
+				return usables.get(i);
+			}
+		}
+
+		return null;
+	}
+
+	public void addUsable(IUsable usable) {
+		usables.add(usable);
+	}
+
+	public void removeUsable(IUsable usable) {
+		usables.remove(usable);
+	}
+
+	public IPlacable getPlacable(ItemStack itemStack, Player player) {
+		for (int i = 0; i < placables.size(); i++) {
+			if (placables.get(i).matches(itemStack, player)) {
+				return placables.get(i);
+			}
+		}
+
+		return null;
+	}
+
+	public void addPlacable(IPlacable placable) {
+		placables.add(placable);
+	}
+
+	public void removePlacable(IPlacable placable) {
+		placables.remove(placable);
+	}
+
+	public List<ICommand> getCommands() {
+		return commands;
+	}
+
+	public ICommand getHelpCommand() {
+		return helpCommand;
+	}
+
+	public ArenaSetup getArenaSetup(Player setuper) {
+		for (ArenaSetup arenaSetup : arenaSetups)
+			if (arenaSetup.getSetuper().getUniqueId().equals(setuper.getUniqueId()))
+				return arenaSetup;
+
+		return null;
+	}
+
+	public enum SetupArenaResponse {
+		ARENA_IN_WORLD_ALREADY_SETTING_UP,
+		ALREADY_SETTING_UP_ARENA,
+		ARENA_IN_WORLD_ALREADY_EXISTS,
+		ARENA_WITH_THAT_NAME_ALREADY_EXISTS,
+		SUCCESS
+	};
+
+	public SetupArenaResponse setupArena(String mapName, int minPlayersToStart, int playersPerTeam, Player setuper) {
+		if (ArenaConfig.getInstance().getArena(setuper.getWorld()) != null)
 			// An Arena already exists in this world
 			return SetupArenaResponse.ARENA_IN_WORLD_ALREADY_EXISTS;
-    	
-    	for (ArenaSetup arenaSetup : arenaSetups) {
-    		if (arenaSetup.getSetuper().getUniqueId().equals(setuper.getUniqueId()))
-    			// The player is already setting up an arena
-    			return SetupArenaResponse.ALREADY_SETTING_UP_ARENA;
-    		
-    		if (arenaSetup.getWorld().getName().equals(setuper.getWorld().getName()))
-    			// An Arena in the setupers world is already being set up.
-    			return SetupArenaResponse.ARENA_IN_WORLD_ALREADY_SETTING_UP;
-    	}
-    	
+
+		for (ArenaSetup arenaSetup : arenaSetups) {
+			if (arenaSetup.getSetuper().getUniqueId().equals(setuper.getUniqueId()))
+				// The player is already setting up an arena
+				return SetupArenaResponse.ALREADY_SETTING_UP_ARENA;
+
+			if (arenaSetup.getWorld().getName().equals(setuper.getWorld().getName()))
+				// An Arena in the setupers world is already being set up.
+				return SetupArenaResponse.ARENA_IN_WORLD_ALREADY_SETTING_UP;
+		}
+
 		if (ArenaConfig.getInstance().getArena(mapName) != null)
-    		// There is already an arena with the same name
-    		return SetupArenaResponse.ARENA_WITH_THAT_NAME_ALREADY_EXISTS;
-    	
-    	arenaSetups.add(new ArenaSetup(mapName, minPlayersToStart, playersPerTeam, setuper));
-    	return SetupArenaResponse.SUCCESS;
-    }
-    
-    public enum FinishArenaSetupResponse {
-    	NO_ARENA_SETTING_UP,
-    	NOT_ENOUGH_BASES,
-    	ARENA_CREATED
-    };
-    
-    public FinishArenaSetupResponse finishArenaSetup(Player setuper) {
-    	for (ArenaSetup arenaSetup : arenaSetups) {
-    		if (arenaSetup.getSetuper().getUniqueId().equals(setuper.getUniqueId())) {
-    			Arena arena = arenaSetup.finish();
-    			if(arena == null)
-    				return FinishArenaSetupResponse.NOT_ENOUGH_BASES;
-    			arenaSetups.remove(arenaSetup);
-    			ArenaConfig.getInstance().addArena(arena);
-    			ArenaConfig.getInstance().saveConfig();
-    			return FinishArenaSetupResponse.ARENA_CREATED;
-    		}
-    	}
-    	
-    	return FinishArenaSetupResponse.NO_ARENA_SETTING_UP;
-    }
+			// There is already an arena with the same name
+			return SetupArenaResponse.ARENA_WITH_THAT_NAME_ALREADY_EXISTS;
 
-    public boolean cancelArenaSetup(Player setuper) {
-    	for (ArenaSetup arenaSetup : arenaSetups) {
-    		if (arenaSetup.getSetuper().getUniqueId().equals(setuper.getUniqueId())) {
-    			arenaSetup.cancel();
-    			arenaSetups.remove(arenaSetup);
-    			return true;
-    		}
-    	}
-    	
-    	return false;
-    }
-    
-    public void addWorldInitHandler(WorldInitHandler handler) {
-    	worldInitListener.addHandler(handler);
-    }
-    
-    public boolean removeWorldInitHandler(WorldInitHandler handler) {
-    	return worldInitListener.removeHandler(handler);
-    }
+		arenaSetups.add(new ArenaSetup(mapName, minPlayersToStart, playersPerTeam, setuper));
+		return SetupArenaResponse.SUCCESS;
+	}
 
-    public MultiverseCore getMultiverse() {
-    	return mv;
-    }
+	public enum FinishArenaSetupResponse {
+		NO_ARENA_SETTING_UP,
+		NOT_ENOUGH_BASES,
+		ARENA_CREATED
+	};
+
+	public FinishArenaSetupResponse finishArenaSetup(Player setuper) {
+		for (ArenaSetup arenaSetup : arenaSetups) {
+			if (arenaSetup.getSetuper().getUniqueId().equals(setuper.getUniqueId())) {
+				Arena arena = arenaSetup.finish();
+				if(arena == null)
+					return FinishArenaSetupResponse.NOT_ENOUGH_BASES;
+				arenaSetups.remove(arenaSetup);
+				ArenaConfig.getInstance().addArena(arena);
+				ArenaConfig.getInstance().saveConfig();
+				return FinishArenaSetupResponse.ARENA_CREATED;
+			}
+		}
+
+		return FinishArenaSetupResponse.NO_ARENA_SETTING_UP;
+	}
+
+	public boolean cancelArenaSetup(Player setuper) {
+		for (ArenaSetup arenaSetup : arenaSetups) {
+			if (arenaSetup.getSetuper().getUniqueId().equals(setuper.getUniqueId())) {
+				arenaSetup.cancel();
+				arenaSetups.remove(arenaSetup);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public void addWorldInitHandler(WorldInitHandler handler) {
+		worldInitListener.addHandler(handler);
+	}
+
+	public boolean removeWorldInitHandler(WorldInitHandler handler) {
+		return worldInitListener.removeHandler(handler);
+	}
+
+	public MultiverseCore getMultiverse() {
+		return mv;
+	}
 
 }

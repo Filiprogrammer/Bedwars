@@ -1,7 +1,7 @@
 package filip.bedwars.game;
 
 public enum TeamColor {
-	
+
 	WHITE,
 	ORANGE,
 	MAGENTA,
@@ -18,5 +18,5 @@ public enum TeamColor {
 	BROWN,
 	RED,
 	BLACK
-	
+
 }

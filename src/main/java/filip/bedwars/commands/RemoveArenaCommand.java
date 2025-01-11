@@ -16,27 +16,27 @@ public class RemoveArenaCommand implements ICommand {
 	public boolean execute(@NotNull CommandSender sender, @NotNull final String[] args) {
 		if (args.length != getArguments().length)
 			return false;
-		
+
 		final String locale;
 		Player player = null;
-		
+
 		if(sender instanceof Player) {
 			player = (Player) sender;
 			locale = player.getLocale();
 		} else {
 			locale = MainConfig.getInstance().getLanguage();
 		}
-		
+
 		if(ArenaConfig.getInstance().removeArena(args[0])) {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "arena-removed").replace("%arenaname%", args[0]));
-		
+
 			if(player != null)
 				SoundPlayer.playSound("success", player);
-			
+
 			ArenaConfig.getInstance().saveConfig();
 		} else {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "arena-not-found").replace("%arenaname%", args[0]));
-			
+
 			if(player != null)
 				SoundPlayer.playSound("error", player);
 		}
@@ -61,4 +61,5 @@ public class RemoveArenaCommand implements ICommand {
 	public String[] getArguments() {
 		return new String[] { "arenaname" };
 	}
+
 }

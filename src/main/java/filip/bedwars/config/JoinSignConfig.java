@@ -17,9 +17,9 @@ import filip.bedwars.sign.GameJoinSign;
 public class JoinSignConfig extends SingleConfig {
 
 	private static JoinSignConfig instance = null;
-	
+
 	private List<GameJoinSign> joinSigns = new ArrayList<GameJoinSign>();
-	
+
 	private JoinSignConfig() {
 		super("joinsigns.yml");
 		reloadConfig();
@@ -34,7 +34,7 @@ public class JoinSignConfig extends SingleConfig {
 	public GameJoinSign getGameJoinSignAt(@NotNull final Location joinSignLoc) {
 		for (GameJoinSign js : joinSigns) {
 			final Location jsLoc = js.getLocation();
-			
+
 			if (jsLoc.getBlockX() == joinSignLoc.getBlockX()
 			 && jsLoc.getBlockY() == joinSignLoc.getBlockY()
 			 && jsLoc.getBlockZ() == joinSignLoc.getBlockZ()
@@ -42,14 +42,14 @@ public class JoinSignConfig extends SingleConfig {
 				return js;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	public void addJoinSign(@NotNull final GameJoinSign gameJoinSign) {
 		joinSigns.add(gameJoinSign);
 	}
-	
+
 	public boolean removeJoinSign(final GameJoinSign gameJoinSign) {
 		return joinSigns.remove(gameJoinSign);
 	}
@@ -58,7 +58,7 @@ public class JoinSignConfig extends SingleConfig {
 	public static JoinSignConfig getInstance() {
 		if (instance == null)
 			instance = new JoinSignConfig();
-		
+
 		return instance;
 	}
 
@@ -66,12 +66,12 @@ public class JoinSignConfig extends SingleConfig {
 	@Override
 	public void reloadConfig() {
 		createAndLoadConfigFileIfNotExistent(true);
-		
+
 		joinSigns = new ArrayList<GameJoinSign>();
-		
+
 		if (config.isList("joinsigns")) {
 			List<Map<String, Object>> serializedJoinSigns = (List<Map<String, Object>>) config.getList("joinsigns");
-			
+
 			for (Map<String, Object> serializedJoinSign : serializedJoinSigns) {
 				final String mapName = (String) serializedJoinSign.get("mapName");
 				final Map<String, Object> serializedLocation = (Map<String, Object>) serializedJoinSign.get("location");
@@ -80,11 +80,11 @@ public class JoinSignConfig extends SingleConfig {
 						(int) serializedLocation.get("x"),
 						(int) serializedLocation.get("y"),
 						(int) serializedLocation.get("z"));
-				
+
 				if (location.getBlock().getState() instanceof Sign)
 					joinSigns.add(new GameJoinSign(location, mapName));
 			}
-			
+
 			saveConfig();
 		}
 	}
@@ -92,9 +92,9 @@ public class JoinSignConfig extends SingleConfig {
 	@Override
 	public boolean saveConfig() {
 		createAndLoadConfigFileIfNotExistent(true);
-		
+
 		List<Map<String, Object>> serializedJoinSigns = new ArrayList<Map<String, Object>>();
-		
+
 		for (GameJoinSign joinSign : joinSigns) {
 			Map<String, Object> serializedJoinSign = new HashMap<String, Object>();
 			serializedJoinSign.put("mapName", joinSign.getMapName());
@@ -106,16 +106,16 @@ public class JoinSignConfig extends SingleConfig {
 			serializedJoinSign.put("location", serializedLocation);
 			serializedJoinSigns.add(serializedJoinSign);
 		}
-		
+
 		config.set("joinsigns", serializedJoinSigns);
-		
+
 		try {
 			config.save(configFile);
 		} catch (IOException e) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 }

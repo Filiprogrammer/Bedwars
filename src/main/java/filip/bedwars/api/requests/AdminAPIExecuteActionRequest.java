@@ -44,18 +44,6 @@ public class AdminAPIExecuteActionRequest implements IAdminAPIRequest {
 			Map<String, Object> serializedAction = (Map<String, Object>) objectStream.readObject();
 			action = ActionDeserializer.deserializeAction(serializedAction);
         } catch (ClassCastException | ClassNotFoundException e) {}
-
-		// To generate a serialized action:
-		/*
-		Map<String, Object> map = new HashMap<>();
-	    map.put("action", "SET_MAX_HEALTH");
-	    map.put("max-health", 40);
-		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        try (ObjectOutputStream objectStream = new ObjectOutputStream(byteStream)) {
-            objectStream.writeObject(map);
-        }
-        byte[] bytes = byteStream.toByteArray();
-		*/
 	}
 
 	@Override

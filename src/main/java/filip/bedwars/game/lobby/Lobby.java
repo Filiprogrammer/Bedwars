@@ -41,7 +41,7 @@ import filip.bedwars.utils.SoundPlayer;
 import filip.bedwars.utils.TeamColorConverter;
 
 public class Lobby {
-	
+
 	private final Location spawnPoint;
 	private Countdown countdown;
 	private Game game;
@@ -49,13 +49,13 @@ public class Lobby {
 	private List<IUsable> usables = new ArrayList<>();
 	private Map<UUID, BossBar> bossbars = new HashMap<>();
 	private final boolean showBossbar = MainConfig.getInstance().getLobbyBossBar();
-	
+
 	public Lobby(@NotNull final Location spawnPoint, @NotNull Game game) {
 		this.spawnPoint = spawnPoint;
 		this.game = game;
-		
+
 		this.countdown = new Countdown(MainConfig.getInstance().getGameLobbyCountdown()) {
-			
+
 			@Override
 			public void onTick() {
 				if (game.getPlayers().size() < game.getArena().getMinPlayersToStart()) {
@@ -65,16 +65,16 @@ public class Lobby {
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "countdown-not-enough-player"));
 						SoundPlayer.playSound("error", player);
 					}
-					
+
 					cancel();
 					return;
 				}
-				
+
 				final int secondsLeft = getSecondsLeft();
-				
+
 				if (secondsLeft == 0)
 					return;
-				
+
 				if (secondsLeft == 1) {
 					for (GamePlayer gamePlayer : game.getPlayers()) {
 						Player player = gamePlayer.getPlayer();
@@ -88,12 +88,12 @@ public class Lobby {
 						SoundPlayer.playSound("countdown-tick", player);
 					}
 				}
-				
+
 				if (showBossbar) {
 					for (UUID uuid : bossbars.keySet()) {
 						BossBar bossbar = bossbars.get(uuid);
 						bossbar.setProgress((double) secondsLeft / getTotalSeconds());
-						
+
 						if (secondsLeft == 1)
 							bossbar.setTitle(MessagesConfig.getInstance().getStringValue(Bukkit.getPlayer(uuid).getLocale(), "game-starts-in-one-second"));
 						else
@@ -101,7 +101,7 @@ public class Lobby {
 					}
 				}
 			}
-			
+
 			@Override
 			public void onStart() {
 				for(GamePlayer gamePlayer : game.getPlayers()) {
@@ -109,7 +109,7 @@ public class Lobby {
 					MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "countdown-started"));
 				}
 			}
-			
+
 			@Override
 			public boolean onFinish() {
 				if (game.getPlayers().size() < game.getArena().getMinPlayersToStart()) {
@@ -119,20 +119,20 @@ public class Lobby {
 						MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "countdown-not-enough-player"));
 						SoundPlayer.playSound("cancel", player);
 					}
-					
+
 					cancel();
 					return true;
 				}
-				
+
 				game.startGame();
 				return false;
 			}
-			
+
 			@Override
 			public void onCancel() {
 				for(GamePlayer gamePlayer : game.getPlayers())
 					MessageSender.sendMessage(gamePlayer.getPlayer(), "The countdown was cancelled");
-				
+
 				if (showBossbar) {
 					for (BossBar bossbar : bossbars.values()) {
 						bossbar.setProgress(1);
@@ -142,7 +142,7 @@ public class Lobby {
 			}
 		};
 	}
-	
+
 	public Countdown getCountdown() {
 		return countdown;
 	}
@@ -151,7 +151,7 @@ public class Lobby {
 	public Location getSpawnPoint() {
 		return spawnPoint;
 	}
-	
+
 	/**
 	 * Teleport player into the lobby.
 	 * @param uuid player UUID
@@ -159,13 +159,13 @@ public class Lobby {
 	public void joinPlayer(@NotNull Player player) {
 		player.teleport(spawnPoint);
 		PlayerUtils.playerReset(player);
-		
+
 		if (showBossbar) {
 			BossBar bossbar = Bukkit.createBossBar(null, MainConfig.getInstance().getLobbyBossBarColor(), BarStyle.SOLID);
 			bossbar.addPlayer(player);
 			bossbars.put(player.getUniqueId(), bossbar);
 		}
-		
+
 		// Make sure only players of the same game see each other
 		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 			if (game.containsPlayer(p.getUniqueId())) {
@@ -176,10 +176,10 @@ public class Lobby {
 				player.hidePlayer(BedwarsPlugin.getInstance(), p);
 			}
 		}
-		
+
 		if (!countdown.isRunning() && (game.getPlayers().size() >= game.getArena().getMinPlayersToStart()))
 			countdown.start();
-		
+
 		IClickable clickable = new ClickableInventory(Bukkit.createInventory(null, 9 * 2, MessagesConfig.getInstance().getStringValue(player.getLocale(), "item-select-team")), player) {
 			{
 				for (final Team team : game.getTeams()) {
@@ -191,43 +191,43 @@ public class Lobby {
 					inventory.addItem(itemStack);
 				}
 			}
-			
+
 			@Override
 			public void drag(InventoryDragEvent event) {}
-			
+
 			@Override
 			public void click(InventoryClickEvent event) {
 				Player p = (Player) event.getWhoClicked();
-				
+
 				if (p != player)
 					return;
-				
+
 				final int slot = event.getSlot();
-				
+
 				if (slot >= game.getTeams().size())
 					return;
-				
+
 				final UUID puuid = p.getUniqueId();
 				Team newTeam = game.getTeams().get(slot);
-				
+
 				if (newTeam.getMembers().size() < game.getArena().getPlayersPerTeam()) {
 					GamePlayer gamePlayer = game.getGamePlayer(puuid);
 					Team previousTeam = gamePlayer.getTeam();
-					
+
 					if (previousTeam != null)
 						previousTeam.removeMember(gamePlayer);
-					
+
 					newTeam.addMember(gamePlayer);
 					event.getView().close();
 					MessageSender.sendMessage(p,
 							MessagesConfig.getInstance().getStringValue(p.getLocale(), "team-changed")
 							.replace("%teamcolor%", TeamColorConverter.convertTeamColorToStringForMessages(newTeam.getBase().getTeamColor(), p.getLocale())));
-					
+
 					for (ItemStack itemStack : inventory.getContents()) {
 						if (itemStack != null)
 							itemStack.removeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL);
 					}
-					
+
 					event.getCurrentItem().addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
 					updateTeamSelectorLores();
 				} else {
@@ -236,60 +236,60 @@ public class Lobby {
 				}
 			}
 		};
-		
+
 		clickables.add(clickable);
-		
+
 		IUsable usable = new UsableItem(new ItemBuilder().setMaterial(Material.GLOWSTONE_DUST).setName(MessagesConfig.getInstance().getStringValue(player.getLocale(), "item-select-team")).build(), player) {
 			@Override
 			public void use(PlayerInteractEvent event) {
 				Player p = event.getPlayer();
-				
+
 				if (p != player)
 					return;
-				
+
 				if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
 					p.openInventory(clickable.getInventory());
 			}
 		};
-		
+
 		usables.add(usable);
 		player.getInventory().setItem(4, usable.getItemStack());
 		updateTeamSelectorLores();
-		
+
 		if (MainConfig.getInstance().getLobbySkipCountdown() > 0 && player.hasPermission("filip.bedwars.lobby.skip")) {
 			usable = new UsableItem(new ItemBuilder().setMaterial(Material.DIAMOND).setName(MessagesConfig.getInstance().getStringValue(player.getLocale(), "item-skip-lobby")).build(), player) {
 				@Override
 				public void use(PlayerInteractEvent event) {
 					Player p = event.getPlayer();
-					
+
 					if (p != player)
 						return;
-					
+
 					if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
 						skipLobbyCountdown(p);
 				}
 			};
-			
+
 			usables.add(usable);
 			player.getInventory().setItem(0, usable.getItemStack());
 		}
-		
+
 		usable = new UsableItem(new ItemBuilder().setMaterial(Material.RED_BED).setName(MessagesConfig.getInstance().getStringValue(player.getLocale(), "item-leave-game")).build(), player) {
 			@Override
 			public void use(PlayerInteractEvent event) {
 				Player p = event.getPlayer();
-				
+
 				if (p != player)
 					return;
-				
+
 				if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
 					leavePlayer(p);
 			}
 		};
-		
+
 		usables.add(usable);
 		player.getInventory().setItem(8, usable.getItemStack());
-		
+
 		usable = new UsableItem(new ItemBuilder().setMaterial(Material.BOOK).setName("§rTutorial").build(), player) {
 			@Override
 			public void use(PlayerInteractEvent event) {
@@ -310,68 +310,68 @@ public class Lobby {
 				}
 			}
 		};
-		
+
 		usables.add(usable);
 		player.getInventory().setItem(2, usable.getItemStack());
 	}
-	
+
 	/**
 	 * Remove player from lobby.
 	 * @param uuid player UUID
 	 */
 	public void leavePlayer(Player player) {
 		Iterator<IClickable> iterClickables = clickables.iterator();
-		
+
 		while (iterClickables.hasNext()) {
 			IClickable clickable = iterClickables.next();
-			
+
 			if (clickable.getPlayer() == player) {
 				BedwarsPlugin.getInstance().removeClickable(clickable);
 				iterClickables.remove();
 			}
 		}
-		
+
 		Iterator<IUsable> iter = usables.iterator();
-		
+
 		while (iter.hasNext()) {
 			IUsable usable = iter.next();
-			
+
 			if (usable.getPlayer() == player) {
 				BedwarsPlugin.getInstance().removeUsable(usable);
 				iter.remove();
 			}
 		}
-		
+
 		if (showBossbar)
 			bossbars.get(player.getUniqueId()).removeAll();
-		
+
 		updateTeamSelectorLores();
 		player.teleport(MainConfig.getInstance().getMainLobby());
 	}
-	
+
 	public void cleanup() {
 		for (IClickable clickable : clickables)
 			BedwarsPlugin.getInstance().removeClickable(clickable);
-		
+
 		for (IUsable usable : usables)
 			BedwarsPlugin.getInstance().removeUsable(usable);
-		
+
 		if (showBossbar) {
 			for (BossBar bossbar : bossbars.values())
 				bossbar.removeAll();
 		}
 	}
-	
+
 	public void updateTeamSelectorLores() {
 		for (IClickable clickable : clickables) {
 			ItemStack[] contents = clickable.getInventory().getContents();
-			
+
 			for (int i = 0; i < game.getTeams().size(); ++i) {
 				List<String> lore = new ArrayList<>();
-				
+
 				for (GamePlayer gp : game.getTeams().get(i).getMembers())
 					lore.add(gp.getPlayer().getName());
-				
+
 				contents[i].setLore(lore);
 			}
 		}

@@ -11,11 +11,11 @@ public class ArmorItemShopReward extends ItemShopReward {
 	public ArmorItemShopReward(ItemStack item) {
 		super(item);
 	}
-	
+
 	@Override
 	public void reward(@NotNull GamePlayer gamePlayer, final int amount) {
 		Player player = gamePlayer.getPlayer();
-		
+
 		final String typeString = item.getType().toString();
 		final ItemStack previousItem;
 		if (typeString.endsWith("_CHESTPLATE") || typeString.equals("ELYTRA")) {
@@ -31,7 +31,7 @@ public class ArmorItemShopReward extends ItemShopReward {
 			previousItem = player.getInventory().getHelmet();
 			player.getInventory().setHelmet(item.clone());
 		}
-		
+
 		if (previousItem != null)
 			player.getWorld().dropItem(player.getLocation(), previousItem).setVelocity(player.getLocation().getDirection().multiply(0.5));
 	}

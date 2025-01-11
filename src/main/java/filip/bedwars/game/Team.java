@@ -21,113 +21,113 @@ import filip.bedwars.game.arena.Base;
 import filip.bedwars.utils.TeamColorConverter;
 
 public class Team {
-    private final int id;
-    private final Base base;
+	private final int id;
+	private final Base base;
 	private final List<GamePlayer> members = new CopyOnWriteArrayList<GamePlayer>();
-    private boolean hasBed = true;
-    private Inventory teamChestInventory = Bukkit.createInventory(null, 3 * 9, "Team Chest");
-    private List<Trap> traps = new ArrayList<>();
-    
-    public HashMap<TeamUpgradeType, Integer> upgrades = new HashMap<TeamUpgradeType, Integer>(){{
-    	for (TeamUpgradeType type : TeamUpgradeType.values())
-    		put(type, 0);
-    }};
-    
-    public Team(int id, @NotNull Base base) {
-        this.id = id;
-        this.base = base;
-    }
-    
-    public int getId() {
-    	return id;
-    }
-    
-    public Base getBase() {
-    	return base;
-    }
-    
-    public void addMember(@NotNull GamePlayer gamePlayer) {
-    	members.add(gamePlayer);
-    }
-    
-    public boolean removeMember(@NotNull GamePlayer gamePlayer) {
-    	return members.remove(gamePlayer);
-    }
-    
-    public boolean containsMember(@NotNull UUID uuid) {
-    	return members.stream().anyMatch(member -> member.uuid.equals(uuid));
-    }
-    
-    public void clearMembers() {
-    	members.clear();
-    }
-    
-    public List<GamePlayer> getMembers() {
+	private boolean hasBed = true;
+	private Inventory teamChestInventory = Bukkit.createInventory(null, 3 * 9, "Team Chest");
+	private List<Trap> traps = new ArrayList<>();
+
+	public HashMap<TeamUpgradeType, Integer> upgrades = new HashMap<TeamUpgradeType, Integer>(){{
+		for (TeamUpgradeType type : TeamUpgradeType.values())
+			put(type, 0);
+	}};
+
+	public Team(int id, @NotNull Base base) {
+		this.id = id;
+		this.base = base;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public Base getBase() {
+		return base;
+	}
+
+	public void addMember(@NotNull GamePlayer gamePlayer) {
+		members.add(gamePlayer);
+	}
+
+	public boolean removeMember(@NotNull GamePlayer gamePlayer) {
+		return members.remove(gamePlayer);
+	}
+
+	public boolean containsMember(@NotNull UUID uuid) {
+		return members.stream().anyMatch(member -> member.uuid.equals(uuid));
+	}
+
+	public void clearMembers() {
+		members.clear();
+	}
+
+	public List<GamePlayer> getMembers() {
 		return Collections.unmodifiableList(members);
-    }
-    
-    public Inventory getTeamChestInventory() {
-    	return teamChestInventory;
-    }
-    
-    public boolean hasBed() {
-    	return hasBed;
-    }
-    
-    public void destroyBed(World world) {
-    	hasBed = false;
-    	base.getBedBottom(world).getBlock().setType(Material.AIR, false);
-    	base.getBedTop(world).getBlock().setType(Material.AIR, false);
-    }
-    
-    public void restoreBed(World world) {
-    	hasBed = true;
-    	Material bedMaterial = TeamColorConverter.convertTeamColorToBedMaterial(base.getTeamColor());
-    	
-    	Block bedBottomBlock = base.getBedBottom(world).getBlock();
-    	Block bedTopBlock = base.getBedTop(world).getBlock();
-    	BlockFace bedFace = BlockFace.NORTH;
-    	
-    	if (bedTopBlock.getX() > bedBottomBlock.getX())
-    		bedFace = BlockFace.EAST;
-    	else if (bedTopBlock.getX() < bedBottomBlock.getX())
-    		bedFace = BlockFace.WEST;
-    	else if (bedTopBlock.getZ() > bedBottomBlock.getZ())
-    		bedFace = BlockFace.SOUTH;
-    	
-    	bedBottomBlock.setType(bedMaterial, false);
-    	Bed bedBottomData = (Bed) bedMaterial.createBlockData();
-    	bedBottomData.setPart(Part.FOOT);
-    	bedBottomData.setFacing(bedFace);
-    	bedBottomBlock.setBlockData(bedBottomData, false);
-    	
-    	bedTopBlock.setType(bedMaterial, false);
-    	Bed bedTopData = (Bed) bedMaterial.createBlockData();
-    	bedTopData.setPart(Part.HEAD);
-    	bedTopData.setFacing(bedFace);
-    	bedTopBlock.setBlockData(bedTopData, false);
-    }
-    
-    public List<Trap> getTraps() {
-    	return traps;
-    }
-    
-    public void addTrap(Trap trap) {
-    	traps.add(trap);
-    }
-    
-    public boolean removeTrap(Trap trap) {
-    	return traps.remove(trap);
-    }
-    
-    public enum TeamUpgradeType {
-    	HEAL_POOL,
-    	MINING_BOOST,
-    	ATTACK_BOOST,
-    	PROTECTION_BOOST,
-    	EXTRA_DRAGONS,
-    	BED_RESTORE,
-    	TRAP
-    }
-    
+	}
+
+	public Inventory getTeamChestInventory() {
+		return teamChestInventory;
+	}
+
+	public boolean hasBed() {
+		return hasBed;
+	}
+
+	public void destroyBed(World world) {
+		hasBed = false;
+		base.getBedBottom(world).getBlock().setType(Material.AIR, false);
+		base.getBedTop(world).getBlock().setType(Material.AIR, false);
+	}
+
+	public void restoreBed(World world) {
+		hasBed = true;
+		Material bedMaterial = TeamColorConverter.convertTeamColorToBedMaterial(base.getTeamColor());
+
+		Block bedBottomBlock = base.getBedBottom(world).getBlock();
+		Block bedTopBlock = base.getBedTop(world).getBlock();
+		BlockFace bedFace = BlockFace.NORTH;
+
+		if (bedTopBlock.getX() > bedBottomBlock.getX())
+			bedFace = BlockFace.EAST;
+		else if (bedTopBlock.getX() < bedBottomBlock.getX())
+			bedFace = BlockFace.WEST;
+		else if (bedTopBlock.getZ() > bedBottomBlock.getZ())
+			bedFace = BlockFace.SOUTH;
+
+		bedBottomBlock.setType(bedMaterial, false);
+		Bed bedBottomData = (Bed) bedMaterial.createBlockData();
+		bedBottomData.setPart(Part.FOOT);
+		bedBottomData.setFacing(bedFace);
+		bedBottomBlock.setBlockData(bedBottomData, false);
+
+		bedTopBlock.setType(bedMaterial, false);
+		Bed bedTopData = (Bed) bedMaterial.createBlockData();
+		bedTopData.setPart(Part.HEAD);
+		bedTopData.setFacing(bedFace);
+		bedTopBlock.setBlockData(bedTopData, false);
+	}
+
+	public List<Trap> getTraps() {
+		return traps;
+	}
+
+	public void addTrap(Trap trap) {
+		traps.add(trap);
+	}
+
+	public boolean removeTrap(Trap trap) {
+		return traps.remove(trap);
+	}
+
+	public enum TeamUpgradeType {
+		HEAL_POOL,
+		MINING_BOOST,
+		ATTACK_BOOST,
+		PROTECTION_BOOST,
+		EXTRA_DRAGONS,
+		BED_RESTORE,
+		TRAP
+	}
+
 }

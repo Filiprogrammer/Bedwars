@@ -119,5 +119,5 @@ public class AdminAPIGetGameInfoRequest implements IAdminAPIRequest {
 			out.writeUTF(player.getName());
 		}
 	}
-	
+
 }

@@ -11,7 +11,7 @@ import filip.bedwars.game.GamePlayer;
 public class ActionSetMaxHealth extends Action {
 
 	private final int maxHealth;
-	
+
 	public ActionSetMaxHealth(@NotNull Integer maxHealth) {
 		this.maxHealth = maxHealth;
 	}
@@ -20,7 +20,7 @@ public class ActionSetMaxHealth extends Action {
 	public void execute(@NotNull Game game, @NotNull GameLogic gameLogic) {
 		for (GamePlayer gamePlayer : game.getPlayers()) {
 			Player p = gamePlayer.getPlayer();
-			
+
 			if (p != null)
 				p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
 		}

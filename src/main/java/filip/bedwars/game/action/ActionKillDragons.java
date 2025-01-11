@@ -14,7 +14,7 @@ public class ActionKillDragons extends Action {
 	@Override
 	public void execute(@NotNull Game game, @NotNull GameLogic gameLogic) {
 		Iterator<EnderDragonController> iter = gameLogic.enderDragonControllers.iterator();
-		
+
 		while (iter.hasNext()) {
 			EnderDragonController enderDragonController = iter.next();
 			iter.remove();

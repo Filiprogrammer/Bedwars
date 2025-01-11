@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface ICommand {
-	
+
 	boolean execute(@NotNull CommandSender sender, @NotNull String[] args);
 
 	@NotNull
@@ -23,5 +23,5 @@ public interface ICommand {
 	default List<String> getSuggestions(int argIndex, @NotNull String arg) {
 		return null;
 	}
-	
+
 }

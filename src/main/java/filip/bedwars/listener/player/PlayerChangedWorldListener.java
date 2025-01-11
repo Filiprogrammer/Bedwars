@@ -10,15 +10,15 @@ import filip.bedwars.config.MessagesConfig;
 import filip.bedwars.utils.MessageSender;
 
 public class PlayerChangedWorldListener implements Listener {
-	
+
 	public PlayerChangedWorldListener(JavaPlugin plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
-	
+
 	@EventHandler
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
 		if (BedwarsPlugin.getInstance().cancelArenaSetup(event.getPlayer()))
 			MessageSender.sendMessage(event.getPlayer(), MessagesConfig.getInstance().getStringValue(event.getPlayer().getLocale(), "arena-setup-cancelled"));
 	}
-	
+
 }

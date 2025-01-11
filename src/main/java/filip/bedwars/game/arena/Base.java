@@ -10,7 +10,7 @@ import filip.bedwars.game.TeamColor;
 public class Base implements Cloneable {
 	private final Location spawn, itemShop, teamShop, bedTop, bedBottom;
 	private final TeamColor teamColor;
-	
+
 	public Base(@NotNull final Location spawn, @NotNull final Location itemShop, @Nullable final Location teamShop, @NotNull final Location bedTop, @NotNull final Location bedBottom, @NotNull final TeamColor teamColor) {
 		this.spawn = spawn;
 		this.itemShop = itemShop;
@@ -47,11 +47,11 @@ public class Base implements Cloneable {
 	public Location getBedBottom(@Nullable World world) {
 		return new Location(world, bedBottom.getX(), bedBottom.getY(), bedBottom.getZ());
 	}
-	
+
 	public TeamColor getTeamColor() {
 		return teamColor;
 	}
-	
+
 	public Base clone() {
 		return new Base(getSpawn(null), getItemShop(null), getTeamShop(null), getBedTop(null), getBedBottom(null), teamColor);
 	}

@@ -8,25 +8,25 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import filip.bedwars.BedwarsPlugin;
 
 public abstract class SingleConfig implements IConfig {
-	
+
 	private String configFileName = null;
 	protected File configFile = null;
 	protected YamlConfiguration config = null;
-	
+
 	protected SingleConfig(String configFileName) {
 		this.configFileName = configFileName;
 	}
-	
+
 	protected boolean createAndLoadConfigFileIfNotExistent(final boolean empty) {
 		File dataFolder = BedwarsPlugin.getInstance().getDataFolder();
-		
+
 		if (!dataFolder.exists())
 			dataFolder.mkdir();
-		
+
 		// Only one config file is used
 		if (configFile == null)
 			configFile = new File(BedwarsPlugin.getInstance().getDataFolder(), configFileName);
-		
+
 		if (!configFile.exists()) {
 			if (empty) {
 				try {
@@ -38,10 +38,10 @@ public abstract class SingleConfig implements IConfig {
 				BedwarsPlugin.getInstance().saveResource(configFileName, false);
 			}
 		}
-		
+
 		config = YamlConfiguration.loadConfiguration(configFile);
-		
+
 		return true;
 	}
-	
+
 }

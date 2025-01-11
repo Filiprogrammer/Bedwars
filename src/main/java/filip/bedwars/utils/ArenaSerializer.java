@@ -19,9 +19,9 @@ public class ArenaSerializer {
 		ret.put("minPlayersToStart", arena.getMinPlayersToStart());
 		ret.put("playersPerTeam", arena.getPlayersPerTeam());
 		ret.put("world", arena.getWorld().getName());
-		
+
 		Location spectatorSpawn = arena.getSpectatorSpawn(null);
-		
+
 		if (spectatorSpawn != null) {
 			ret.put("spectatorSpawn", new HashMap<String, Double>() {{
 				put("x", spectatorSpawn.getX());
@@ -31,9 +31,9 @@ public class ArenaSerializer {
 				put("pitch", (double) spectatorSpawn.getPitch());
 			}});
 		}
-		
+
 		List<Map<String, Object>> spawnerList = new ArrayList<Map<String, Object>>();
-		
+
 		for (Spawner spawner : arena.getSpawner()) {
 			Map<String, Object> spawnerInfo = new HashMap<String, Object>() {{
 				put("ticksPerSpawn", spawner.getTicksPerSpawn());
@@ -48,11 +48,11 @@ public class ArenaSerializer {
 			}};
 			spawnerList.add(spawnerInfo);
 		}
-		
+
 		ret.put("spawner", spawnerList);
-		
+
 		List<Map<String, Object>> baseList = new ArrayList<Map<String, Object>>();
-		
+
 		for (Base base : arena.getBases()) {
 			Map<String, Object> baseInfo = new HashMap<String, Object>() {{
 				put("spawn", new HashMap<String, Integer>() {{
@@ -82,7 +82,7 @@ public class ArenaSerializer {
 					put("y", loc.getBlockY());
 					put("z", loc.getBlockZ());
 				}});
-				
+
 				if(base.getTeamShop(null) != null) { // only write the team shop if it exists
 					put("teamShop", new HashMap<String, Integer>() {{
 						Location loc = base.getTeamShop(null);
@@ -94,10 +94,10 @@ public class ArenaSerializer {
 			}};
 			baseList.add(baseInfo);
 		}
-		
+
 		ret.put("bases", baseList);
-		
+
 		return ret;
 	}
-	
+
 }

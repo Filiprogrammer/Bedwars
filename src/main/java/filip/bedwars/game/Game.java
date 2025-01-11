@@ -39,7 +39,7 @@ public class Game implements Listener {
 	private List<GamePlayer> players = Collections.synchronizedList(new ArrayList<GamePlayer>());
 	private final List<Team> teams;
 	private boolean isStarting = false;
-	
+
 	public Game(@NotNull Arena arena) {
 		this.arena = arena.clone();
 		this.lobby = new Lobby(MainConfig.getInstance().getGameLobby(), this);
@@ -53,7 +53,7 @@ public class Game implements Listener {
 
 		BedwarsPlugin.getInstance().getServer().getPluginManager().registerEvents(this, BedwarsPlugin.getInstance());
 	}
-	
+
 	/**
 	 * Starts the game if there are enough players
 	 * @return false if not enough players
@@ -61,30 +61,30 @@ public class Game implements Listener {
 	public boolean startGame() {
 		if (players.size() < arena.getMinPlayersToStart())
 			return false; // Not enough players
-		
+
 		lobby.cleanup();
-		
+
 		// Assign players who didn't choose a team to a team automatically.
 		assignLonelyPlayersToTeamsAutomatically();
-		
+
 		// Make sure there are at least two teams that contain at least one player.
 		int filledTeamsCount = 0;
-		
+
 		synchronized (teams) {
 			for (Team team : teams)
 				if (team.getMembers().size() > 0)
 					++filledTeamsCount;
 		}
-		
+
 		if (filledTeamsCount < 2) {
 			synchronized (teams) {
 				for (Team team : teams)
 					team.clearMembers();
 			}
-			
+
 			assignLonelyPlayersToTeamsAutomatically();
 		}
-		
+
 		isStarting = true;
 		// TODO: Pre-load the world during the countdown and load chunks around player spawn points using plugin chunk tickets
 		GameWorld gameWorld = GameWorldManager.getInstance().claimGameWorld(arena.getWorld());
@@ -93,7 +93,7 @@ public class Game implements Listener {
 		isStarting = false;
 		return true;
 	}
-	
+
 	/**
 	 * Cleans everything up after a game
 	 */
@@ -103,15 +103,15 @@ public class Game implements Listener {
 
 		for (GamePlayer gamePlayer : tempPlayers)
 			leavePlayer(gamePlayer.getPlayer());
-		
+
 		HandlerList.unregisterAll(this);
-		
+
 		if (gameLogic != null)
 			gameLogic.cleanup();
-		
+
 		GameManager.getInstance().removeGame(this);
 	}
-	
+
 	public boolean isRunning() {
 		return (gameLogic != null);
 	}
@@ -119,28 +119,28 @@ public class Game implements Listener {
 	@Nullable
 	public Team isOver() {
 		List<Team> aliveTeams = new ArrayList<Team>();
-		
+
 		synchronized (teams) {
 			for (Team team : teams)
 				if (team.getMembers().size() != 0)
 					aliveTeams.add(team);
 		}
-		
+
 		if (aliveTeams.size() == 1)
 			return aliveTeams.get(0);
-		
+
 		return null;
 	}
-	
+
 	// TODO: Add reconnect function
-	
+
 	public void joinPlayer(@NotNull Player player) {
 		if (containsPlayer(player.getUniqueId())) {
 			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "already-in-this-game"));
 			SoundPlayer.playSound("error", player);
 			return; // Player is already in this game 
 		}
-		
+
 		if (isRunning()) {
 			gameLogic.joinSpectator(player);
 			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "joined-game-as-spectator"));
@@ -148,21 +148,21 @@ public class Game implements Listener {
 		} else {
 			players.add(new GamePlayer(player.getUniqueId(), this));
 			lobby.joinPlayer(player);
-			
+
 			for(GamePlayer gp : players) {
 				Player p = gp.getPlayer();
 				MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "player-joined").replace("%player%", player.getName()));
 			}
-			
+
 			SoundPlayer.playSound("success", player);
 		}
 	}
-	
+
 	public void joinPlayers(Player... players) {
 		for (Player player : players)
 			joinPlayer(player);
 	}
-	
+
 	/**
 	 * Remove a player or spectator from the game
 	 * @param player
@@ -173,27 +173,27 @@ public class Game implements Listener {
 			players.remove(gp);
 			return gp;
 		});
-		
+
 		if (gamePlayerOptional.isPresent()) {
 			GamePlayer gamePlayer = gamePlayerOptional.get();
-			
+
 			synchronized (teams) {
 				for (Team team : teams)
 					if (team.removeMember(gamePlayer)) {
 						if (team.getMembers().size() == 0 && isRunning())
 							team.destroyBed(gameLogic.getGameWorld().getWorld());
-						
+
 						break;
 					}
 			}
-			
+
 			if (isRunning())
 				gameLogic.leavePlayer(player);
 			else
 				lobby.leavePlayer(player);
-			
+
 			gamePlayer.cleanup();
-			
+
 			for(GamePlayer gp : players) {
 				Player p = gp.getPlayer();
 				MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "player-left").replace("%player%", player.getName()));
@@ -208,7 +208,7 @@ public class Game implements Listener {
 
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -216,74 +216,74 @@ public class Game implements Listener {
 	public Arena getArena() {
 		return arena;
 	}
-	
+
 	public List<Team> getTeams() {
 		return teams;
 	}
-	
+
 	public List<GamePlayer> getPlayers() {
 		return players;
 	}
-	
+
 	public Lobby getLobby() {
 		return lobby;
 	}
-	
+
 	public GameLogic getGameLogic() {
 		return gameLogic;
 	}
-	
+
 	public boolean containsPlayer(final UUID uuid) {
 		synchronized (players) {
 			return players.stream().anyMatch(gp -> gp.uuid.equals(uuid));
 		}
 	}
-	
+
 	public GamePlayer getGamePlayer(final UUID uuid) {
 		synchronized (players) {
 			Optional<GamePlayer> optionalGamePlayer = players.stream().filter(gp -> gp.uuid.equals(uuid)).findFirst();
-			
+
 			if (optionalGamePlayer.isPresent())
 				return optionalGamePlayer.get();
-			
+
 			return null;
 		}
 	}
-	
+
 	public Team getTeamOfPlayer(final UUID uuid) {
 		GamePlayer gamePlayer = getGamePlayer(uuid);
-		
+
 		if (gamePlayer != null)
 			return gamePlayer.getTeam();
-		
+
 		return null;
 	}
-	
+
 	private Team getSmallestTeam() {
 		Team ret = null;
-		
+
 		synchronized (teams) {
 			for(Team team : teams){
 				if(ret == null) {
 					ret = team;
 					continue;
 				}
-				
+
 				if(team.getMembers().size() < ret.getMembers().size())
 					ret = team;
 			}
 		}
-		
+
 		return ret;
 	}
-	
+
 	private void assignLonelyPlayersToTeamsAutomatically() {
 		synchronized (players) {
 			for (GamePlayer gamePlayer : players) {
 				if (gamePlayer.getTeam() == null) {
 					Team team = getSmallestTeam();
 					team.addMember(gamePlayer);
-					
+
 					Player p = gamePlayer.getPlayer();
 					String colorStr = TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale());
 					MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "team-changed").replace("%teamcolor%", colorStr));
@@ -291,23 +291,23 @@ public class Game implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
-		
+
 		if (containsPlayer(player.getUniqueId()))
 			leavePlayer(player);
 	}
-	
+
 	@EventHandler
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
 		Player player = event.getPlayer();
-		
+
 		if (containsPlayer(player.getUniqueId())) {
 			if (isStarting)
 				return;
-			
+
 			if (isRunning()) {
 				if (!player.getWorld().getName().equals(gameLogic.getGameWorld().getWorld().getName()))
 					leavePlayer(player); // Player left the game world and therefore leaves the game
@@ -339,22 +339,22 @@ public class Game implements Listener {
 			player.hidePlayer(BedwarsPlugin.getInstance(), p);
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
-		
+
 		if (containsPlayer(player.getUniqueId())) {
 			if (isStarting) {
 				event.setCancelled(true);
 				return;
 			}
-			
+
 			if (!isRunning() && !player.getWorld().getName().equals(lobby.getSpawnPoint().getWorld().getName())) {
 				if (player.getGameMode() != GameMode.CREATIVE)
 					event.setCancelled(true);
 			}
 		}
 	}
-	
+
 }

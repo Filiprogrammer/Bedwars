@@ -12,12 +12,12 @@ public abstract class Countdown {
 	private int secondsLeft;
 	private BukkitTask task = null;
 	private BukkitRunnable bukkitRunnable;
-	
+
 	public Countdown(int totalSeconds) {
 		this.totalSeconds = totalSeconds;
 		secondsLeft = totalSeconds;
 	}
-	
+
 	/**
 	 * Start the countdown if it was not already started.
 	 * @return false if the countdown was already started
@@ -30,9 +30,9 @@ public abstract class Countdown {
 				public void run() {
 					if (secondsLeft == totalSeconds)
 						onStart();
-					
+
 					--secondsLeft;
-					
+
 					if (secondsLeft == 0) {
 						if (onFinish()) {
 							secondsLeft = totalSeconds;
@@ -42,21 +42,21 @@ public abstract class Countdown {
 							task = null;
 						}
 					}
-					
+
 					onTick();
 				}
 			};
-			
+
 			try {
 				task = bukkitRunnable.runTaskTimer(BedwarsPlugin.getInstance(), 0, 20L);
 			} catch (IllegalPluginAccessException e) {}
-			
+
 			return true;
 		}
-		
+
 		return false;
     }
-	
+
 	public void cancel() {
 		if (isRunning()) {
 			bukkitRunnable.cancel();
@@ -65,42 +65,42 @@ public abstract class Countdown {
 			onCancel();
 		}
 	}
-	
+
 	public boolean isRunning() {
 		if (task == null)
 			return false;
-		
+
 		return !task.isCancelled();
 	}
-	
+
 	public int getSecondsLeft() {
 		return secondsLeft;
 	}
-	
+
 	public void setSecondsLeft(final int secondsLeft) {
 		this.secondsLeft = secondsLeft;
 	}
-	
+
 	public int getTotalSeconds() {
 		return totalSeconds;
 	}
-	
+
 	/**
 	 * Called every second.
 	 */
 	public abstract void onTick();
-	
+
 	/**
 	 * Called when the countdown is started.
 	 */
 	public abstract void onStart();
-	
+
 	/**
 	 * Called when the countdown is finished.
 	 * @return should restart
 	 */
 	public abstract boolean onFinish();
-	
+
 	/**
 	 * Called when the countdown is canceled.
 	 */

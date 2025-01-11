@@ -14,20 +14,20 @@ import filip.bedwars.game.Team;
 import filip.bedwars.inventory.ItemBuilder;
 
 public class Shop {
-	
+
 	private final String title;
 	private final ShopCategory[] categories;
-	
+
 	/**
 	 * Inventory containing only the category items
 	 */
 	private final Inventory categoryListInventory;
-    
+
 	public Shop(@NotNull final String title, @NotNull final ShopCategory[] categories) {
     	this.title = title;
     	this.categories = categories;
         this.categoryListInventory = Bukkit.createInventory(null, 9 * 2, title);
-    	
+
         addCategoryListToInv(this.categoryListInventory);
     }
 
@@ -43,39 +43,39 @@ public class Shop {
     	
     	return createInventory(categories[categoryIndex], title, team);
     }
-    
+
 	public int handleClick(final int shopCategoryIndex, @NotNull final InventoryClickEvent event, @NotNull GamePlayer gamePlayer) {
 		if (!(event.getWhoClicked() instanceof Player))
 			return shopCategoryIndex;
-		
+
 		Player player = (Player) event.getWhoClicked();
 		Team team = gamePlayer.getTeam();
 		Inventory inv = getCategoryInventory(event.getSlot(), team);
-		
+
 		if (inv != null) {
 			player.openInventory(inv);
 			return event.getSlot();
 		}
-		
+
 		inv = getCategoryInventory(shopCategoryIndex, team);
-		
+
 		if (inv == null)
 			return shopCategoryIndex;
-		
+
 		ShopCategory category = categories[shopCategoryIndex];
 		ShopEntry entry;
-		
+
 		if (event.getSlot() >= 27)
 			entry = category.getShopEntry(event.getSlot() - 27);
 		else
 			entry = category.getShopEntry(event.getSlot() - 18);
-		
+
 		if (entry != null && entry.buy(gamePlayer, event.isShiftClick()))
 			player.openInventory(getCategoryInventory(shopCategoryIndex, team));
-		
+
 		return shopCategoryIndex;
 	}
-    
+
     /**
      * Create an Inventory for the given ShopCategory including the category list at the top and puts it in the inventories field at the specified index.
      * @param category the ShopCategory
@@ -85,17 +85,17 @@ public class Shop {
 	private Inventory createInventory(ShopCategory category, final String title, Team team) {
     	// Create a new inventory and put it into the inventories field
     	Inventory thisCategoryInv = Bukkit.createInventory(null, 9 * 4, title);
-    	
+
     	// Add the category items at the top of the inventory
     	addCategoryListToInv(thisCategoryInv);
-    	
+
     	// Add the items with the prices to the inventory
     	for (int i = 0; i < category.getShopEntriesCount(); ++i) {
     		ShopEntry shopEntry = category.getShopEntry(i);
-    		
+
     		ItemStack displayItem = shopEntry.getDisplayItem(team);
     		thisCategoryInv.setItem(9 * 2 + i, displayItem);
-    		
+
     		ItemStack priceItem = new ItemBuilder()
     				.setMaterial(shopEntry.getPriceMaterial(team))
     				.setAmount(shopEntry.getPriceCount(team))
@@ -103,10 +103,10 @@ public class Shop {
     				.build();
     		thisCategoryInv.setItem(9 * 3 + i, priceItem);
     	}
-    	
+
     	return thisCategoryInv;
     }
-    
+
     /**
      * Add the category items at the top of the given Inventory.
      * @param inv the inventory to add the category items to
@@ -118,10 +118,10 @@ public class Shop {
                         .setMaterial(categories[i].getMaterial())
                         .setName("§r§l".concat(categories[i].getName()))
                         .build();
-            	
+
             	inv.setItem(i, categoryItem);
             }
-            
+
             inv.setItem(i + 9, ItemBuilder.NULL);
     	}
     }

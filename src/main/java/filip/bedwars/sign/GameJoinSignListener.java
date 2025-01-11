@@ -25,11 +25,11 @@ public class GameJoinSignListener implements Listener {
 	public GameJoinSignListener(JavaPlugin plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
-	
+
 	@EventHandler
 	public void onSignChange(SignChangeEvent event) {
 		Player player = event.getPlayer();
-		
+
 		if (player.hasPermission("filip.bedwars.setup")) {
 			if (event.getLine(0).equalsIgnoreCase("[bedwars]")) {
 				String mapName = event.getLine(1);
@@ -43,52 +43,52 @@ public class GameJoinSignListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onSignClick(PlayerInteractEvent event) {
 		if (event.getAction() != Action.RIGHT_CLICK_BLOCK)
 			return;
-		
+
 		final Block block = event.getClickedBlock();
 		Player player = event.getPlayer();
-		
+
 		if (!player.hasPermission("filip.bedwars.play.sign"))
 			return;
-		
+
 		if (!(block.getState() instanceof Sign))
 			return;
-		
+
 		GameJoinSign joinSign = JoinSignConfig.getInstance().getGameJoinSignAt(block.getLocation());
-		
+
 		if (joinSign == null)
 			return;
-		
+
 		String mapName = joinSign.getMapName();
 		Arena arena = ArenaConfig.getInstance().getArena(mapName);
-		
+
 		if (arena == null) {
 			MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "arena-not-found").replace("%arenaname%", mapName));
 			SoundPlayer.playSound("error", player);
 			return;
 		}
-		
+
 		GameManager.getInstance().joinGame(arena, player);
 	}
-	
+
 	@EventHandler
 	public void onSignBreak(BlockBreakEvent event) {
 		final Block block = event.getBlock();
-		
+
 		if (!(block.getState() instanceof Sign))
 			return;
-		
+
 		GameJoinSign joinSign = JoinSignConfig.getInstance().getGameJoinSignAt(block.getLocation());
-		
+
 		if (joinSign == null)
 			return;
-		
+
 		JoinSignConfig.getInstance().removeJoinSign(joinSign);
 		JoinSignConfig.getInstance().saveConfig();
 	}
-	
+
 }

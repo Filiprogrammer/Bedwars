@@ -22,18 +22,18 @@ public class ActionSummonDragons extends Action {
 		for (Team team : game.getTeams()) {
 			if (team.getMembers().size() == 0)
 				continue;
-			
+
 			List<Entity> targetEntities = new ArrayList<>();
-			
+
 			for (Team t : game.getTeams()) {
 				if (t.getId() != team.getId()) {
 					for (GamePlayer gamePlayer : t.getMembers())
 						targetEntities.add(gamePlayer.getPlayer());
 				}
 			}
-			
+
 			final int dragonCount = 1 + team.upgrades.get(TeamUpgradeType.EXTRA_DRAGONS);
-			
+
 			for (int i = 0; i < dragonCount; ++i) {
 				// TODO: Clean this shit up
 				gameLogic.enderDragonControllers.add(

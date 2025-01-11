@@ -22,7 +22,7 @@ import filip.bedwars.utils.MessageSender;
 public class MainConfig extends SingleConfig {
 
 	private static MainConfig instance = null;
-	
+
 	private String language = "en_us";
 	private Location mainLobby;
 	private Location gameLobby;
@@ -42,7 +42,7 @@ public class MainConfig extends SingleConfig {
 	private int lobbySkipCountdown = 5;
 	private List<ItemStack> spawnItems;
 	private InetSocketAddress adminApi = new InetSocketAddress(InetAddress.getLoopbackAddress(), 18080);
-	
+
 	protected MainConfig() {
 		super("config.yml");
 		reloadConfig();
@@ -52,15 +52,15 @@ public class MainConfig extends SingleConfig {
 	public String getLanguage() {
 		return language;
 	}
-	
+
 	public Location getMainLobby() {
 		return mainLobby;
 	}
-	
+
 	public Location getGameLobby() {
 		return gameLobby;
 	}
-	
+
 	public int getGameLobbyCountdown() {
 		return gameLobbyCountdown;
 	}
@@ -69,7 +69,7 @@ public class MainConfig extends SingleConfig {
 	public String getGameWorldPrefix() {
 		return gameWorldPrefix;
 	}
-	
+
 	public boolean getHunger() {
 		return hunger;
 	}
@@ -93,38 +93,38 @@ public class MainConfig extends SingleConfig {
 	public String getJoinSignLine(final int line) {
 		if(line < 0 || line > joinSignLines.length - 1)
 			return null;
-		
+
 		return joinSignLines[line];
 	}
-	
+
 	public boolean getDropOnlySpawnerResourcesOnDeath() {
 		return dropOnlySpawnerResourcesOnDeath;
 	}
-	
+
 	public boolean getAttackCooldown() {
 		return attackCooldown;
 	}
-	
+
 	public boolean getLobbyBossBar() {
 		return lobbyBossbar;
 	}
-	
+
 	public BarColor getLobbyBossBarColor() {
 		return lobbyBossbarColor;
 	}
-	
+
 	public int getRespawnDelay() {
 		return respawnDelay;
 	}
-	
+
 	public boolean getBedwarsChat() {
 		return bedwarsChat;
 	}
-	
+
 	public int getLobbySkipCountdown() {
 		return lobbySkipCountdown;
 	}
-	
+
 	public List<ItemStack> getSpawnItems() {
 		return spawnItems;
 	}
@@ -133,19 +133,19 @@ public class MainConfig extends SingleConfig {
 	public InetSocketAddress getAdminApi() {
 		return adminApi;
 	}
-	
+
 	public void setMainLobby(Location loc) {
 		mainLobby = loc;
 	}
-	
+
 	public void setGameLobby(Location loc) {
 		gameLobby = loc;
 	}
-	
+
 	@Override
 	public boolean saveConfig() {
 		createAndLoadConfigFileIfNotExistent(true);
-		
+
 		config.set("language", language);
 		config.set("game-lobby-countdown", gameLobbyCountdown);
 		config.set("game-world-prefix", gameWorldPrefix);
@@ -170,35 +170,35 @@ public class MainConfig extends SingleConfig {
 			config.set("admin-api", adminApi.getHostString() + ":" + adminApi.getPort());
 
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
-		
+
 		if (mainLobbySection == null)
 			mainLobbySection = config.createSection("main-lobby");
-		
+
 		mainLobbySection.set("w", mainLobby.getWorld().getName());
 		mainLobbySection.set("x", mainLobby.getX());
 		mainLobbySection.set("y", mainLobby.getY());
 		mainLobbySection.set("z", mainLobby.getZ());
 		mainLobbySection.set("yaw", mainLobby.getYaw());
 		mainLobbySection.set("pitch", mainLobby.getPitch());
-		
+
 		ConfigurationSection gameLobbySection = config.getConfigurationSection("game-lobby");
-		
+
 		if (gameLobbySection == null)
 			gameLobbySection = config.createSection("game-lobby");
-		
+
 		gameLobbySection.set("w", gameLobby.getWorld().getName());
 		gameLobbySection.set("x", gameLobby.getX());
 		gameLobbySection.set("y", gameLobby.getY());
 		gameLobbySection.set("z", gameLobby.getZ());
 		gameLobbySection.set("yaw", gameLobby.getYaw());
 		gameLobbySection.set("pitch", gameLobby.getPitch());
-		
+
 		try {
 			config.save(configFile);
 		} catch (IOException e) {
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -206,7 +206,7 @@ public class MainConfig extends SingleConfig {
 	@Override
 	public void reloadConfig() {
 		createAndLoadConfigFileIfNotExistent(false);
-		
+
 		language = config.getString("language", "en_us");
 		gameLobbyCountdown = config.getInt("game-lobby-countdown", 60);
 		gameWorldPrefix = config.getString("game-world-prefix", "bw_game_").replace("/", "").replace("\\", "");
@@ -222,12 +222,12 @@ public class MainConfig extends SingleConfig {
 		bedwarsChat = config.getBoolean("bedwars-chat", true);
 		lobbySkipCountdown = config.getInt("lobby-skip-countdown", 5);
 		List<?> spawnItemsList = config.getList("spawn-items");
-		
+
 		if (spawnItemsList.size() > 0 && spawnItemsList.get(0) instanceof ItemStack)
 			spawnItems = (List<ItemStack>) spawnItemsList;
 		else
 			spawnItems = new ArrayList<ItemStack>();
-		
+
 		try {
 			lobbyBossbarColor = BarColor.valueOf(config.getString("lobby-bossbar-color", "YELLOW"));
 		} catch (IllegalArgumentException e) {
@@ -253,27 +253,27 @@ public class MainConfig extends SingleConfig {
 		hunger = config.getBoolean("hunger", false);
 		dropOnlySpawnerResourcesOnDeath = config.getBoolean("drop-only-spawner-resources-on-death", true);
 		hunger = config.getBoolean("attack-cooldown", false);
-		
+
 		if (itemShopName.length() > 16) {
 			MessageSender.sendWarning("item-shop-name must not be longer than 16 characters. Check your config.yml!");
 			itemShopName = "§2Item Shop";
 		}
-		
+
 		if (teamShopName.length() > 16) {
 			MessageSender.sendWarning("team-shop-name must not be longer than 16 characters. Check your config.yml!");
 			teamShopName = "§1Team Shop";
 		}
-		
+
 		if (baseSpawnPointName.length() > 16) {
 			MessageSender.sendWarning("base-spawn-point-name must not be longer than 16 characters. Check your config.yml!");
 			baseSpawnPointName = "§dSpawn-Point";
 		}
-		
+
 		ConfigurationSection mainLobbySection = config.getConfigurationSection("main-lobby");
-		
+
 		if (mainLobbySection == null)
 			mainLobbySection = config.createSection("main-lobby");
-		
+
 		final String mainLobbyWorld = mainLobbySection.getString("w", "world");
 		final double mainLobbyX = mainLobbySection.getDouble("x", 0.0);
 		final double mainLobbyY = mainLobbySection.getDouble("y", 65.0);
@@ -281,9 +281,9 @@ public class MainConfig extends SingleConfig {
 		final float mainLobbyYaw = (float) mainLobbySection.getDouble("yaw", 0.0);
 		final float mainLobbyPitch = (float) mainLobbySection.getDouble("pitch", 0.0);
 		mainLobby = new Location(Bukkit.getWorld(mainLobbyWorld), mainLobbyX, mainLobbyY, mainLobbyZ, mainLobbyYaw, mainLobbyPitch);
-		
+
 		ConfigurationSection gameLobbySection = config.getConfigurationSection("game-lobby");
-		
+
 		if (gameLobbySection == null)
 			gameLobbySection = config.createSection("game-lobby");
 
@@ -307,7 +307,7 @@ public class MainConfig extends SingleConfig {
 	public static MainConfig getInstance() {
 		if (instance == null)
 			instance = new MainConfig();
-		
+
 		return instance;
 	}
 

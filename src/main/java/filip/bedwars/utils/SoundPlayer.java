@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import filip.bedwars.config.SoundsConfig;
 
 public class SoundPlayer {
-	
+
 	/**
 	 * Play the sound that is in the sounds.yml to the given player.
 	 * @param sound Sound as string
@@ -19,14 +19,14 @@ public class SoundPlayer {
 	 */
 	public static boolean playSound(@NotNull String sound, @NotNull Player player) {
 		SoundSetting soundSetting = SoundsConfig.getInstance().getSoundValue(sound);
-		
-		if(soundSetting == null)
+
+		if (soundSetting == null)
 			return false;
-		
+
 		soundSetting.play(player);
 		return true;
 	}
-	
+
 	/**
 	 * Play the sound that is in the sounds.yml to the given group of players.
 	 * @param sound Sound as string
@@ -36,7 +36,7 @@ public class SoundPlayer {
 	public static boolean playSound(@NotNull String sound, @NotNull List<Player> players) {
 		return playSound(sound, players.toArray(new Player[0]));
 	}
-	
+
 	/**
 	 * Play the sound that is in the sounds.yml to the given group of players.
 	 * @param sound Sound as string
@@ -46,15 +46,15 @@ public class SoundPlayer {
 	public static boolean playSound(@NotNull String sound, @NotNull Player... players) {
 		SoundSetting soundSetting = SoundsConfig.getInstance().getSoundValue(sound);
 
-		if(soundSetting == null)
+		if (soundSetting == null)
 			return false;
-		
-		for(Player player : players)
+
+		for (Player player : players)
 			playSound(sound, player);
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Play the sound that is in the sounds.yml to a uuid
 	 * @param sound Sound as string
@@ -65,18 +65,18 @@ public class SoundPlayer {
 		SoundSetting soundSetting = SoundsConfig.getInstance().getSoundValue(sound);
 
 		Player player = Bukkit.getPlayer(uuid);
-		
-		if(soundSetting == null)
+
+		if (soundSetting == null)
 			return false;
-		
-		if(player == null)
+
+		if (player == null)
 			return false;
-		
+
 		playSound(sound, player);
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Play the sound that is in the sounds.yml to a uuid list
 	 * @param sound Sound as string
@@ -86,18 +86,18 @@ public class SoundPlayer {
 	public static boolean playSoundUUID(@NotNull String sound, @NotNull List<UUID> uuids) {
 		SoundSetting soundSetting = SoundsConfig.getInstance().getSoundValue(sound);
 
-		if(soundSetting == null)
+		if (soundSetting == null)
 			return false;
 
-		for(UUID uuid : uuids) {
+		for (UUID uuid : uuids) {
 			Player player = Bukkit.getPlayer(uuid);
-			
-			if(player == null)
+
+			if (player == null)
 				continue;
-			
+
 			playSound(sound, player);
 		}
-		
+
 		return true;
 	}
 

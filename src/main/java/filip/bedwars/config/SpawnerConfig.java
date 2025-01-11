@@ -14,14 +14,14 @@ import filip.bedwars.utils.MessageSender;
 public class SpawnerConfig extends SingleConfig{
 
 	private static SpawnerConfig instance = null;
-	
+
 	private List<SpawnerType> spawnerTypes = new ArrayList<SpawnerType>();
 
 	@Nullable
 	public SpawnerType getSpawnerType(final int index) {
 		if (index >= spawnerTypes.size())
 			return null;
-		
+
 		return spawnerTypes.get(index);
 	}
 
@@ -29,7 +29,7 @@ public class SpawnerConfig extends SingleConfig{
 	public List<SpawnerType> getSpawnerTypes(){
 		return spawnerTypes;
 	}
-	
+
 	private SpawnerConfig() {
 		super("spawner.yml");
 		reloadConfig();
@@ -44,12 +44,12 @@ public class SpawnerConfig extends SingleConfig{
 	@Override
 	public void reloadConfig() {
 		createAndLoadConfigFileIfNotExistent(false);
-		
+
 		spawnerTypes.clear();
-		
+
 		if (config.isList("spawner")) {
 			List<Object> serializedSpawners = (List<Object>) config.getList("spawner");
-			
+
 			for (Object serializedSpawner : serializedSpawners) {
 				final Map<String, Object> mapOfElements = (Map<String, Object>) serializedSpawner;
 
@@ -86,7 +86,7 @@ public class SpawnerConfig extends SingleConfig{
 	public static SpawnerConfig getInstance() {
 		if (instance == null)
 			instance = new SpawnerConfig();
-		
+
 		return instance;
 	}
 

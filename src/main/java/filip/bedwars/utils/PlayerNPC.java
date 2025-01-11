@@ -137,8 +137,8 @@ public class PlayerNPC extends NPC {
 				reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, addPlayerPacket);
 
 				float var0 = (location.getYaw() * 256.0F / 360.0F);
-		        int var1 = (int)var0;
-		        byte headYaw = (byte)((var0 < var1) ? (var1 - 1) : var1);
+				int var1 = (int)var0;
+				byte headYaw = (byte)((var0 < var1) ? (var1 - 1) : var1);
 				reflectionUtils.playerConnectionSendPacketMethod.invoke(connection, new ClientboundRotateHeadPacket(entity, headYaw));
 
 				Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), () -> {
@@ -159,6 +159,6 @@ public class PlayerNPC extends NPC {
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
 				e.printStackTrace();
 			}
-        }
+		}
 	}
 }

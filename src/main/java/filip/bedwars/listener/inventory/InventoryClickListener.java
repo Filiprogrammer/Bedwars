@@ -11,11 +11,11 @@ import filip.bedwars.BedwarsPlugin;
 import filip.bedwars.inventory.IClickable;
 
 public class InventoryClickListener implements Listener {
-	
+
 	public InventoryClickListener(JavaPlugin plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
-	
+
 	@EventHandler
 	private void onClick(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
@@ -31,20 +31,20 @@ public class InventoryClickListener implements Listener {
 					event.setCancelled(true);
 				}
 			}
-	    }
+		}
 	}
-	
+
 	@EventHandler
 	private void onDrag(InventoryDragEvent event) {
 		Player player = (Player) event.getWhoClicked();
 
 		if (event.getInventory() != null) {
-            IClickable clickable = BedwarsPlugin.getInstance().getClickable(event.getInventory(), player);
-            if (clickable != null) {
-                clickable.drag(event);
-                event.setCancelled(true);
-            }
-        }
+			IClickable clickable = BedwarsPlugin.getInstance().getClickable(event.getInventory(), player);
+			if (clickable != null) {
+				clickable.drag(event);
+				event.setCancelled(true);
+			}
+		}
 	}
-	
+
 }

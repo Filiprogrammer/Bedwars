@@ -12,9 +12,9 @@ public interface IPlacable {
 	 * @return
 	 */
 	ItemStack getItemStack();
-	
+
 	Player getPlayer();
-	
+
 	/**
 	 * Get whether the item matches the param.
 	 * @param itemStack
@@ -22,15 +22,15 @@ public interface IPlacable {
 	 * @return matches
 	 */
 	boolean matches(ItemStack itemStack, Player player);
-	
+
 	/**
-     * Called when the block is placed
-     *
-     * @param event
-     * @param playerWrapper
-     */
+	 * Called when the block is placed
+	 *
+	 * @param event
+	 * @param playerWrapper
+	 */
 	void place(BlockPlaceEvent event);
-	
+
 	/**
 	 * Register the usable.
 	 */

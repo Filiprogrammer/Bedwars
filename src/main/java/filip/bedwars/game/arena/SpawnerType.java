@@ -14,11 +14,11 @@ public class SpawnerType {
 		this.material = material;
 		this.defaultTicksPerSpawn = defaultTicksPerSpawn;
 	}
-	
+
 	public int getDefaultTicksPerSpawn() {
 		return defaultTicksPerSpawn;
 	}
-	
+
 	public Material getMaterial() {
 		return material;
 	}

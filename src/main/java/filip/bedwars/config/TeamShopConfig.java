@@ -12,13 +12,13 @@ import filip.bedwars.utils.TeamShopCategoryDeserializer;
 public class TeamShopConfig extends SingleConfig{
 
 	private static TeamShopConfig instance = null;
-	
+
 	private Shop shop;
-	
+
 	public Shop getShop() {
 		return shop;
 	}
-	
+
 	private TeamShopConfig() {
 		super("teamshop.yml");
 		reloadConfig();
@@ -26,32 +26,30 @@ public class TeamShopConfig extends SingleConfig{
 
 	@Override
 	public boolean saveConfig() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void reloadConfig() {
 		createAndLoadConfigFileIfNotExistent(false);
-		
+
 		if (config.isList("categories")) {
 			List<Object> serializedCategories = (List<Object>) config.getList("categories");
-			
+
 			List<ShopCategory> shopCategories = new ArrayList<ShopCategory>();
-			
+
 			for (Object serializedCategory : serializedCategories)
 				shopCategories.add(TeamShopCategoryDeserializer.deserializeCategory(serializedCategory));
-			
+
 			shop = new Shop(MainConfig.getInstance().getTeamShopName(), shopCategories.toArray(new ShopCategory[0]));
 		}
-		
 	}
 
 	@NotNull
 	public static TeamShopConfig getInstance() {
 		if (instance == null)
 			instance = new TeamShopConfig();
-		
+
 		return instance;
 	}
 

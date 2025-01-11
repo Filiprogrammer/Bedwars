@@ -7,18 +7,18 @@ public abstract class UsableItem implements IUsable {
 
 	protected final ItemStack itemStack;
 	protected final Player player;
-	
+
 	public UsableItem(ItemStack itemStack, Player player) {
 		this.itemStack = itemStack;
 		this.player = player;
 		registerUsable();
 	}
-	
+
 	@Override
 	public ItemStack getItemStack() {
 		return itemStack;
 	}
-	
+
 	@Override
 	public Player getPlayer() {
 		return player;

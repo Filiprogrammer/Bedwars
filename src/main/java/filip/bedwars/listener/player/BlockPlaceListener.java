@@ -16,21 +16,21 @@ public class BlockPlaceListener implements Listener {
 	public BlockPlaceListener(JavaPlugin plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
-	
+
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent event) {
 		Block blockPlaced = event.getBlockPlaced();
-		
+
 		if (blockPlaced != null) {
 			ItemStack item = event.getItemInHand();
-			
+
 			if (item != null) {
 				if (item.hasItemMeta()) {
 					ItemMeta itemMeta = item.getItemMeta();
-					
+
 					if (itemMeta.hasDisplayName()) {
 						IPlacable placable = BedwarsPlugin.getInstance().getPlacable(item, event.getPlayer());
-						
+
 						if (placable != null) {
 							placable.place(event);
 							event.setCancelled(true);
@@ -40,5 +40,5 @@ public class BlockPlaceListener implements Listener {
 			}
 		}
 	}
-	
+
 }

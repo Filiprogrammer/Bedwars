@@ -12,9 +12,9 @@ public interface IUsable {
 	 * @return
 	 */
 	ItemStack getItemStack();
-	
+
 	Player getPlayer();
-	
+
 	/**
 	 * Get whether the item matches the param.
 	 * @param itemStack
@@ -22,15 +22,15 @@ public interface IUsable {
 	 * @return matches
 	 */
 	boolean matches(ItemStack itemStack, Player player);
-	
+
 	/**
-     * Called when the item is interacted on
-     *
-     * @param event
-     * @param playerWrapper
-     */
+	 * Called when the item is interacted on
+	 *
+	 * @param event
+	 * @param playerWrapper
+	 */
 	void use(PlayerInteractEvent event);
-	
+
 	/**
 	 * Register the usable.
 	 */

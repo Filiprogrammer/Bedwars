@@ -14,13 +14,13 @@ import filip.bedwars.utils.MessageSender;
 import filip.bedwars.utils.SoundPlayer;
 
 public class ActionDestroyBeds extends Action {
-	
+
 	@Override
 	public void execute(@NotNull Game game, @NotNull GameLogic gameLogic) {
 		for (Team team : game.getTeams()) {
 			team.destroyBed(gameLogic.getGameWorld().getWorld());
 			gameLogic.scoreboardManager.update();
-			
+
 			for (GamePlayer gamePlayer : team.getMembers()) {
 				Player p = gamePlayer.getPlayer();
 				final String locale = p.getLocale();
@@ -28,12 +28,12 @@ public class ActionDestroyBeds extends Action {
 				p.sendTitle(title);
 			}
 		}
-		
+
 		for (Player p : gameLogic.getGameWorld().getWorld().getPlayers()) {
 			MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), "all-beds-destroyed"));
 			SoundPlayer.playSound("bed-destroyed", p);
 		}
-		
+
 		gameLogic.allBedsPermDestroyed = true;
 	}
 

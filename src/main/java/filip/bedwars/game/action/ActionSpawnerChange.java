@@ -14,23 +14,23 @@ public class ActionSpawnerChange extends Action {
 	enum Alert {
 		CHAT, ACTION_BAR, BOSS_BAR, TITLE, SUBTITLE
 	}
-	
+
 	private final String name;
 	private final double ticksPerSpawnMultiplier;
 	private final Alert alert;
-	
+
 	public ActionSpawnerChange(String name, Double ticksPerSpawnMultiplier, String alert) {
 		this.name = name;
 		this.ticksPerSpawnMultiplier = ticksPerSpawnMultiplier;
 		this.alert = Alert.valueOf(alert);
 	}
-	
+
 	@Override
 	public void execute(@NotNull Game game, @NotNull GameLogic gameLogic) {
 		for (Spawner spawner : game.getArena().getSpawner())
 			if (name.equals(spawner.getItemName()))
 				spawner.setTicksPerSpawn((int) (spawner.getTicksPerSpawn() * ticksPerSpawnMultiplier));
-		
+
 		for (Player p : gameLogic.getGameWorld().getWorld().getPlayers()) {
 			switch (alert) {
 			case CHAT:
@@ -51,7 +51,7 @@ public class ActionSpawnerChange extends Action {
 			}
 		}
 	}
-	
+
 	public static String[] getArgumentNames() {
 		return new String[] { "name", "ticksPerSpawn-multiplier", "alert" };
 	}

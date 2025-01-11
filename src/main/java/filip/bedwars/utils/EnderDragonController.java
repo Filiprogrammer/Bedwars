@@ -40,30 +40,30 @@ public class EnderDragonController {
 	private BukkitTask task;
 	private BukkitRunnable bukkitRunnable;
 	private net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon;
-	
+
 	private Entity currentTargetEntity;
 	private int dragonPhase;
 	private Random random = new Random();
 	private final Location spawnLoc;
 	private ServerLevel nmsWorld;
-	
+
 	public EnderDragonController(@NotNull final Location loc, @NotNull List<Entity> targetEntities, @NotNull Set<Player> viewers) {
 		reflectionUtils = BedwarsPlugin.getInstance().reflectionUtils;
-		
+
 		this.targetEntities = targetEntities;
-		
+
 		for (Player viewer : viewers)
 			this.viewers.put(viewer, true);
-		
+
 		this.spawnLoc = loc;
 		spawn(loc);
 		runTask();
 	}
-	
+
 	public void addTargetEntity(Entity entity) {
 		targetEntities.add(entity);
 	}
-	
+
 	public boolean removeTargetEntity(Entity entity) {
 		if (currentTargetEntity != null && entity.getEntityId() == currentTargetEntity.getEntityId()) {
 			currentTargetEntity = null;
@@ -71,19 +71,19 @@ public class EnderDragonController {
 
 		return targetEntities.remove(entity);
 	}
-	
+
 	public void addViewer(Player viewer) {
 		viewers.put(viewer, true);
 		respawn(viewer);
 	}
-	
+
 	public boolean removeViewer(Player viewer) {
 		if (spawnLoc.getWorld().getName().equals(viewer.getWorld().getName()))
 			despawn(viewer);
-		
+
 		return viewers.remove(viewer);
 	}
-	
+
 	public void stopTask() {
 		if (isTaskRunning()) {
 			bukkitRunnable.cancel();
@@ -91,16 +91,16 @@ public class EnderDragonController {
 			task = null;
 		}
 	}
-	
+
 	public void runTask() {
 		if (isTaskRunning())
 			return;
-		
+
 		if (targetEntities.size() == 0)
 			currentTargetEntity = null;
 		else
 			currentTargetEntity = targetEntities.get(random.nextInt(targetEntities.size()));
-		
+
 		bukkitRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -156,12 +156,12 @@ public class EnderDragonController {
 				// We only want to do this for Endstone and Obsidian, since the other blocks are destroyed by the dragon anyway and play nice breaking sounds.
 			}
 		};
-		
+
 		try {
 			task = bukkitRunnable.runTaskTimer(BedwarsPlugin.getInstance(), 1L, 1L);
 		} catch (IllegalPluginAccessException e) {}
 	}
-	
+
 	public void respawn(Player... viewers) {
 		final String bukkitVersion = Bukkit.getBukkitVersion();
 
@@ -182,7 +182,7 @@ public class EnderDragonController {
 			}
 		}
 	}
-	
+
 	public void despawn(Player... viewers) {
 		for (Player p : viewers) {
 			try {
@@ -203,14 +203,14 @@ public class EnderDragonController {
 		Object craftEntity = reflectionUtils.entityGetBukkitEntityMethod.invoke(dragon);
 		return (Location) reflectionUtils.craftEntityGetLocationMethod.invoke(craftEntity);
 	}
-	
+
 	private boolean isTaskRunning() {
 		if (task == null)
 			return false;
-		
+
 		return !task.isCancelled();
 	}
-	
+
 	private void spawn(final Location loc) {
 		try {
 			nmsWorld = reflectionUtils.worldToNMSWorld(loc.getWorld());
@@ -221,7 +221,7 @@ public class EnderDragonController {
 		}
 		respawn(viewers.keySet().toArray(new Player[0]));
 	}
-	
+
 	private void updateLocation() {
 		final String bukkitVersion = Bukkit.getBukkitVersion();
 		Iterator<Player> iter = viewers.keySet().iterator();
@@ -243,7 +243,7 @@ public class EnderDragonController {
 				Player p = iter.next();
 
 				Object craftWorld = reflectionUtils.levelGetWorldMethod.invoke(reflectionUtils.entityLevelMethod.invoke(dragon));
-				
+
 				if (!p.getWorld().getName().equals(reflectionUtils.craftWorldGetNameMethod.invoke(craftWorld))) {
 					iter.remove();
 					continue;
@@ -270,7 +270,7 @@ public class EnderDragonController {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void dragonHoldingPattern(Location loc) {
 		try {
 			Object phaseManager = reflectionUtils.entityEnderDragonGetPhaseManagerMethod.invoke(dragon);
@@ -283,7 +283,7 @@ public class EnderDragonController {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void dragonChargingPlayer(Location loc) {
 		try {
 			Object phaseManager = reflectionUtils.entityEnderDragonGetPhaseManagerMethod.invoke(dragon);
@@ -307,5 +307,5 @@ public class EnderDragonController {
 			e.printStackTrace();
 		}
 	}
-	
+
 }

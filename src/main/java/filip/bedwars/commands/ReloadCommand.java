@@ -22,7 +22,7 @@ public class ReloadCommand implements ICommand {
 	public boolean execute(@NotNull CommandSender sender, @NotNull final String[] args) {
 		if (args.length != getArguments().length)
 			return false;
-		
+
 		MainConfig.getInstance().reloadConfig();
 		MessagesConfig.getInstance().reloadConfig();
 		ArenaConfig.getInstance().reloadConfig();
@@ -32,7 +32,7 @@ public class ReloadCommand implements ICommand {
 		TeamShopConfig.getInstance().reloadConfig();
 		JoinSignConfig.getInstance().reloadConfig();
 		GameStatesConfig.getInstance().reloadConfig();
-		
+
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(player.getLocale(), "config-reloaded"));
@@ -40,7 +40,7 @@ public class ReloadCommand implements ICommand {
 		} else {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(MainConfig.getInstance().getLanguage(), "config-reloaded"));
 		}
-		
+
 		return true;
 	}
 

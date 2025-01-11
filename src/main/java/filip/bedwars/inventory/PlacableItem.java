@@ -7,18 +7,18 @@ public abstract class PlacableItem implements IPlacable {
 
 	protected final ItemStack itemStack;
 	protected final Player player;
-	
+
 	public PlacableItem(ItemStack itemStack, Player player) {
 		this.itemStack = itemStack;
 		this.player = player;
 		registerPlacable();
 	}
-	
+
 	@Override
 	public ItemStack getItemStack() {
 		return itemStack;
 	}
-	
+
 	@Override
 	public Player getPlayer() {
 		return player;

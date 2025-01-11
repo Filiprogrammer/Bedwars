@@ -13,32 +13,32 @@ public interface IClickable {
 	 * @return
 	 */
 	Inventory getInventory();
-	
+
 	Player getPlayer();
-	
+
 	/**
-     * Gets whether the inventory matches the parameter
-     *
-     * @param inventory
-     * @param playerWrapper
-     * @return match
-     */
-    boolean matches(Inventory inventory, Player player);
-	
+	 * Gets whether the inventory matches the parameter
+	 *
+	 * @param inventory
+	 * @param playerWrapper
+	 * @return match
+	 */
+	boolean matches(Inventory inventory, Player player);
+
 	/**
-     * Called when the inventory is clicked
-     *
-     * @param event
-     * @param playerWrapper
-     */
-    void click(InventoryClickEvent event);
-    
-    void drag(InventoryDragEvent event);
-    
-    /**
-     * Registers the clickable
-     */
-    default void registerClickable() {
-        BedwarsPlugin.getInstance().addClickable(this);
-    }
+	 * Called when the inventory is clicked
+	 *
+	 * @param event
+	 * @param playerWrapper
+	 */
+	void click(InventoryClickEvent event);
+
+	void drag(InventoryDragEvent event);
+
+	/**
+	 * Registers the clickable
+	 */
+	default void registerClickable() {
+		BedwarsPlugin.getInstance().addClickable(this);
+	}
 }

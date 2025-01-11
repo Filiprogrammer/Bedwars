@@ -17,12 +17,12 @@ public class FinishArenaCommand implements ICommand {
 	public boolean execute(@NotNull CommandSender sender, @NotNull final String[] args) {
 		if (args.length != getArguments().length)
 			return false;
-		
+
 		if (!(sender instanceof Player)) {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(MainConfig.getInstance().getLanguage(), "you-must-be-player"));
 			return true;
 		}
-		
+
 		Player player = (Player) sender;
 		final FinishArenaSetupResponse finishArenaSetupResponse = BedwarsPlugin.getInstance().finishArenaSetup(player);
 		final String locale = player.getLocale();
@@ -41,7 +41,7 @@ public class FinishArenaCommand implements ICommand {
 			SoundPlayer.playSound("error", player);
 			break;
 		}
-		
+
 		return true;
 	}
 

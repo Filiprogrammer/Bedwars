@@ -124,26 +124,26 @@ public class GameLogic implements Listener {
 	public final Set<EnderDragonController> enderDragonControllers = new HashSet<>();
 	public final ScoreboardManager scoreboardManager;
 	public boolean allBedsPermDestroyed = false;
-	
+
 	public GameLogic(Game game, Arena arena, GameWorld gameWorld) {
 		this.game = game;
 		this.arena = arena;
 		this.gameWorld = gameWorld;
 		scoreboardManager = new ScoreboardManager(game, this);
-		
+
 		// Destroy beds of empty teams
 		for (Team team : game.getTeams())
 			if (team.getMembers().size() == 0)
 				team.destroyBed(gameWorld.getWorld());
-		
+
 		for (GameStateSetting gameStateSetting : GameStatesConfig.getInstance().getGameStateSettings())
 			gameStates.add(new GameState(gameStateSetting, game, this));
-		
+
 		Action gameEndStartAction = new Action() {
 			@Override
 			public void execute(@NotNull Game game, @NotNull GameLogic gameLogic) {
 				Team winnerTeam = game.isOver();
-				
+
 				if (winnerTeam == null) {
 					// No Team wins
 					for (Player p : gameWorld.getWorld().getPlayers())
@@ -153,44 +153,44 @@ public class GameLogic implements Listener {
 						String teamHasWonMsg = MessagesConfig.getInstance().getStringValue(p.getLocale(), "team-has-won").replace("%teamcolor%", TeamColorConverter.convertTeamColorToStringForMessages(winnerTeam.getBase().getTeamColor(), p.getLocale()));
 						MessageSender.sendMessage(p, teamHasWonMsg);
 						SoundPlayer.playSound("victory", p);
-						
+
 						if(winnerTeam.containsMember(p.getUniqueId()))
 							p.sendTitle(MessagesConfig.getInstance().getStringValue(p.getLocale(), "victory"), teamHasWonMsg, 10, 70, 20);
 					}
-					
+
 					Set<Player> winners = new HashSet<>();
-					
+
 					for (GamePlayer gp : winnerTeam.getMembers())
 						winners.add(gp.getPlayer());
-					
+
 					BedwarsPlugin.getInstance().getServer().getPluginManager().callEvent(new BedwarsVictoryEvent(winners));
 				}
 			}
 		};
-		
+
 		Action gameEndEndAction = new Action() {
 			@Override
 			public void execute(@NotNull Game game, @NotNull GameLogic gameLogic) {
 				game.endGame();
 			}
 		};
-		
+
 		GameStateSetting gameEndSetting = new GameStateSetting("Game End", 10, null, null, new ArrayList<Action>() {{
 			add(gameEndStartAction);
 		}}, new ArrayList<Action>() {{
 			add(gameEndEndAction);
 		}});
-		
+
 		gameStates.add(new GameState(gameEndSetting, game, this));
-		
+
 		initiateNextGameState();
-		
+
 		// Setup game ticker for spawners
 		gameTicker = new BukkitRunnable() {
 			{
 				runTaskTimer(BedwarsPlugin.getInstance(), 1L, 1L);
 			}
-			
+
 			@Override
 			public void run() {
 				for (Spawner spawner : arena.getSpawner()) {
@@ -200,30 +200,30 @@ public class GameLogic implements Listener {
 		};
 
 		BedwarsPlugin.getInstance().getServer().getPluginManager().registerEvents(this, BedwarsPlugin.getInstance());
-		
+
 		List<GamePlayer> syncPlayersList = game.getPlayers();
 		Player[] players;
 		int i = 0;
 		synchronized (syncPlayersList) {
 			players = new Player[syncPlayersList.size()];
-			
+
 			for (GamePlayer gamePlayer : syncPlayersList) {
 				Player player = gamePlayer.getPlayer();
 				players[i] = player;
 				// Teleport player to the spawnpoint of their base
 				teleportToSpawn(gamePlayer);
-				
+
 				if (!MainConfig.getInstance().getAttackCooldown())
 					// Disable attack cooldown
 					player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(20);
-				
+
 				// Notify the player that the game has started.
 				MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "game-started"));
 				SoundPlayer.playSound("game-started", player);
 				++i;
 			}
 		}
-		
+
 		for (Base base : arena.getBases()) {
 			// Setup item shop NPC
 			VillagerNPC itemShopNPC = new VillagerNPC(base.getItemShop(gameWorld.getWorld()).clone().add(0.5, 0, 0.5), "DESERT", "ARMORER", MainConfig.getInstance().getItemShopName(), players);
@@ -235,7 +235,7 @@ public class GameLogic implements Listener {
 				teamShopNPCs.add(teamShopNPC);
 			}
 		}
-		
+
 		for (GamePlayer gamePlayer : syncPlayersList) {
 			itemShopClickables.add(new ClickableInventory(ItemShopConfig.getInstance().getShop().getCategoryListInventory(), gamePlayer.getPlayer()) {
 				@Override
@@ -247,7 +247,7 @@ public class GameLogic implements Listener {
 				@Override
 				public void drag(InventoryDragEvent event) {}
 			});
-			
+
 			teamShopClickables.add(new ClickableInventory(TeamShopConfig.getInstance().getShop().getCategoryListInventory(), gamePlayer.getPlayer()) {
 				@Override
 				public void click(InventoryClickEvent event) {
@@ -259,7 +259,7 @@ public class GameLogic implements Listener {
 				public void drag(InventoryDragEvent event) {}
 			});
 		}
-		
+
 		bukkitRunnable = new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -269,93 +269,93 @@ public class GameLogic implements Listener {
 					int attackBoostLevel = team.upgrades.get(TeamUpgradeType.ATTACK_BOOST);
 					int protectionBoostLevel = team.upgrades.get(TeamUpgradeType.PROTECTION_BOOST);
 					Location baseSpawn = team.getBase().getSpawn(gameWorld.getWorld());
-					
+
 					if (healPoolLevel > 0) {
 						for (GamePlayer gp : team.getMembers()) {
 							Player p = gp.getPlayer();
-							
+
 							if (p.getGameMode() == GameMode.SPECTATOR)
 								continue;
-							
+
 							// TODO: Do not hard code this value
 							if (p.getLocation().distance(baseSpawn) < 20) {
 								if (p.hasPotionEffect(PotionEffectType.REGENERATION) &&
 									p.getPotionEffect(PotionEffectType.REGENERATION).getAmplifier() <= (healPoolLevel - 1))
 									p.removePotionEffect(PotionEffectType.REGENERATION);
-								
+
 								p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 40, healPoolLevel - 1, true, false, true));
 							}
 						}
 					}
-					
+
 					if (miningBoostLevel > 0) {
 						for (GamePlayer gp : team.getMembers()) {
 							Player p = gp.getPlayer();
-							
+
 							if (p.getGameMode() == GameMode.SPECTATOR)
 								continue;
-							
+
 							p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, Integer.MAX_VALUE, miningBoostLevel - 1, true, false, true));
 						}
 					}
-					
+
 					if (attackBoostLevel > 0) {
 						for (GamePlayer gp : team.getMembers()) {
 							Player p = gp.getPlayer();
-							
+
 							if (p.getGameMode() == GameMode.SPECTATOR)
 								continue;
-							
+
 							p.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, attackBoostLevel - 1, true, false, true));
 						}
 					}
-					
+
 					if (protectionBoostLevel > 0) {
 						for (GamePlayer gp : team.getMembers()) {
 							Player p = gp.getPlayer();
-							
+
 							if (p.getGameMode() == GameMode.SPECTATOR)
 								continue;
-							
+
 							p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, protectionBoostLevel - 1, true, false, true));
 						}
 					}
 				}
 			}
 		};
-		
+
 		try {
 			bukkitTask = bukkitRunnable.runTaskTimer(BedwarsPlugin.getInstance(), 0, 20L);
 		} catch (IllegalPluginAccessException e) {}
-		
+
 		scoreboardManager.update();
 	}
-	
+
 	private void teleportToSpawn(GamePlayer gamePlayer) {
 		if (gamePlayer == null)
 			return;
-		
+
 		Location spawnLoc = gamePlayer.getTeam().getBase().getSpawn(gameWorld.getWorld());
 		Player player = gamePlayer.getPlayer();
 		player.teleport(spawnLoc);
 		PlayerUtils.playerReset(player);
-		
+
 		for (ItemStack is : MainConfig.getInstance().getSpawnItems())
 			player.getInventory().addItem(is);
 	}
-	
+
 	public void joinSpectator(Player player) {
 		player.teleport(getSpectatorSpawn());
 		PlayerUtils.playerReset(player);
 		player.setGameMode(GameMode.SPECTATOR);
 		MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "joined-game-as-spectator"));
-		
+
 		for (VillagerNPC itemShopNPC : itemShopNPCs)
 			itemShopNPC.respawn(player);
-		
+
 		for (VillagerNPC teamShopNPC : teamShopNPCs)
 			teamShopNPC.respawn(player);
-		
+
 		for (EnderDragonController enderDragonController : enderDragonControllers)
 			enderDragonController.addViewer(player);
 
@@ -373,64 +373,64 @@ public class GameLogic implements Listener {
 
 		scoreboardManager.update(player);
 	}
-	
+
 	public void leavePlayer(Player player) {
 		player.spigot().respawn();
 		player.teleport(MainConfig.getInstance().getMainLobby());
 		removePlayerListeners(player);
-		
+
 		for (EnderDragonController enderDragonController : enderDragonControllers) {
 			enderDragonController.removeViewer(player);
 			enderDragonController.removeTargetEntity(player);
 		}
-		
+
 		scoreboardManager.update();
 		scoreboardManager.reset(player);
-		
+
 		checkGameOver();
 	}
-	
+
 	public GameWorld getGameWorld() {
 		return gameWorld;
 	}
-	
+
 	public GameState getGameState() {
 		return gameState;
 	}
-	
+
 	public GameState getNextGameState() {
 		return gameStates.peek();
 	}
-	
+
 	public GameState getLastGameEndGameState() {
 		return gameStates.peekLast();
 	}
-	
+
 	public void cleanup() {
 		gameTicker.cancel();
-		
+
 		List<GamePlayer> syncPlayersList = game.getPlayers();
 		synchronized (syncPlayersList) {
 			for (GamePlayer gamePlayer : syncPlayersList)
 				leavePlayer(gamePlayer.getPlayer());
 		}
-		
+
 		for (EnderDragonController enderDragonController : enderDragonControllers)
 			enderDragonController.stopTask();
-		
+
 		for (Player p : gameWorld.getWorld().getPlayers()) {
 			PlayerUtils.playerReset(p);
 			p.teleport(MainConfig.getInstance().getMainLobby());
 		}
-		
+
 		HandlerList.unregisterAll(this);
-		
+
 		bukkitRunnable.cancel();
 		bukkitTask.cancel();
-		
+
 		GameWorldManager.getInstance().removeGameWorld(gameWorld);
 	}
-	
+
 	public void initiateNextGameState() {
 		if (gameState == gameStates.getLast())
 			// The Game is already over
@@ -448,7 +448,7 @@ public class GameLogic implements Listener {
 			gameState.initiate();
 		}
 	}
-	
+
 	public void initiateLastGameEndState() {
 		// Check if the game is not already over
 		if (gameState != gameStates.getLast()) {
@@ -456,7 +456,7 @@ public class GameLogic implements Listener {
 			gameState.initiate();
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerUseUnknownEntity(PlayerUseUnknownEntityEvent event) {
 		Player player = event.getPlayer();
@@ -485,11 +485,11 @@ public class GameLogic implements Listener {
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
-		
+
 		// Check if the player is a spectator
 		if (!game.containsPlayer(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
 			event.setCancelled(true);
-		
+
 		if (event.getClickedBlock() != null && !event.getClickedBlock().hasMetadata("bedwars_placed")) {
 			if (event.getAction() == org.bukkit.event.block.Action.PHYSICAL) {
 				if (event.getClickedBlock().getType() == Material.FARMLAND)
@@ -499,7 +499,7 @@ public class GameLogic implements Listener {
 					event.setCancelled(true);
 			}
 		}
-		
+
 		if (event.hasItem()) {
 			if (event.getAction() == org.bukkit.event.block.Action.RIGHT_CLICK_AIR || event.getAction() == org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK) {
 				NamespacedKey namespacedKey = new NamespacedKey(BedwarsPlugin.getInstance(), "bedwars-fireball");
@@ -531,42 +531,42 @@ public class GameLogic implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerBedEnter(PlayerBedEnterEvent event) {
 		// Check if the player is a part of this game
 		if (game.containsPlayer(event.getPlayer().getUniqueId()))
 			event.setCancelled(true);
 	}
-	
+
 	@EventHandler
 	public void onPlayerPickupItem(EntityPickupItemEvent event) {
 		if (event.getEntityType() != EntityType.PLAYER)
 			return;
-		
+
 		Player player = (Player) event.getEntity();
-		
+
 		// Check if the player is a spectator
 		if (!game.containsPlayer(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
 			event.setCancelled(true);
 	}
-	
+
 	@EventHandler
 	public void onPlayerDropItem(PlayerDropItemEvent event) {
 		Player player = event.getPlayer();
-		
+
 		// Check if the player is a spectator
 		if (!game.containsPlayer(player.getUniqueId()) && player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
 			event.setCancelled(true);
 	}
-	
+
 	@EventHandler
 	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
 		if (event.getDamager().getType() != EntityType.PLAYER)
 			return;
-		
+
 		Player damager = (Player) event.getDamager();
-		
+
 		if (game.containsPlayer(damager.getUniqueId())) {
 			if (event.getEntity().getType() == EntityType.PLAYER) {
 				GamePlayer damagerGamePlayer = game.getGamePlayer(damager.getUniqueId());
@@ -582,14 +582,14 @@ public class GameLogic implements Listener {
 				event.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void onEntityDamage(EntityDamageEvent event) {
 		if (event.getEntityType() != EntityType.PLAYER)
 			return;
-		
+
 		Player player = (Player) event.getEntity();
-		
+
 		// Check if the player is in the game world
 		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
 			if (game.containsPlayer(player.getUniqueId())) {
@@ -602,39 +602,39 @@ public class GameLogic implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onFoodLevelChange(FoodLevelChangeEvent event) {
 		if (!(event.getEntity() instanceof Player))
 			return;
-		
+
 		Player player = (Player) event.getEntity();
-		
+
 		if (!game.containsPlayer(player.getUniqueId()))
 			return;
-		
+
 		if (!MainConfig.getInstance().getHunger()) {
 			event.setCancelled(true);
 			event.setFoodLevel(20);
 		}
 	}
-	
+
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent event) {
 		Player player = event.getPlayer();
-		
+
 		if (!game.containsPlayer(player.getUniqueId()))
 			return;
-		
+
 		Block block = event.getBlock();
-		
+
 		if (block.getType() == Material.TNT) {
 			Location loc = block.getLocation();
 			loc.getWorld().spawnEntity(loc.clone().add(0.5, 0, 0.5), EntityType.PRIMED_TNT);
 			block.setType(Material.AIR);
 			return;
 		}
-		
+
 		for (Base base : game.getArena().getBases()) {
 			if (base.getSpawn(gameWorld.getWorld()).getBlock().getLocation().distance(block.getLocation()) <= 2) {
 				event.setCancelled(true);
@@ -653,17 +653,17 @@ public class GameLogic implements Listener {
 
 		block.setMetadata("bedwars_placed", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
 	}
-	
+
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
 		Player player = event.getPlayer();
-		
+
 		if (!game.containsPlayer(player.getUniqueId()))
 			return;
-		
+
 		Location blockLocation = event.getBlock().getLocation();
 		Team teamOfPlayer = game.getTeamOfPlayer(player.getUniqueId());
-		
+
 		// Check if the broken block is a bed
 		if (event.getBlock().getBlockData() instanceof Bed) {
 			List<Team> teamsSyncList = game.getTeams();
@@ -672,11 +672,11 @@ public class GameLogic implements Listener {
 					// Check if the team still has a bed
 					if (!team.hasBed())
 						continue;
-					
+
 					Base base = team.getBase();
 					Location bedBottom = base.getBedBottom(gameWorld.getWorld());
 					Location bedTop = base.getBedTop(gameWorld.getWorld());
-					
+
 					// Check if the broken block was the bed of the team
 					if ((blockLocation.getBlockX() == bedBottom.getBlockX()
 					  && blockLocation.getBlockY() == bedBottom.getBlockY()
@@ -694,21 +694,21 @@ public class GameLogic implements Listener {
 							broadcastBedDestroyed(player, team);
 							BedwarsPlugin.getInstance().getServer().getPluginManager().callEvent(new BedwarsBedBrokenByPlayerEvent(player));
 						}
-						
+
 						break;
 					}
 				}
 			}
 		}
-		
+
 		if (!event.getBlock().hasMetadata("bedwars_placed"))
 			event.setCancelled(true);
 	}
-	
+
 	@EventHandler
 	public void onBlockPistonExtend(BlockPistonExtendEvent event) {
 		List<Block> blocks = event.getBlocks();
-		
+
 		if (event.getBlock().hasMetadata("bedwars_placed")) {
 			for (Block b : blocks) {
 				if (!b.hasMetadata("bedwars_placed")) {
@@ -717,17 +717,17 @@ public class GameLogic implements Listener {
 				}
 			}
 		}
-		
+
 		BlockFace direction = event.getDirection();
 		ListIterator<Block> iterator = blocks.listIterator(blocks.size());
-		
+
 		while (iterator.hasPrevious()) {
 			Block b = iterator.previous();
-			
+
 			if (b.hasMetadata("bedwars_placed")) {
 				b.removeMetadata("bedwars_placed", BedwarsPlugin.getInstance());
 				b.getLocation().clone().add(direction.getDirection()).getBlock().setMetadata("bedwars_placed", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
-				
+
 				if (b.hasMetadata("bedwars_blast_proof")) {
 					b.removeMetadata("bedwars_blast_proof", BedwarsPlugin.getInstance());
 					b.getLocation().clone().add(direction.getDirection()).getBlock().setMetadata("bedwars_blast_proof", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
@@ -737,11 +737,11 @@ public class GameLogic implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onBlockPistonRetract(BlockPistonRetractEvent event) {
 		List<Block> blocks = event.getBlocks();
-		
+
 		if (event.getBlock().hasMetadata("bedwars_placed")) {
 			for (Block b : blocks) {
 				if (!b.hasMetadata("bedwars_placed")) {
@@ -750,17 +750,17 @@ public class GameLogic implements Listener {
 				}
 			}
 		}
-		
+
 		BlockFace direction = event.getDirection();
 		ListIterator<Block> iterator = blocks.listIterator(blocks.size());
-		
+
 		while (iterator.hasPrevious()) {
 			Block b = iterator.previous();
-			
+
 			if (b.hasMetadata("bedwars_placed")) {
 				b.removeMetadata("bedwars_placed", BedwarsPlugin.getInstance());
 				b.getLocation().clone().add(direction.getDirection()).getBlock().setMetadata("bedwars_placed", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
-				
+
 				if (b.hasMetadata("bedwars_blast_proof")) {
 					b.removeMetadata("bedwars_blast_proof", BedwarsPlugin.getInstance());
 					b.getLocation().clone().add(direction.getDirection()).getBlock().setMetadata("bedwars_blast_proof", new FixedMetadataValue(BedwarsPlugin.getInstance(), true));
@@ -770,87 +770,87 @@ public class GameLogic implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onEntityExplode(EntityExplodeEvent event) {
 		// Check if the explosion is in the game world
 		if (event.getLocation().getWorld().getName().equals(getGameWorld().getWorld().getName())) {
 			if (event.getEntityType() == EntityType.ENDER_DRAGON)
 				return;
-			
+
 			List<Block> blockListCopy = new ArrayList<Block>();
 	        blockListCopy.addAll(event.blockList());
-	        
+
 	        for (Block block : blockListCopy) {
 	        	if (block.getBlockData() instanceof Bed)
 	        		event.blockList().remove(block);
-	        	
+
 	        	if (!block.hasMetadata("bedwars_placed") || block.hasMetadata("bedwars_blast_proof"))
 	        		event.blockList().remove(block);
 	        }
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity();
-		
+
 		// Check if the player is in the game world
 		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
 			Component deathMessage = event.deathMessage();
 			event.setDeathMessage(null);
 			GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
-			
+
 			if (gamePlayer == null)
 				return;
-			
+
 			Team team = gamePlayer.getTeam();
-			
+
 			if (MainConfig.getInstance().getDropOnlySpawnerResourcesOnDeath()) {
 				// Only drop spawner resources
 				Iterator<ItemStack> iter = event.getDrops().iterator();
-				
+
 				while (iter.hasNext()) {
 					ItemStack itemStack = iter.next();
 					boolean removeItem = true;
-					
+
 					for (SpawnerType spawnerType : SpawnerConfig.getInstance().getSpawnerTypes()) {
 						if (itemStack.getType() == spawnerType.getMaterial() && itemStack.hasItemMeta()) {
 							ItemMeta itemMeta = itemStack.getItemMeta();
-							
+
 							if (itemMeta.hasDisplayName() && itemMeta.getDisplayName().equals(spawnerType.getName()))
 								removeItem = false;
 						}
 					}
-					
+
 					if (removeItem)
 						iter.remove();
 				}
 			}
-			
+
 			if (team != null) {
 				EntityDamageEvent entityDamageEvent = player.getLastDamageCause();
-				
+
 				if (entityDamageEvent != null) {
 					Player killer = player.getKiller();
-					
+
 					if (killer != null) {
 						SoundPlayer.playSound("kill", killer);
 						BedwarsPlugin.getInstance().getServer().getPluginManager().callEvent(new BedwarsKillEvent(killer, player));
-						
+
 						if (entityDamageEvent.getCause() == DamageCause.PROJECTILE || entityDamageEvent.getCause() == DamageCause.VOID) {
 							Iterator<ItemStack> iter = event.getDrops().iterator();
-							
+
 							while (iter.hasNext()) {
 								ItemStack itemStack = iter.next();
-								
+
 								if (itemStack == null)
 									continue;
-								
+
 								if (!event.getItemsToKeep().contains(itemStack)) {
 									iter.remove();
 									HashMap<Integer, ItemStack> didNotFit = killer.getInventory().addItem(itemStack);
-									
+
 									for (ItemStack is : didNotFit.values())
 										killer.getWorld().dropItem(killer.getLocation(), is).setVelocity(killer.getLocation().getDirection().multiply(0.5));
 								}
@@ -858,32 +858,32 @@ public class GameLogic implements Listener {
 						}
 					}
 				}
-				
+
 				boolean isFinalKill = false;
-				
+
 				if (!team.hasBed()) {
 					removePlayerListeners(player);
 					team.removeMember(gamePlayer);
-					
+
 					if (team.getMembers().size() == 0)
 						team.destroyBed(gameWorld.getWorld());
-					
+
 					scoreboardManager.update();
 					isFinalKill = true;
-					
+
 					List<GamePlayer> syncPlayersList = game.getPlayers();
 					synchronized (syncPlayersList) {
 						syncPlayersList.remove(gamePlayer);
 					}
-					
+
 					checkGameOver();
 
 					Bukkit.getScheduler().scheduleSyncDelayedTask(BedwarsPlugin.getInstance(), () -> {
 						player.spigot().respawn();
-						
+
 						for (EnderDragonController enderDragonController : enderDragonControllers)
 							enderDragonController.removeTargetEntity(player);
-						
+
 						joinSpectator(player);
 					}, 1L);
 				} else {
@@ -898,20 +898,20 @@ public class GameLogic implements Listener {
 										0, 25, 10);
 							}
 						}
-						
+
 						@Override
 						public void onStart() {
 							player.setItemOnCursor(null);
 							player.spigot().respawn();
 							player.setGameMode(GameMode.SPECTATOR);
 						}
-						
+
 						@Override
 						public boolean onFinish() {
 							respawnPlayerAtBase(player);
 							return false;
 						}
-						
+
 						@Override
 						public void onCancel() {}
 					});
@@ -953,20 +953,20 @@ public class GameLogic implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		Player player = event.getPlayer();
-		
+
 		// Check if the player is in the game world
 		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName()))
 			event.setRespawnLocation(getSpectatorSpawn());
 	}
-	
+
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
-		
+
 		// Check if the player is in the game world
 		if (player.getWorld().getName().equals(getGameWorld().getWorld().getName())) {
 			if (event.getTo().getY() < player.getWorld().getMinHeight()) {
@@ -976,39 +976,39 @@ public class GameLogic implements Listener {
 				else
 					player.teleport(getSpectatorSpawn());
 			}
-			
+
 			GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
-			
+
 			if (gamePlayer != null) {
 				Team playerTeam = gamePlayer.getTeam();
-				
+
 				for (Team team : game.getTeams()) {
 					if (team == playerTeam)
 						continue;
-					
+
 					Iterator<Trap> iter = team.getTraps().iterator();
-					
+
 					while (iter.hasNext()) {
 						Trap trap = iter.next();
-						
+
 						if (player.getLocation().distance(team.getBase().getBedTop(gameWorld.getWorld())) <= trap.getRange()) {
 							SoundPlayer.playSound("trap", player);
 							MessageSender.sendMessage(player, MessagesConfig.getInstance().getStringValue(player.getLocale(), "trap-you-triggered"));
-							
+
 							for (PotionEffect effect : trap.getEffectsIntruder())
 								player.addPotionEffect(effect);
-							
+
 							for (GamePlayer gp : team.getMembers()) {
 								Player p = gp.getPlayer();
 								SoundPlayer.playSound("trap", p);
 								String msg = MessagesConfig.getInstance().getStringValue(p.getLocale(), "trap-triggered").replace("%player%", player.getName());
 								MessageSender.sendMessage(p, msg);
 								p.sendTitle(MessagesConfig.getInstance().getStringValue(p.getLocale(), "trap-alert"), msg, 10, 70, 20);
-								
+
 								for (PotionEffect effect : trap.getEffectsTeam())
 									p.addPotionEffect(effect);
 							}
-							
+
 							iter.remove();
 						}
 					}
@@ -1016,7 +1016,7 @@ public class GameLogic implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
 		Player player = event.getPlayer();
@@ -1035,46 +1035,46 @@ public class GameLogic implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onHangingBreak(HangingBreakEvent event) {
 		// Check if the hanging is in the game world
 		if (event.getEntity().getWorld().getName().equals(gameWorld.getWorld().getName()))
 			event.setCancelled(true);
 	}
-	
+
 	@EventHandler
 	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
 		Entity entity = event.getRightClicked();
-		
+
 		if (entity.getWorld().getName().equals(gameWorld.getWorld().getName())) {
 			if (entity.getType() == EntityType.ITEM_FRAME)
 				event.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void onPrepareItemCraft(PrepareItemCraftEvent event) {
 		if (event.getView().getPlayer().getWorld().getName().equals(gameWorld.getWorld().getName()))
 			event.getInventory().setResult(null);
 	}
-	
+
 	@EventHandler
 	public void onEnchantItem(EnchantItemEvent event) {
 		if (event.getEnchanter().getWorld().getName().equals(gameWorld.getWorld().getName()))
 			event.setCancelled(true);
 	}
-	
+
 	@EventHandler
 	public void onPrepareAnvil(PrepareAnvilEvent event) {
 		if (event.getView().getPlayer().getWorld().getName().equals(gameWorld.getWorld().getName()))
 			event.setResult(null);
 	}
-	
+
 	@EventHandler
 	public void onInventoryOpen(InventoryOpenEvent event) {
 		HumanEntity humanEntity = event.getPlayer();
-		
+
 		if (humanEntity.getWorld().getName().equals(gameWorld.getWorld().getName())) {
 			switch (event.getInventory().getType()) {
 			case ANVIL:
@@ -1099,46 +1099,46 @@ public class GameLogic implements Listener {
 			case ENDER_CHEST:
 				event.setCancelled(true);
 				Team team = game.getTeamOfPlayer(humanEntity.getUniqueId());
-				
+
 				if (team != null)
 					humanEntity.openInventory(team.getTeamChestInventory());
 			default:
 			}
 		}
 	}
-	
+
 	@EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent event) {
 		if (event.getPlayer().getWorld().getName().equals(gameWorld.getWorld().getName()) && event.getCause().equals(TeleportCause.SPECTATE))
 			event.setCancelled(true);
 	}
-	
+
 	@EventHandler
 	public void onBlockPhysics(BlockPhysicsEvent event) {
 		if (event.getBlock().getWorld().getName().equals(gameWorld.getWorld().getName())) {
 			if (event.getBlock().hasMetadata("bedwars_placed"))
 				return;
-			
+
 			if (event.getChangedType() != Material.AIR) {
 				Material material = event.getBlock().getType();
-				
+
 				if (Tag.SMALL_FLOWERS.getValues().contains(material) || Tag.SAPLINGS.getValues().contains(material))
 					event.setCancelled(true);
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
-		
+
 		if (!player.getWorld().getName().equals(gameWorld.getWorld().getName()))
 			return;
-		
+
 		event.setCancelled(true);
 		String msg = event.getMessage();
 		GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
-		
+
 		if (gamePlayer == null) {
 			for (Player p : gameWorld.getWorld().getPlayers()) {
 				if (!game.containsPlayer(p.getUniqueId()))
@@ -1167,7 +1167,7 @@ public class GameLogic implements Listener {
 			}
 		}
 	}
-	
+
 	private void removePlayerListeners(Player player) {
 		for (IClickable itemShopClickable : itemShopClickables) {
 			if (itemShopClickable.getPlayer().equals(player)) {
@@ -1183,77 +1183,77 @@ public class GameLogic implements Listener {
 			}
 		}
 	}
-	
+
 	private void checkGameOver() {
 		if (gameState == gameStates.getLast())
 			// Game is already over
 			return;
-		
+
 		Team winnerTeam = game.isOver();
-		
+
 		if (winnerTeam != null)
 			// Game is over
 			runGameOver();
 	}
-	
+
 	private void runGameOver() {
 		// Make sure that the countdown of the current game state is cancelled
 		gameState.getCountdown().cancel();
-		
+
 		// Initiate game over phase
 		initiateLastGameEndState();
 	}
-	
+
 	private void broadcastBedDestroyed(Player destroyer, Team team) {
 		for (Player p : gameWorld.getWorld().getPlayers()) {
 			String colorStr = TeamColorConverter.convertTeamColorToStringForMessages(team.getBase().getTeamColor(), p.getLocale());
-			
+
 			MessageSender.sendMessage(p,
 					MessagesConfig.getInstance().getStringValue(p.getLocale(), "bed-destroyed")
 					.replace("%player%", destroyer.getName())
 					.replace("%teamcolor%", colorStr));
-			
+
 			SoundPlayer.playSound("bed-destroyed", p);
-			
+
 			if(team.containsMember(p.getUniqueId())) {
 				Title title = new Title(MessagesConfig.getInstance().getStringValue(p.getLocale(), "your-bed-destroyed"), MessagesConfig.getInstance().getStringValue(p.getLocale(), "you-cant-respawn-anymore"));
 				p.sendTitle(title);
 			}
 		}
 	}
-	
+
 	private Location getSpectatorSpawn() {
 		Location spectatorSpawn = arena.getSpectatorSpawn(gameWorld.getWorld());
-		
+
 		if (spectatorSpawn == null)
 			return game.getTeams().get(0).getBase().getSpawn(gameWorld.getWorld());
-		
+
 		return spectatorSpawn;
 	}
-	
+
 	private void respawnPlayerAtBase(Player player) {
 		PlayerUtils.playerReset(player);
 		Team team = game.getTeamOfPlayer(player.getUniqueId());
-		
+
 		if (team != null) {
 			player.teleport(team.getBase().getSpawn(gameWorld.getWorld()));
-			
+
 			if (!MainConfig.getInstance().getAttackCooldown())
 				// Disable attack cooldown
 				player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(20);
 		}
-		
+
 		for (VillagerNPC itemShopNPC : itemShopNPCs)
 			itemShopNPC.respawn(player);
-		
+
 		for (VillagerNPC teamShopNPC : teamShopNPCs)
 			teamShopNPC.respawn(player);
-		
+
 		for (EnderDragonController enderDragonController : enderDragonControllers)
 			enderDragonController.respawn(player);
-		
+
 		for (ItemStack is : MainConfig.getInstance().getSpawnItems())
 			player.getInventory().addItem(is);
 	}
-	
+
 }

@@ -13,7 +13,7 @@ import filip.bedwars.game.arena.Base;
 import filip.bedwars.game.arena.Spawner;
 
 public class ArenaBuilder {
-	
+
 	private String mapName;
 	private List<Base> bases = new ArrayList<Base>();
 	private List<Spawner> spawner = new ArrayList<Spawner>();
@@ -69,23 +69,23 @@ public class ArenaBuilder {
 		this.spectatorSpawn = location;
 		return this;
 	}
-	
+
 	public boolean hasBase(@NotNull Base base) {
 		return bases.contains(base);
 	}
-	
+
 	public int getBaseCount() {
 		return bases.size();
 	}
-	
+
 	public int getSpawnerCount() {
 		return spawner.size();
 	}
-	
+
 	public String getMapName() {
 		return mapName;
 	}
-	
+
 	public World getWorld() {
 		return world;
 	}

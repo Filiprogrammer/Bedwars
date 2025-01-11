@@ -15,18 +15,18 @@ public class PlayerInteractListener implements Listener {
 	public PlayerInteractListener(JavaPlugin plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
-	
+
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		ItemStack item = event.getItem();
-		
+
 		if (item != null) {
 			if (item.hasItemMeta()) {
 				ItemMeta itemMeta = item.getItemMeta();
-				
+
 				if (itemMeta.hasDisplayName()) {
 					IUsable usable = BedwarsPlugin.getInstance().getUsable(item, event.getPlayer());
-					
+
 					if (usable != null) {
 						usable.use(event);
 						event.setCancelled(true);
@@ -35,5 +35,5 @@ public class PlayerInteractListener implements Listener {
 			}
 		}
 	}
-	
+
 }

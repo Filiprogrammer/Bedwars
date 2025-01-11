@@ -13,10 +13,10 @@ import filip.bedwars.game.action.Action;
 import filip.bedwars.utils.MessageSender;
 
 public class GameState {
-	
+
 	private String name;
 	private Countdown countdown;
-	
+
 	public GameState(@NotNull GameStateSetting gameStateSetting, @NotNull Game game, @NotNull GameLogic gameLogic) {
 		this.name = gameStateSetting.name;
 		int durationSeconds = gameStateSetting.durationSeconds;
@@ -24,7 +24,7 @@ public class GameState {
 		String countdownOneMinMsgKey = gameStateSetting.countdownOneMinMsgKey;
 		List<Action> actionsStart = gameStateSetting.actionsStart;
 		List<Action> actionsEnd = gameStateSetting.actionsEnd;
-		
+
 		countdown = new Countdown(durationSeconds) {
 			@Override
 			public void onTick() {
@@ -39,40 +39,40 @@ public class GameState {
 							MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), countdownMsgKey).replace("%minutes%", "" + (getSecondsLeft() / 60)));
 					}
 				}
-				
+
 				gameLogic.scoreboardManager.update();
 			}
-			
+
 			@Override
 			public void onStart() {
 				for (Action action : actionsStart)
 					action.execute(game, gameLogic);
 			}
-			
+
 			@Override
 			public boolean onFinish() {
 				for (Action action : actionsEnd)
 					action.execute(game, gameLogic);
-				
+
 				gameLogic.initiateNextGameState();
 				return false;
 			}
-			
+
 			@Override
 			public void onCancel() {}
 		};
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public Countdown getCountdown() {
 		return countdown;
 	}
-	
+
 	public void initiate() {
 		countdown.start();
 	}
-	
+
 }

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Arena implements Cloneable {
-	
+
 	private final List<Spawner> spawner;
 	private final List<Base> bases;
 	private final String mapName;	
@@ -32,7 +32,7 @@ public class Arena implements Cloneable {
 	public Base getBase(int id) {
         if (id < bases.size())
             return bases.get(id); //only if id is one of the bases
-        
+
         return null;
     }
 
@@ -55,11 +55,11 @@ public class Arena implements Cloneable {
 	public String getMapName() {
 		return mapName;
 	}
-	
+
 	public int getMinPlayersToStart() {
 		return minPlayersToStart;
 	}
-	
+
 	public int getPlayersPerTeam() {
 		return playersPerTeam;
 	}
@@ -68,26 +68,26 @@ public class Arena implements Cloneable {
 	public Location getSpectatorSpawn(@Nullable World world) {
 		if (spectatorSpawn == null)
 			return null;
-		
+
 		return new Location(world, spectatorSpawn.getX(), spectatorSpawn.getY(), spectatorSpawn.getZ(), spectatorSpawn.getYaw(), spectatorSpawn.getPitch());
 	}
-	
+
 	public Arena clone() {
 		List<Spawner> newSpawner = new ArrayList<>();
 		List<Base> newBases = new ArrayList<>();
-		
+
 		for (Spawner spawner : this.spawner)
 			newSpawner.add(spawner.clone());
-		
+
 		for (Base base : this.bases)
 			newBases.add(base.clone());
-		
+
 		Location newSpectatorSpawn = null;
-		
+
 		if (spectatorSpawn != null)
 			newSpectatorSpawn = spectatorSpawn.clone();
-		
+
 		return new Arena(mapName, minPlayersToStart, playersPerTeam, world, newSpawner, newBases, newSpectatorSpawn);
 	}
-	
+
 }

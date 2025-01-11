@@ -17,30 +17,30 @@ public class SkipCountdownCommand implements ICommand {
 	public boolean execute(@NotNull CommandSender sender, @NotNull final String[] args) {
 		if (args.length != getArguments().length)
 			return false;
-		
+
 		if(!(sender instanceof Player)) {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(MainConfig.getInstance().getLanguage(), "you-must-be-player"));
 			return true;
 		}
-		
+
 		Player player = (Player) sender;
 		final String locale = player.getLocale();
 		Game game = GameManager.getInstance().getGameOfPlayer(player);
-		
+
 		if(game == null) {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "you-are-not-ingame"));
 			SoundPlayer.playSound("error", player);
 			return true;
 		}
-		
+
 		if (game.isRunning()) {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "game-already-running"));
 			SoundPlayer.playSound("error", player);
 			return true;
 		}
-		
+
 		game.getLobby().skipLobbyCountdown(player);
-		
+
 		return true;
 	}
 

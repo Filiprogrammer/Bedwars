@@ -25,7 +25,7 @@ public class TeamShopCategoryDeserializer {
 
 	public static ShopCategory deserializeCategory(Object serializedCategory) {
 		Map<String, Object> mapOfElements = (Map<String, Object>) serializedCategory;
-		
+
 		final String categoryName;
 		try {
 			categoryName = ((String) mapOfElements.get("name")).replace('&', '§');
@@ -44,11 +44,11 @@ public class TeamShopCategoryDeserializer {
 
 		List<Map<String, Object>> shopEntriesList = (List<Map<String, Object>>) mapOfElements.get("shopentries");
 		List<ShopEntry> shopEntries = new ArrayList<ShopEntry>();
-		
+
 		for (Map<String, Object> serializedShopEntry : shopEntriesList) {
 			Object typeObject = serializedShopEntry.get("type");
 			TeamUpgradeType type = null;
-			
+
 			if (typeObject == null) {
 				MessageSender.sendWarning("team upgrade type of an entry in the team shop category §6\"" + categoryName + "\" §e was not specified");
 			} else if (!(typeObject instanceof String)) {
@@ -60,33 +60,33 @@ public class TeamShopCategoryDeserializer {
 					MessageSender.sendWarning("team upgrade type of an item in the team shop category §6\"" + categoryName + "\" §e has an invalid value");
 				}
 			}
-			
+
 			if (type == null)
 				continue;
-			
+
 			Object maxlevelObject = serializedShopEntry.get("maxlevel");
 			int maxlevel = 1;
-			
+
 			if (maxlevelObject == null)
 				MessageSender.sendWarning("maxlevel of an entry in the team shop category §6\"" + categoryName + "\" §e was not specified");
 			else if (!(maxlevelObject instanceof Integer))
 				MessageSender.sendWarning("maxlevel of an entry in the team shop category §6\"" + categoryName + "\" §e has an invalid value");
 			else
 				maxlevel = (int) maxlevelObject;
-			
+
 			Object priceCountsObject = serializedShopEntry.get("priceCounts");
 			int[] priceCounts = null;
-			
+
 			if (priceCountsObject == null)
 				MessageSender.sendWarning("priceCounts of an entry in the team shop category §6\"" + categoryName + "\" §e was not specified");
 			else if (!(priceCountsObject instanceof List<?>))
 				MessageSender.sendWarning("priceCounts of an entry in the team shop category §6\"" + categoryName + "\" §e has an invalid value");
 			else
 				priceCounts = ((List<Integer>) priceCountsObject).stream().mapToInt(i->i).toArray();
-			
+
 			Object priceMaterialsObject = serializedShopEntry.get("priceMaterials");
 			Material[] priceMaterials = null;
-			
+
 			if (priceMaterialsObject == null)
 				MessageSender.sendWarning("priceMaterials of an entry in the team shop category §6\"" + categoryName + "\" §e was not specified");
 			else if (!(priceMaterialsObject instanceof List<?>))
@@ -94,13 +94,13 @@ public class TeamShopCategoryDeserializer {
 			else {
 				List<String> priceMaterialsStrings = (List<String>) priceMaterialsObject;
 				priceMaterials = new Material[priceMaterialsStrings.size()];
-				
+
 				for (int i = 0; i < priceMaterialsStrings.size(); ++i)
 					priceMaterials[i] = Material.valueOf(priceMaterialsStrings.get(i));
 			}
-			
+
 			TeamShopReward reward = null;
-			
+
 			switch (type) {
 			case HEAL_POOL:
 				reward = new HealPoolTeamShopReward(maxlevel, priceCounts, priceMaterials);
@@ -123,13 +123,13 @@ public class TeamShopCategoryDeserializer {
 			case TRAP:
 				Object displayNameObject = serializedShopEntry.get("displayName");
 				String displayName = null;
-				
+
 				if (displayNameObject instanceof String)
 					displayName = ((String) displayNameObject).replace('&', '§');
-				
+
 				Object materialObject = serializedShopEntry.get("material");
 				Material material = null;
-				
+
 				if (materialObject instanceof String) {
 					try {
 						material = Material.valueOf((String) materialObject);
@@ -137,28 +137,28 @@ public class TeamShopCategoryDeserializer {
 						MessageSender.sendWarning("material of a team shop trap has an invalid value \"" + ((String) materialObject) + "\"");
 					}
 				}
-				
+
 				Object rangeObject = serializedShopEntry.get("range");
 				int range = 20;
-				
+
 				if (rangeObject instanceof Integer)
 					range = (int) rangeObject;
-				
+
 				Object effectsIntruderObject = serializedShopEntry.get("effectsIntruder");
 				List<PotionEffect> effectsIntruder = new ArrayList<>();
-				
+
 				if (effectsIntruderObject instanceof List) {
 					List<?> effectsIntruderList = (List<?>) effectsIntruderObject;
-					
+
 					for (Object effectObject : effectsIntruderList) {
 						if (effectObject instanceof PotionEffect)
 							effectsIntruder.add((PotionEffect) effectObject);
 					}
 				}
-				
+
 				Object effectsTeamObject = serializedShopEntry.get("effectsTeam");
 				List<PotionEffect> effectsTeam = new ArrayList<>();
-				
+
 				if (effectsTeamObject instanceof List) {
 					List<?> effectsTeamList = (List<?>) effectsTeamObject;
 					
@@ -167,14 +167,14 @@ public class TeamShopCategoryDeserializer {
 							effectsTeam.add((PotionEffect) effectObject);
 					}
 				}
-				
+
 				reward = new TrapTeamShopReward(maxlevel, priceCounts, priceMaterials, new Trap(displayName, range, effectsIntruder, effectsTeam), material);
 				break;
 			}
-			
+
 			shopEntries.add(new TeamShopEntry(reward));
 		}
-		
+
 		return new ShopCategory(categoryName, categoryMaterial, shopEntries);
 	}
 

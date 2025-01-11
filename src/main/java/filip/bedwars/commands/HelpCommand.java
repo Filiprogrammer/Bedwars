@@ -16,33 +16,33 @@ public class HelpCommand implements ICommand {
 	@Override
 	public boolean execute(@NotNull CommandSender sender, @NotNull final String[] args) {
 		final String locale;
-		
+
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
 			locale = player.getLocale();
 		} else {
 			locale = MainConfig.getInstance().getLanguage();
 		}
-		
+
 		List<ICommand> commands = BedwarsPlugin.getInstance().getCommands();
-		
+
 		MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "available-commands"));
 		for (ICommand command : commands) {
 			if (sender.hasPermission("filip.bedwars." + command.getPermission())) {
 				StringBuilder sb = new StringBuilder();
 				sb.append("/bw " + command.getName());
-				
+
 				final String[] arguments = command.getArguments();
 				for (String argument : arguments) {
 					sb.append(" <");
 					sb.append(argument);
 					sb.append(">");
 				}
-				
+
 				MessageSender.sendMessage(sender,sb.toString());
 			}
 		}
-		
+
 		return true;
 	}
 

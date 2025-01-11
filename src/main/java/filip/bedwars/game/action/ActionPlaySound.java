@@ -12,7 +12,7 @@ public class ActionPlaySound extends Action {
 
 	private final String sound;
 	private final boolean includeSpectators;
-	
+
 	public ActionPlaySound(@NotNull final String sound, @NotNull final Boolean includeSpectators) {
 		this.sound = sound;
 		this.includeSpectators = includeSpectators;

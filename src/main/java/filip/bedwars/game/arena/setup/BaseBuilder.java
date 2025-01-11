@@ -39,27 +39,27 @@ public class BaseBuilder {
 		this.teamColor = teamColor;
 		return this;
 	}
-	
+
 	public Location getSpawn() {
 		return spawn;
 	}
-	
+
 	public Location getItemShop() {
 		return itemShop;
 	}
-	
+
 	public Location getTeamShop() {
 		return teamShop;
 	}
-	
+
 	public Location getBedTop() {
 		return bedTop;
 	}
-	
+
 	public Location getBedBottom() {
 		return bedBottom;
 	}
-	
+
 	public TeamColor getTeamColor() {
 		return teamColor;
 	}

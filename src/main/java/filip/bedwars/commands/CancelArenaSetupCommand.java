@@ -16,15 +16,15 @@ public class CancelArenaSetupCommand implements ICommand {
 	public boolean execute(@NotNull CommandSender sender, @NotNull final String[] args) {
 		if (args.length != getArguments().length)
 			return false;
-		
+
 		if (!(sender instanceof Player)) {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(MainConfig.getInstance().getLanguage(), "you-must-be-player"));
 			return true;
 		}
-		
+
 		Player player = (Player) sender;
 		final String locale = player.getLocale();
-		
+
 		if (BedwarsPlugin.getInstance().cancelArenaSetup(player)) {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "arena-setup-cancelled"));
 			SoundPlayer.playSound("cancel", player);
@@ -32,7 +32,7 @@ public class CancelArenaSetupCommand implements ICommand {
 			MessageSender.sendMessage(sender, MessagesConfig.getInstance().getStringValue(locale, "arena-you-were-not-setup"));
 			SoundPlayer.playSound("error", player);
 		}
-		
+
 		return true;
 	}
 
@@ -53,5 +53,5 @@ public class CancelArenaSetupCommand implements ICommand {
 	public String[] getArguments() {
 		return new String[0];
 	}
-	
+
 }

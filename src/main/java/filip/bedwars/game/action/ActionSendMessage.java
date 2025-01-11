@@ -13,7 +13,7 @@ public class ActionSendMessage extends Action {
 
 	private final String message;
 	private final boolean includeSpectators;
-	
+
 	public ActionSendMessage(@NotNull final String message, @NotNull final Boolean includeSpectators) {
 		this.message = message;
 		this.includeSpectators = includeSpectators;
@@ -27,7 +27,7 @@ public class ActionSendMessage extends Action {
 		} else {
 			for (GamePlayer gamePlayer : game.getPlayers()) {
 				Player p = gamePlayer.getPlayer();
-				
+
 				if (p != null)
 					MessageSender.sendMessage(p, MessagesConfig.getInstance().getStringValue(p.getLocale(), message));
 			}

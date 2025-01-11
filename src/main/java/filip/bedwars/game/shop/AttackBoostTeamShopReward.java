@@ -19,16 +19,16 @@ public class AttackBoostTeamShopReward extends TeamShopReward {
 	public ItemStack getDisplayItem(final Team team) {
 		final int level = team.upgrades.get(type);
 		StringBuilder lore = new StringBuilder();
-		
+
 		int i;
 		for (i = 0; i < level; ++i)
 			lore.append("§l§a[]");
-		
+
 		for (; i < maxLevel; ++i)
 			lore.append("§l§7[]");
 
 		ItemBuilder itemBuilder = new ItemBuilder().setLore(new ArrayList<String>() {{ add(lore.toString()); }});
-		
+
 		// TODO: Read the messages from a config file
 		if (level >= maxLevel) {
 			return itemBuilder
