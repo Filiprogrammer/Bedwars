@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build Bedwars Plugin for Paper 1.20
+    name: Build Bedwars Plugin for Paper 1.17.1+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
